@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Վիկտորինա {{ level_name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <!-- ՎԵՐՆԱԳԻՐ -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <span style="background: #4caf50; padding: 8px 20px; border-radius: 50px; color: white;">{{ level_name }}</span>
+        <span style="margin-left: 20px;">Հարց <span id="current-q">1</span>/<span id="total-q">{{ total }}</span></span>
+    </div>
+
+<!-- ՀԱՐՑԻ ՏԵՔՍՏ -->
+<h3 id="question-text" style="text-align: center; margin: 30px 0;"></h3>
+
+<!-- ՆԿԱՐԻ ՏԵՂԸ (ավելացրու սա) -->
+<img id="question-image" style="max-width: 500px; max-height: 400px; margin: 20px auto; display: none; border-radius: 10px; border: 2px solid #2cc3ff; object-fit: contain;">
+
+    <!-- ՊԱՏԱՍԽԱՆԻ ԿՈՃԱԿՆԵՐ (ՈՒՂԻՂ onclick-ՈՎ) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0;">
+        <button id="btn0" class="option-btn" onclick="checkAnswer(0)">Տարբերակ 1</button>
+        <button id="btn1" class="option-btn" onclick="checkAnswer(1)">Տարբերակ 2</button>
+        <button id="btn2" class="option-btn" onclick="checkAnswer(2)">Տարբերակ 3</button>
+        <button id="btn3" class="option-btn" onclick="checkAnswer(3)">Տարբերակ 4</button>
+    </div>
+
+    <!-- ՀԱՋՈՐԴ ԿՈՃԱԿ -->
+    <div style="text-align: center;">
+        <button id="next-btn" style="display: none;" class="next-btn" onclick="nextQuestion()">Հաջորդը →</button>
+    </div>
+
+<!-- ===== ԱՐԴՅՈՒՆՔՆԵՐԻ DIV ===== -->
+<div id="result-area" style="display: none; text-align: center;">
+    <h2 style="color: #2cc3ff;">🎉 Վիկտորինան ավարտվեց</h2>
+    <div style="font-size: 3rem; margin: 20px;" id="final-score">0/0</div>
+    <div id="final-grade" style="font-size: 2rem; margin: 20px;"></div>
+    
+    <!-- Անուն մուտքագրելու համար -->
+    <div style="margin: 30px 0;">
+        <input type="text" id="player-name" placeholder="Մուտքագրիր քո անունը" 
+               style="padding: 12px; width: 250px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(255,255,255,0.1); color: white;">
+        <!-- ԿՈՃԱԿԸ inline onclick-ով -->
+         <button class="btn-primary" onclick="saveScore()" style="margin-left: 10px; padding: 12px 30px;">💾 Պահպանել</button>
+    </div>
+    
+    <a href="/quiz" class="btn-secondary" style="padding: 12px 30px; display: inline-block;">🔄 Նոր մակարդակ</a>
+</div>
+
+
+
+<script>
+// ==================== ՏՎՅԱԼՆԵՐ ====================
+const level = "{{ level }}";
+const questions = {{ questions | tojson }};
+const totalQuestions = questions.length;
+let currentIndex = 0;
+let score = 0;
+
+// ==================== ՍԿՍԵԼ ====================
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('total-q').innerText = totalQuestions;
+    loadQuestion();
+});
+
+// ==================== ԲԵՌՆԵԼ ՀԱՐՑԸ ====================
+function loadQuestion() {
+    if (currentIndex >= totalQuestions) {
+        showResults();
+        return;
+    }
+    
+    const q = questions[currentIndex];
+    document.getElementById('question-text').innerText = q.question;
+    
+    // ՆԿԱՐԻ ՄԱՍ
+    const img = document.getElementById('question-image');
+    if (q.image) {
+        img.src = q.image;
+        img.style.display = 'block';
+        img.onerror = function() {
+            this.src = 'https://via.placeholder.com/300x200?text=Նկարը+չի+գտնվել';
+        };
+    } else {
+        img.style.display = 'none';
+    }
+    
+    // Կոճակներ
+    for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById('btn' + i);
+        if (i < q.options.length) {
+            btn.innerText = q.options[i];
+            btn.style.display = 'block';
+            btn.disabled = false;
+            btn.style.background = '#2cc3ff';
+            btn.style.color = '#0b1d3a';
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+    
+    document.getElementById('next-btn').style.display = 'none';
+}
+
+// ==================== ՍՏՈՒԳԵԼ ՊԱՏԱՍԽԱՆԸ ====================
+function checkAnswer(selected) {
+    const q = questions[currentIndex];
+    const correct = q.correct;
+    
+    if (selected === correct) {
+        score++;
+    }
+    
+    for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById('btn' + i);
+        if (btn.style.display !== 'none') {
+            btn.disabled = true;
+            if (i === correct) {
+                btn.style.background = '#4caf50';
+                btn.style.color = 'white';
+            } else if (i === selected && i !== correct) {
+                btn.style.background = '#f44336';
+                btn.style.color = 'white';
+            }
+        }
+    }
+    
+    document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+// ==================== ՀԱՋՈՐԴ ՀԱՐՑ ====================
+function nextQuestion() {
+    currentIndex++;
+    loadQuestion();
+}
+
+// ==================== ԱՐԴՅՈՒՆՔՆԵՐ ====================
+function showResults() {
+    document.querySelector('.option-btn').parentElement.style.display = 'none';
+    document.getElementById('question-text').style.display = 'none';
+    document.getElementById('question-image').style.display = 'none'; // թաքցնել նկարը
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('result-area').style.display = 'block';
+    
+    const percent = (score / totalQuestions * 100).toFixed(1);
+    document.getElementById('final-score').innerText = `${score}/${totalQuestions}`;
+    
+    let grade = '';
+    if (percent >= 90) grade = 'A+ (Գերազանց)';
+    else if (percent >= 80) grade = 'A (Շատ լավ)';
+    else if (percent >= 70) grade = 'B (Լավ)';
+    else if (percent >= 60) grade = 'C (Միջակ)';
+    else grade = 'D (Փորձիր նորից)';
+    
+    document.getElementById('final-grade').innerText = grade;
+}
+
+// ==================== ՊԱՀՊԱՆԵԼ ====================
+window.saveScore = function() {
+    const name = document.getElementById('player-name').value.trim();
+    if (!name) {
+        alert('Մուտքագրիր քո անունը');
+        return;
+    }
+    
+    const data = {
+        name: name,
+        level: level,
+        score: score,
+        total: totalQuestions,
+        percent: ((score / totalQuestions) * 100).toFixed(1)
+    };
+    
+    fetch('/save_score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            window.location.href = '/leaderboard';
+        } else {
+            alert('Սխալ պահպանման ժամանակ');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Ցանցային սխալ');
+    });
+};
+</script>
+
+<style>
+.option-btn {
+    background: #2cc3ff;
+    color: #0b1d3a;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+.option-btn:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+.next-btn {
+    background: #ffc107;
+    color: #0b1d3a;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+.back-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #2cc3ff;
+    color: #0b1d3a;
+    text-decoration: none;
+    border-radius: 25px;
+}
+</style>
+{% endblock %}

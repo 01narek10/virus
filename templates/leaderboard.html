@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Գլոբալ ցուցակ{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center; color: #2cc3ff;">🏆 Գլոբալ ցուցակ</h2>
+    <p style="text-align: center;">Լավագույն 50 արդյունքները</p>
+    
+    {% if leaderboard %}
+    <table style="width:100%; border-collapse: collapse; margin-top:20px;">
+        <thead>
+            <tr style="background: #2cc3ff; color: #0b1d3a;">
+                <th style="padding:12px;">#</th>
+                <th style="padding:12px;">Անուն</th>
+                <th style="padding:12px;">Մակարդակ</th>
+                <th style="padding:12px;">Միավոր</th>
+                <th style="padding:12px;">Տոկոս</th>
+                <th style="padding:12px;">Ամսաթիվ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in leaderboard %}
+            <tr style="border-bottom: 1px solid #2a4e8a;">
+                <td style="padding:10px; text-align:center;">{{ loop.index }}</td>
+                <td style="padding:10px;"><strong>{{ entry.name }}</strong></td>
+                <td style="padding:10px; text-align:center;">
+                    <span style="background: 
+                        {% if entry.level_class == 'very_easy' %}#4caf50
+                        {% elif entry.level_class == 'easy' %}#8bc34a
+                        {% elif entry.level_class == 'medium' %}#ffc107
+                        {% elif entry.level_class == 'hard' %}#ff9800
+                        {% else %}#f44336{% endif %}; 
+                        padding:4px 12px; border-radius:50px; color:white; display:inline-block;">
+                        {{ entry.level_display }}
+                    </span>
+                </td>
+                <td style="padding:10px; text-align:center;">{{ entry.score }}/{{ entry.total }}</td>
+                <td style="padding:10px; text-align:center;">{{ entry.percent }}%</td>
+                <td style="padding:10px; text-align:center;">{{ entry.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; margin: 50px 0;">Դեռ ոչ մի արդյունք չկա։ Եղիր առաջինը 🎯</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}Վիրուսային սիմուլյատոր{% endblock %}
+
+{% block extra_head %}
+<style>
+    .simulator-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    canvas {
+        border: 2px solid #2cc3ff;
+        border-radius: 20px;
+        background: #0a192f;
+        box-shadow: 0 0 30px rgba(44,195,255,0.3);
+    }
+    .controls {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        background: rgba(18,59,122,0.3);
+        padding: 20px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+    }
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+    .control-group label {
+        color: #2cc3ff;
+        font-weight: bold;
+    }
+    .control-group input {
+        width: 150px;
+        padding: 8px;
+        border-radius: 10px;
+        border: 2px solid #2cc3ff;
+        background: rgba(0,0,0,0.3);
+        color: white;
+    }
+    .stats {
+        display: flex;
+        gap: 30px;
+        font-size: 1.2rem;
+        background: rgba(0,0,0,0.5);
+        padding: 15px 30px;
+        border-radius: 50px;
+        border: 1px solid #2cc3ff;
+    }
+    .stat-item {
+        display: flex;
+        gap: 10px;
+    }
+    .stat-value {
+        color: #2cc3ff;
+        font-weight: bold;
+    }
+    button {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #2cc3ff, #9d4edd);
+        border: none;
+        border-radius: 50px;
+        color: #0a192f;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px #2cc3ff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center;">🧬 Վիրուսային տարածման սիմուլյատոր</h2>
+    <p style="text-align: center;">Դիտեք, թե ինչպես է վիրուսը տարածվում բջիջների միջև: Կարգավորեք պարամետրերը և սեղմեք «Սկսել»:</p>
+    
+    <div class="simulator-container">
+        <canvas id="simulatorCanvas" width="800" height="500"></canvas>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Վարակման արագություն</label>
+                <input type="range" id="speed" min="1" max="10" value="5">
+            </div>
+            <div class="control-group">
+                <label>Մահացություն (%)</label>
+                <input type="range" id="lethality" min="0" max="100" value="20">
+            </div>
+            <div class="control-group">
+                <label>Պատվաստվածներ (%)</label>
+                <input type="range" id="vaccinated" min="0" max="100" value="0">
+            </div>
+            <div class="control-group">
+                <label>Սկզբնական վարակվածներ</label>
+                <input type="number" id="initial" min="1" max="20" value="3">
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">Առողջ🟢: <span id="healthyCount" class="stat-value">0</span></div>
+            <div class="stat-item">Վարակված🔴: <span id="infectedCount" class="stat-value">0</span></div>
+            <div class="stat-item">Ապաքինված🟡: <span id="recoveredCount" class="stat-value">0</span></div>
+            <div class="stat-item">Մահացած⚫: <span id="deadCount" class="stat-value">0</span></div>
+        </div>
+        
+        <div style="display: flex; gap: 20px;">
+            <button onclick="startSimulation()">▶ Սկսել</button>
+            <button onclick="stopSimulation()">⏹ Կանգնեցնել</button>
+            <button onclick="resetSimulation()">🔄 Վերականգնել</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('simulatorCanvas');
+const ctx = canvas.getContext('2d');
+const width = canvas.width;
+const height = canvas.height;
+
+// Բջիջների զանգված
+let cells = [];
+let animationId = null;
+let simulationRunning = false;
+
+// Բջիջների դաս
+class Cell {
+    constructor(x, y, vaccinated = false) {
+        this.x = x;
+        this.y = y;
+        this.radius = 8;
+        this.state = 'healthy'; // healthy, infected, recovered, dead
+        this.infectedTime = 0;
+        this.vaccinated = vaccinated;
+    }
+
+    draw() {
+        // Գույնը ըստ վիճակի
+        if (this.state === 'healthy') {
+            ctx.fillStyle = this.vaccinated ? '#4caf50' : '#2cc3ff';
+        } else if (this.state === 'infected') {
+            ctx.fillStyle = '#ff4444';
+        } else if (this.state === 'recovered') {
+            ctx.fillStyle = '#ffd700';
+        } else if (this.state === 'dead') {
+            ctx.fillStyle = '#333';
+        }
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Եզրագիծ
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+
+    update() {
+        if (this.state === 'infected') {
+            this.infectedTime++;
+            
+            // 100 ֆրեյմ հետո կա՛մ ապաքինվում, կա՛մ մահանում
+            if (this.infectedTime > 100) {
+                const lethality = parseInt(document.getElementById('lethality').value) / 100;
+                if (Math.random() < lethality) {
+                    this.state = 'dead';
+                } else {
+                    this.state = 'recovered';
+                }
+            }
+        }
+    }
+}
+
+// Սկզբնական բջիջների ստեղծում
+function createCells() {
+    cells = [];
+    const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) / 100;
+    const initialInfected = parseInt(document.getElementById('initial').value);
+    
+    // Ստեղծել 200 բջիջ պատահական դիրքերով
+    for (let i = 0; i < 200; i++) {
+        let overlapping = true;
+        let attempts = 0;
+        let x, y;
+        
+        // Ապահովել, որ բջիջները իրար չեն համընկնում
+        while (overlapping && attempts < 1000) {
+            x = Math.random() * (width - 40) + 20;
+            y = Math.random() * (height - 40) + 20;
+            
+            overlapping = false;
+            for (let cell of cells) {
+                const dist = Math.hypot(cell.x - x, cell.y - y);
+                if (dist < 25) {
+                    overlapping = true;
+                    break;
+                }
+            }
+            attempts++;
+        }
+        
+        const vaccinated = Math.random() < vaccinatedPercent;
+        cells.push(new Cell(x, y, vaccinated));
+    }
+    
+    // Սկզբնական վարակվածներ
+    for (let i = 0; i < initialInfected && i < cells.length; i++) {
+        cells[i].state = 'infected';
+        cells[i].infectedTime = 0;
+    }
+}
+
+// Վարակի տարածում
+function spreadInfection() {
+    const speed = parseInt(document.getElementById('speed').value) / 10;
+    
+    for (let cell of cells) {
+        if (cell.state === 'infected') {
+            for (let other of cells) {
+                if (other.state === 'healthy' && !other.vaccinated) {
+                    const dist = Math.hypot(cell.x - other.x, cell.y - other.y);
+                    // Տարածման հավանականությունը կախված հեռավորությունից
+                    if (dist < 40 && Math.random() < speed * 0.1) {
+                        other.state = 'infected';
+                        other.infectedTime = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Վիճակագրության թարմացում
+function updateStats() {
+    let healthy = 0, infected = 0, recovered = 0, dead = 0;
+    
+    for (let cell of cells) {
+        if (cell.state === 'healthy') healthy++;
+        else if (cell.state === 'infected') infected++;
+        else if (cell.state === 'recovered') recovered++;
+        else if (cell.state === 'dead') dead++;
+    }
+    
+    document.getElementById('healthyCount').innerText = healthy;
+    document.getElementById('infectedCount').innerText = infected;
+    document.getElementById('recoveredCount').innerText = recovered;
+    document.getElementById('deadCount').innerText = dead;
+}
+
+// Անիմացիայի ցիկլ
+function animate() {
+    if (!simulationRunning) return;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    spreadInfection();
+    
+    for (let cell of cells) {
+        cell.update();
+        cell.draw();
+    }
+    
+    updateStats();
+    
+    animationId = requestAnimationFrame(animate);
+}
+
+// Վերահսկիչ ֆունկցիաներ
+function startSimulation() {
+    if (!simulationRunning) {
+        simulationRunning = true;
+        animate();
+    }
+}
+
+function stopSimulation() {
+    simulationRunning = false;
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
+}
+
+function resetSimulation() {
+    stopSimulation();
+    createCells();
+    
+    // Վերանկարել
+    ctx.clearRect(0, 0, width, height);
+    for (let cell of cells) {
+        cell.draw();
+    }
+    updateStats();
+}
+
+// Սկզբնավորում
+window.onload = function() {
+    resetSimulation();
+};
+</script>
+{% endblock %}

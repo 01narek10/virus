@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Վիրուսների համեմատում{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center;">🦠 Վիրուսների համեմատման գործիք</h2>
+    <p style="text-align: center;">Ընտրիր երկու վիրուս և տես դրանց տարբերությունները</p>
+
+    <!-- ԸՆՏՐՈՒԹՅԱՆ ՎԱՀԱՆԱԿ -->
+    <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0;">
+        <div style="flex: 1; max-width: 300px;">
+            <label style="display: block; margin-bottom: 10px; color: #2cc3ff;">Առաջին վիրուս</label>
+            <select id="virus1" class="compare-select" onchange="updateComparison()">
+                <option value="">-- Ընտրիր --</option>
+                {% for key, virus in viruses.items() %}
+                <option value="{{ key }}">{{ virus.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; max-width: 300px;">
+            <label style="display: block; margin-bottom: 10px; color: #2cc3ff;">Երկրորդ վիրուս</label>
+            <select id="virus2" class="compare-select" onchange="updateComparison()">
+                <option value="">-- Ընտրիր --</option>
+                {% for key, virus in viruses.items() %}
+                <option value="{{ key }}">{{ virus.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- ՀԱՄԵՄԱՏՄԱՆ ԱՂՅՈՒՍԱԿ -->
+    <div id="comparison-table" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 15px; margin-top: 30px; background: rgba(44,195,255,0.1); border-radius: 20px; padding: 20px;">
+            <!-- ՎԵՐՆԱԳԻՐ -->
+            <div style="font-weight: bold; color: #2cc3ff;">Չափանիշ</div>
+            <div style="font-weight: bold; color: #2cc3ff; text-align: center;" id="virus1-name"></div>
+            <div style="font-weight: bold; color: #2cc3ff; text-align: center;" id="virus2-name"></div>
+
+            <!-- ՆԿԱՐ -->
+            <div>Պատկեր</div>
+            <div style="text-align: center;"><img id="virus1-img" style="max-width: 100px; border-radius: 10px;"></div>
+            <div style="text-align: center;"><img id="virus2-img" style="max-width: 100px; border-radius: 10px;"></div>
+
+            <!-- ԼԻՐԱԿԱՆ ԱՆՈՒՆ -->
+            <div>Լրիվ անուն</div>
+            <div id="virus1-full_name"></div>
+            <div id="virus2-full_name"></div>
+
+            <!-- ՏԵՍԱԿ -->
+            <div>Տեսակ</div>
+            <div id="virus1-type"></div>
+            <div id="virus2-type"></div>
+
+            <!-- ՀԱՅՏՆԱԲԵՐՄԱՆ ԹՎԱԿԱՆ -->
+            <div>Հայտնաբերման տարեթիվ</div>
+            <div id="virus1-discovery"></div>
+            <div id="virus2-discovery"></div>
+
+            <!-- ՓՈԽԱՆՑՄԱՆ ՁԵՎ -->
+            <div>Փոխանցման ձև</div>
+            <div id="virus1-transmission"></div>
+            <div id="virus2-transmission"></div>
+
+            <!-- ՄԱՀԱՑՈՒԹՅՈՒՆ -->
+            <div>Մահացություն</div>
+            <div id="virus1-mortality"></div>
+            <div id="virus2-mortality"></div>
+
+            <!-- ՊԱՏՎԱՍՏԱՆՅՈՒԹ -->
+            <div>Պատվաստանյութ</div>
+            <div id="virus1-vaccine"></div>
+            <div id="virus2-vaccine"></div>
+
+            <!-- ԱԽՏԱՆԻՇՆԵՐ -->
+            <div>Ախտանիշներ</div>
+            <div id="virus1-symptoms"></div>
+            <div id="virus2-symptoms"></div>
+        </div>
+    </div>
+
+    <!-- ԵԹԵ ՎԻՐՈՒՍՆԵՐԸ ՆՈՒՅՆՆ ԵՆ -->
+    <div id="same-error" style="display: none; text-align: center; margin-top: 20px; color: #ff4444; padding: 10px; background: rgba(255,68,68,0.1); border-radius: 10px;">
+        ⚠️ Խնդրում ենք ընտրել տարբեր վիրուսներ
+    </div>
+</div>
+
+<script>
+    const viruses = {{ viruses | tojson }};
+
+    function updateComparison() {
+        const virus1 = document.getElementById('virus1').value;
+        const virus2 = document.getElementById('virus2').value;
+        const table = document.getElementById('comparison-table');
+        const error = document.getElementById('same-error');
+
+        // Եթե երկուսն էլ ընտրված են
+        if (virus1 && virus2) {
+            if (virus1 === virus2) {
+                table.style.display = 'none';
+                error.style.display = 'block';
+                return;
+            }
+
+            // Թաքցնել սխալը
+            error.style.display = 'none';
+
+            // Լրացնել տվյալները
+            const v1 = viruses[virus1];
+            const v2 = viruses[virus2];
+
+            // Անուններ
+            document.getElementById('virus1-name').innerText = v1.name;
+            document.getElementById('virus2-name').innerText = v2.name;
+
+            // Նկարներ
+            document.getElementById('virus1-img').src = v1.image;
+            document.getElementById('virus2-img').src = v2.image;
+
+            // Լրիվ անուն
+            document.getElementById('virus1-full_name').innerText = v1.full_name;
+            document.getElementById('virus2-full_name').innerText = v2.full_name;
+
+            // Տեսակ
+            document.getElementById('virus1-type').innerText = v1.type;
+            document.getElementById('virus2-type').innerText = v2.type;
+
+            // Հայտնաբերման տարեթիվ
+            document.getElementById('virus1-discovery').innerText = v1.discovery;
+            document.getElementById('virus2-discovery').innerText = v2.discovery;
+
+            // Փոխանցման ձև
+            document.getElementById('virus1-transmission').innerText = v1.transmission;
+            document.getElementById('virus2-transmission').innerText = v2.transmission;
+
+            // Մահացություն
+            document.getElementById('virus1-mortality').innerText = v1.mortality;
+            document.getElementById('virus2-mortality').innerText = v2.mortality;
+
+            // Պատվաստանյութ
+            document.getElementById('virus1-vaccine').innerText = v1.vaccine;
+            document.getElementById('virus2-vaccine').innerText = v2.vaccine;
+
+            // Ախտանիշներ
+            document.getElementById('virus1-symptoms').innerText = v1.symptoms;
+            document.getElementById('virus2-symptoms').innerText = v2.symptoms;
+
+            // Ցույց տալ աղյուսակը
+            table.style.display = 'block';
+        } else {
+            table.style.display = 'none';
+            error.style.display = 'none';
+        }
+    }
+</script>
+
+<style>
+    .compare-select {
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 50px;
+        border: 2px solid #2cc3ff;
+        background: rgba(6,20,45,0.8);
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .compare-select:hover {
+        background: rgba(44,195,255,0.1);
+        box-shadow: 0 0 15px rgba(44,195,255,0.3);
+    }
+
+    .compare-select option {
+        background: #0a192f;
+        color: white;
+    }
+
+    #comparison-table > div {
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
