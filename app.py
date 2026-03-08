@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect
 from datetime import datetime
-import google.genai as genai
+import google.generativeai as genai
 import os
 
 app = Flask(__name__)
