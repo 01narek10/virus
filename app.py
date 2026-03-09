@@ -259,9 +259,8 @@ def chat():
             return jsonify({'reply': 'Խնդրում եմ գրել հարցը'}), 400
 
         # Gemini-ին հարցում
-        response = genai_client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
+        response = genai_client.generate_content(
+            f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
 )
         
         return jsonify({'reply': response.text})
