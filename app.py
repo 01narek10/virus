@@ -260,7 +260,7 @@ def chat():
 
         # Gemini-ին հարցում
         response = genai_client.models.generate_content(
-            model='gemini-2.0-flash',  # <-- սա աշխատում է
+            model='gemini-2.0-flash',
             contents=f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
 )
         
