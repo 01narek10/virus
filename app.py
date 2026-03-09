@@ -10,8 +10,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 # ==================== Google Gemini API Կարգավորում ====================
 # ՔՈ ԲԱՆԱԼԻՆԸ (ստացիր https://aistudio.google.com/)
 GENAI_API_KEY = os.environ.get('GENAI_API_KEY', '')
-genai_client = genai.Client(api_key=GENAI_API_KEY)
-
+genai_client = genai.GenerativeModel('gemini-2.0-flash')
 # ==================== ԳԼՈԲԱԼ ՑՈՒՑԱԿ ====================
 leaderboard = []
 
