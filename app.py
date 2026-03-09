@@ -10,7 +10,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 # ==================== Google Gemini API Կարգավորում ====================
 # ՔՈ ԲԱՆԱԼԻՆԸ (ստացիր https://aistudio.google.com/)
 GENAI_API_KEY = os.environ.get('GENAI_API_KEY', '')
-genai_client = genai.Client(api_key=GENAI_API_KEY)
+genai_model = genai.GenerativeModel('gemini-2.0-flash')
 
 # ==================== ԳԼՈԲԱԼ ՑՈՒՑԱԿ ====================
 leaderboard = []
@@ -260,9 +260,8 @@ def chat():
             return jsonify({'reply': 'Խնդրում եմ գրել հարցը'}), 400
 
         # Gemini-ին հարցում
-        response = genai_client.models.generate_content(
-            model='gemini-2.0-flash',  # <-- սա աշխատում է
-            contents=f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
+        response = genai_model.generate_content(
+    f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
 )
         
         return jsonify({'reply': response.text})
@@ -276,7 +275,4 @@ def page_not_found(e):
     return render_template("404.html"), 404
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-
+    app.run(debug=True)
