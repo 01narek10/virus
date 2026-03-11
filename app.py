@@ -26,7 +26,7 @@ virus_data = {
         'mortality': '2-3% (տարբերակված)',
         'vaccine': '✅ Կա',
         'symptoms': 'Ջերմություն, հազ, շնչառության դժվարություն, համի/հոտի կորուստ',
-        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/300px-SARS-CoV-2_%28CDC-23312%29.png'
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/e/e5/SARS-CoV-2_%28CDC-23312%29.png'
     },
     'ebola': {
         'name': 'Էբոլա',
@@ -70,7 +70,7 @@ virus_data = {
     'mortality': '0.1% (բարձր երեխաների մոտ)',
     'vaccine': '✅ Կա',
     'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Rotavirus_Reconstruction.jpg'
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg'
 },
 'adenovirus': {
     'name': 'Ադենովիրուս',
@@ -81,7 +81,7 @@ virus_data = {
     'mortality': 'Ցածր (<1%)',
     'vaccine': '✅ Կա (որոշ տեսակների)',
     'symptoms': 'Մրսածություն, կոկորդի ցավ, կոնյուկտիվիտ',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Adenovirus_3D.png/300px-Adenovirus_3D.png'
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg'
 },
 }
 
@@ -277,6 +277,7 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
 
