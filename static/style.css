@@ -5963,3 +5963,80 @@ footer::before {
         text-align: center !important;
     }
 }
+
+/* ===== LEADERBOARD ՄՈԲԱՅԼ ՏԱՐԲԵՐԱԿ ===== */
+@media (max-width: 768px) {
+    .leaderboard-table {
+        font-size: 12px !important;
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 6px 8px !important;
+    }
+    
+    .leaderboard-table th {
+        font-size: 12px !important;
+    }
+    
+    .difficulty-badge {
+        font-size: 10px !important;
+        padding: 3px 6px !important;
+    }
+}
+
+/* Նույնիսկ ավելի փոքր էկրանների համար */
+@media (max-width: 480px) {
+    .leaderboard-table {
+        font-size: 10px !important;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 4px 5px !important;
+    }
+}
+
+
+/* ===== SIMULATOR ՄՈԲԱՅԼ ՏԱՐԲԵՐԱԿ ===== */
+@media (max-width: 768px) {
+    .simulator-container {
+        padding: 10px !important;
+    }
+    
+    .simulator-controls {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .simulator-controls button,
+    .simulator-controls input,
+    .simulator-controls select {
+        width: 100% !important;
+        margin: 5px 0 !important;
+    }
+    
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* ===== ԸՆԴՀԱՆՈՒՐ ՄՈԲԱՅԼ ՈՃԵՐ ===== */
+@media (max-width: 768px) {
+    .card {
+        padding: 15px !important;
+    }
+    
+    h2 {
+        font-size: 20px !important;
+    }
+    
+    p {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }
+}
