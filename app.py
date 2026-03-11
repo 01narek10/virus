@@ -70,19 +70,19 @@ virus_data = {
     'mortality': '0.1% (բարձր երեխաների մոտ)',
     'vaccine': '✅ Կա',
     'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Rotavirus_Reconstruction.jpg/300px-Rotavirus_Reconstruction.jpg'
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Rotavirus_Reconstruction.jpg'
 },
-    'adenovirus': {
-        'name': 'Ադենովիրուս',
-        'full_name': 'Adenovirus',
-        'type': 'ԴՆԹ վիրուս',
-        'discovery': '1953',
-        'transmission': 'Օդակաթիլային, կոնտակտային',
-        'mortality': 'Ցածր (<1%)',
-        'vaccine': '✅ Կա (որոշ տեսակների)',
-        'symptoms': 'Մրսածություն, կոկորդի ցավ, կոնյուկտիվիտ',
-        'image': "https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg" alt="Adenovirus"
-    }
+'adenovirus': {
+    'name': 'Ադենովիրուս',
+    'full_name': 'Adenovirus',
+    'type': 'ԴՆԹ վիրուս',
+    'discovery': '1953',
+    'transmission': 'Օդակաթիլային, կոնտակտային',
+    'mortality': 'Ցածր (<1%)',
+    'vaccine': '✅ Կա (որոշ տեսակների)',
+    'symptoms': 'Մրսածություն, կոկորդի ցավ, կոնյուկտիվիտ',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Adenovirus_3D.png/300px-Adenovirus_3D.png'
+},
 }
 
 # ==================== ՎԻԿՏՈՐԻՆԱՅԻ ՀԱՐՑԵՐ ====================
@@ -277,6 +277,7 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
 
