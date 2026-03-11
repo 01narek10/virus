@@ -6127,3 +6127,38 @@ footer::before {
         padding: 4px 6px !important;
     }
 }
+
+/* ===== ՈՒԺԵՂ ՄՈԲԱՅԼ ՈՃԵՐ ===== */
+@media (max-width: 768px) {
+    /* Սիմուլյատորի բոլոր կարգավորիչները */
+    .simulator-controls,
+    [class*="control"],
+    [class*="parameter"] {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+    
+    /* Վիճակագրությունը */
+    .simulator-stats,
+    [class*="stat"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    /* Աղյուսակը */
+    table, 
+    [class*="table"] {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+    
+    /* Բոլոր input-երը, button-երը, select-երը */
+    input, button, select {
+        width: 100% !important;
+        margin: 5px 0 !important;
+    }
+}
