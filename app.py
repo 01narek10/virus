@@ -48,7 +48,7 @@ virus_data = {
         'mortality': 'Բարձր առանց բուժման (80-90%)',
         'vaccine': '❌ Չկա (կա թերապիա)',
         'symptoms': 'Իմունային անբավարարություն, վարակների նկատմամբ զգայունություն',
-        'image': "https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" 
+        'image': "https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg",
     },
     'flu': {
         'name': 'Գրիպ',
@@ -277,5 +277,6 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
