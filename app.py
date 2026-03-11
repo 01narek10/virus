@@ -70,7 +70,7 @@ virus_data = {
         'mortality': '0.1% (բարձր երեխաների մոտ)',
         'vaccine': '✅ Կա',
         'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
-        'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg' alt="Rotavirus"
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Rotavirus_Reconstruction.jpg'
     },
     'adenovirus': {
         'name': 'Ադենովիրուս',
@@ -277,4 +277,5 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
