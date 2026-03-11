@@ -48,7 +48,7 @@ virus_data = {
         'mortality': 'Բարձր առանց բուժման (80-90%)',
         'vaccine': '❌ Չկա (կա թերապիա)',
         'symptoms': 'Իմունային անբավարարություն, վարակների նկատմամբ զգայունություն',
-        'image': "https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg",
+        'image': "https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg"
     },
     'flu': {
         'name': 'Գրիպ',
@@ -61,17 +61,17 @@ virus_data = {
         'symptoms': 'Ջերմություն, հազ, մկանացավ, հոգնածություն',
         'image': 'https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg'
     },
-    'rotavirus': {
-        'name': 'Ռոտավիրուս',
-        'full_name': 'Rotavirus',
-        'type': 'ՌՆԹ վիրուս',
-        'discovery': '1973',
-        'transmission': 'Ֆեկալ-օրալ',
-        'mortality': '0.1% (բարձր երեխաների մոտ)',
-        'vaccine': '✅ Կա',
-        'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
-        'image': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Rotavirus_Reconstruction.jpg'
-    },
+'rotavirus': {
+    'name': 'Ռոտավիրուս',
+    'full_name': 'Rotavirus',
+    'type': 'ՌՆԹ վիրուս',
+    'discovery': '1973',
+    'transmission': 'Ֆեկալ-օրալ',
+    'mortality': '0.1% (բարձր երեխաների մոտ)',
+    'vaccine': '✅ Կա',
+    'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Rotavirus_Reconstruction.jpg/300px-Rotavirus_Reconstruction.jpg'
+},
     'adenovirus': {
         'name': 'Ադենովիրուս',
         'full_name': 'Adenovirus',
@@ -277,6 +277,7 @@ def page_not_found(e):
 if __name__ == "__main__":
 
     app.run(debug=True)
+
 
 
 
