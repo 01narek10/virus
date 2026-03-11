@@ -5964,39 +5964,45 @@ footer::before {
     }
 }
 
-/* ===== LEADERBOARD ՄՈԲԱՅԼ ՏԱՐԲԵՐԱԿ ===== */
+/* ===== LEADERBOARD ՄՈԲԱՅԼ ՏԱՐԲԵՐԱԿ (ՈՒԺԵՂ) ===== */
 @media (max-width: 768px) {
     .leaderboard-table {
-        font-size: 12px !important;
         display: block !important;
+        width: 100% !important;
         overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
         white-space: nowrap !important;
+        border: 1px solid #2cc3ff !important;
+    }
+    
+    .leaderboard-table table {
+        width: 100% !important;
+        border-collapse: collapse !important;
     }
     
     .leaderboard-table th,
     .leaderboard-table td {
-        padding: 6px 8px !important;
+        padding: 8px 10px !important;
+        font-size: 14px !important;
+        white-space: normal !important;
+        min-width: 120px !important; /* Յուրաքանչյուր սյունակի նվազագույն լայնություն */
     }
     
     .leaderboard-table th {
-        font-size: 12px !important;
+        background: #2cc3ff !important;
+        color: #0b1d3a !important;
+        font-size: 14px !important;
     }
     
+    /* Առաջին 3 տեղերի հատուկ ոճեր */
+    .rank-1, .rank-2, .rank-3 {
+        font-weight: bold !important;
+    }
+    
+    /* Դժվարության badge-եր */
     .difficulty-badge {
-        font-size: 10px !important;
-        padding: 3px 6px !important;
-    }
-}
-
-/* Նույնիսկ ավելի փոքր էկրանների համար */
-@media (max-width: 480px) {
-    .leaderboard-table {
-        font-size: 10px !important;
-    }
-    
-    .leaderboard-table th,
-    .leaderboard-table td {
-        padding: 4px 5px !important;
+        font-size: 11px !important;
+        padding: 4px 8px !important;
     }
 }
 
@@ -6039,4 +6045,14 @@ footer::before {
         font-size: 14px !important;
         line-height: 1.5 !important;
     }
+}
+
+/* ===== ԸՆԴՀԱՆՈՒՐ ՏԵՔՍՏԻ ԸՆԹԵՐՑԵԼԻՈՒԹՅՈՒՆ ===== */
+.card p, .card li, .card div:not(.special-class) {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+.card h2, .card h3 {
+    color: #2cc3ff !important;
 }
