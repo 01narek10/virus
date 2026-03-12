@@ -6162,3 +6162,13 @@ footer::before {
         margin: 5px 0 !important;
     }
 }
+
+
+/* ===== ՍԻՄՈՒԼՅԱՏՈՐԻ ԿՏԱՎԸ ՄՈԲԱՅԼՈՒՄ ===== */
+@media (max-width: 768px) {
+    #simulatorCanvas {
+        width: 100% !important;
+        height: auto !important;
+        max-width: 100% !important;
+    }
+}
