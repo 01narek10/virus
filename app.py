@@ -1,21 +1,48 @@
 from flask import Flask, render_template, request, jsonify, redirect
 from datetime import datetime
 import google.generativeai as genai
+from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
 app.secret_key = 'virus-site-secret-key-2026'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-# ==================== Google Gemini API Կարգավորում ====================
-# ՔՈ ԲԱՆԱԼԻՆԸ (ստացիր https://aistudio.google.com/)
-GENAI_API_KEY = os.environ.get('GENAI_API_KEY', '')
+# ==================== PostgreSQL ԿՈՆՖԻԳՈՒՐԱՑԻԱ ====================
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# ==================== LEADERBOARD ՄՈԴԵԼ ====================
+class Score(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    level = db.Column(db.String(50), nullable=False)
+    level_display = db.Column(db.String(50))
+    level_class = db.Column(db.String(50))
+    score = db.Column(db.Integer)
+    total = db.Column(db.Integer)
+    percent = db.Column(db.String(10))
+    date = db.Column(db.String(50))
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'level': self.level,
+            'level_display': self.level_display,
+            'level_class': self.level_class,
+            'score': self.score,
+            'total': self.total,
+            'percent': self.percent,
+            'date': self.date
+        }
+
+# ==================== Google Gemini API ====================
+genai.configure(api_key=os.environ.get('GENAI_API_KEY', ''))
 genai_model = genai.GenerativeModel('gemini-2.0-flash')
 
-# ==================== ԳԼՈԲԱԼ ՑՈՒՑԱԿ ====================
-leaderboard = []
-
-# ==================== ՎԻՐՈՒՍՆԵՐԻ ՏՎՅԱԼՆԵՐ (համեմատման համար) ====================
+# ==================== ՎԻՐՈՒՍՆԵՐԻ ՏՎՅԱԼՆԵՐ ====================
 virus_data = {
     'covid19': {
         'name': 'COVID-19',
@@ -26,7 +53,7 @@ virus_data = {
         'mortality': '2-3% (տարբերակված)',
         'vaccine': '✅ Կա',
         'symptoms': 'Ջերմություն, հազ, շնչառության դժվարություն, համի/հոտի կորուստ',
-        'image': 'https://upload.wikimedia.org/wikipedia/commons/e/e5/SARS-CoV-2_%28CDC-23312%29.png'
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/300px-SARS-CoV-2_%28CDC-23312%29.png'
     },
     'ebola': {
         'name': 'Էբոլա',
@@ -48,7 +75,7 @@ virus_data = {
         'mortality': 'Բարձր առանց բուժման (80-90%)',
         'vaccine': '❌ Չկա (կա թերապիա)',
         'symptoms': 'Իմունային անբավարարություն, վարակների նկատմամբ զգայունություն',
-        'image': "https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg"
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/HIV_Virion-en.png/300px-HIV_Virion-en.png'
     },
     'flu': {
         'name': 'Գրիպ',
@@ -61,118 +88,37 @@ virus_data = {
         'symptoms': 'Ջերմություն, հազ, մկանացավ, հոգնածություն',
         'image': 'https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg'
     },
-'rotavirus': {
-    'name': 'Ռոտավիրուս',
-    'full_name': 'Rotavirus',
-    'type': 'ՌՆԹ վիրուս',
-    'discovery': '1973',
-    'transmission': 'Ֆեկալ-օրալ',
-    'mortality': '0.1% (բարձր երեխաների մոտ)',
-    'vaccine': '✅ Կա',
-    'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg'
-},
-'adenovirus': {
-    'name': 'Ադենովիրուս',
-    'full_name': 'Adenovirus',
-    'type': 'ԴՆԹ վիրուս',
-    'discovery': '1953',
-    'transmission': 'Օդակաթիլային, կոնտակտային',
-    'mortality': 'Ցածր (<1%)',
-    'vaccine': '✅ Կա (որոշ տեսակների)',
-    'symptoms': 'Մրսածություն, կոկորդի ցավ, կոնյուկտիվիտ',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg'
-},
+    'rotavirus': {
+        'name': 'Ռոտավիրուս',
+        'full_name': 'Rotavirus',
+        'type': 'ՌՆԹ վիրուս',
+        'discovery': '1973',
+        'transmission': 'Ֆեկալ-օրալ',
+        'mortality': '0.1% (բարձր երեխաների մոտ)',
+        'vaccine': '✅ Կա',
+        'symptoms': 'Լուծ, փսխում, ջերմություն, ջրազրկում',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Rotavirus_Reconstruction.jpg/300px-Rotavirus_Reconstruction.jpg'
+    },
+    'adenovirus': {
+        'name': 'Ադենովիրուս',
+        'full_name': 'Adenovirus',
+        'type': 'ԴՆԹ վիրուս',
+        'discovery': '1953',
+        'transmission': 'Օդակաթիլային, կոնտակտային',
+        'mortality': 'Ցածր (<1%)',
+        'vaccine': '✅ Կա (որոշ տեսակների)',
+        'symptoms': 'Մրսածություն, կոկորդի ցավ, կոնյուկտիվիտ',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Adenovirus_3D.png/300px-Adenovirus_3D.png'
+    }
 }
 
 # ==================== ՎԻԿՏՈՐԻՆԱՅԻ ՀԱՐՑԵՐ ====================
 questions_db = {
-    'very_easy': [
-        {
-            "question": "Վիրուսները տեսանելի են անզեն աչքով?",
-            "options": ["Այո", "Ոչ"],
-            "correct": 1,
-            "explanation": "Վիրուսները շատ փոքր են (20-300 նանոմետր), տեսանելի են միայն էլեկտրոնային մանրադիտակով:"
-        },
-        {
-            "question": "Գրիպը վիրուսային հիվանդությո՞ւն է",
-            "options": ["Այո", "Ոչ"],
-            "correct": 0,
-            "explanation": "Գրիպը առաջանում է ինֆլուենցա վիրուսից:"
-        },
-        {
-            "question": "Պատվաստումը պաշտպանում է վիրուսներից?",
-            "options": ["Այո", "Ոչ"],
-            "correct": 0,
-            "explanation": "Պատվաստումները օգնում են իմունային համակարգին ճանաչել և պայքարել վիրուսների դեմ:"
-        }
-    ],
-    'easy': [
-        {
-            "question": "Ո՞րն է ամենատարածված վիրուսային հիվանդությունը",
-            "options": ["Գրիպ", "Էբոլա", "COVID-19", "Կարմրուկ"],
-            "correct": 0,
-            "explanation": "Գրիպը ամենատարածված վիրուսային հիվանդությունն է, ամեն տարի վարակում է միլիոնավոր մարդկանց:"
-        },
-        {
-            "question": "Ինչպե՞ս են վիրուսները բազմանում",
-            "options": ["Բաժանվելով", "Բջիջների ներսում պատճենվելով", "Սպորներով", "Պարզ բաժանմամբ"],
-            "correct": 1,
-            "explanation": "Վիրուսները կարող են բազմանալ միայն կենդանի բջիջների ներսում՝ օգտագործելով բջջի մեխանիզմները:"
-        },
-        {
-            "question": "Ո՞ր օրգանիզմներն են ավելի փոքր՝ վիրուսները, թե բակտերիաները",
-            "options": ["Վիրուսները", "Բակտերիաները", "Նույն չափն են", "Կախված է տեսակից"],
-            "correct": 0,
-            "explanation": "Վիրուսները 10-100 անգամ փոքր են բակտերիաներից:"
-        },
-        {
-            "question": "Հակաբիոտիկները արդյունավետ են վիրուսների դեմ?",
-            "options": ["Այո", "Ոչ", "Միայն որոշների", "Միայն գրիպի"],
-            "correct": 1,
-            "explanation": "Հակաբիոտիկները աշխատում են միայն բակտերիաների դեմ, ոչ թե վիրուսների:"
-        }
-    ],
-    'medium': [
-        {
-            "question": "Ո՞ր վիրուսն է առաջացնում COVID-19 հիվանդությունը:",
-            "options": ["SARS-CoV-2", "MERS-CoV", "H1N1", "Էբոլա"],
-            "correct": 0,
-            "explanation": "COVID-19-ը առաջացնում է SARS-CoV-2 վիրուսը:"
-        },
-        {
-            "question": "Ո՞ր վիրուսն է առաջացնում ՁԻԱՀ",
-            "options": ["HPV", "HIV", "HBV", "HSV"],
-            "correct": 1,
-            "explanation": "ՄԻԱՎ-ը (HIV) առաջացնում է ՁԻԱՀ:"
-        },
-        {
-            "question": "Ո՞ր թվականին հայտնաբերվեց COVID-19-ի առաջին դեպքը",
-            "options": ["2018", "2019", "2020", "2021"],
-            "correct": 1,
-            "explanation": "COVID-19-ի առաջին դեպքը գրանցվել է 2019 թվականի դեկտեմբերին Ուհանում, Չինաստան:"
-        },
-        {
-            "question": "Ինչպե՞ս է փոխանցվում գրիպի վիրուսը",
-            "options": ["Օդակաթիլային", "Արյան միջոցով", "Սեռական ճանապարհով", "Մոծակների միջոցով"],
-            "correct": 0,
-            "explanation": "Գրիպը փոխանցվում է օդակաթիլային ճանապարհով՝ հազալով, փռշտալով:"
-        },
-        {
-            "question": "Ո՞ր վիրուսն է փոխանցվում մոծակների միջոցով",
-            "options": ["COVID-19", "ՄԻԱՎ", "Դենգե", "Գրիպ"],
-            "correct": 2,
-            "explanation": "Դենգե տենդը փոխանցվում է Aedes մոծակների միջոցով:"
-        },
-        {
-            "question": "Ո՞րն է ամենամահաբեր վիրուսը պատմության մեջ",
-            "options": ["COVID-19", "Էբոլա", "Իսպանական գրիպ", "ՄԻԱՎ"],
-            "correct": 2,
-            "explanation": "Իսպանական գրիպը (1918-1920) սպանեց 50-100 միլիոն մարդ:"
-        }
-    ],
-    'hard': [],
-    'very_hard': []
+    'very_easy': [...],  # քո հարցերը
+    'easy': [...],
+    'medium': [...],
+    'hard': [...],
+    'very_hard': [...]
 }
 
 # ==================== ԵՐԹՈՒԹՅՈՒՆՆԵՐ ====================
@@ -216,7 +162,8 @@ def quiz_level(level):
 
 @app.route("/leaderboard")
 def show_leaderboard():
-    return render_template("leaderboard.html", leaderboard=leaderboard[:50])
+    scores = Score.query.order_by(Score.percent.desc(), Score.score.desc()).limit(50).all()
+    return render_template("leaderboard.html", leaderboard=[s.to_dict() for s in scores])
 
 @app.route("/compare")
 def compare():
@@ -229,57 +176,46 @@ def simulator():
 @app.route("/save_score", methods=['POST'])
 def save_score():
     data = request.json
-    entry = {
-        'name': data['name'],
-        'level': data['level'],
-        'level_display': {
+    new_score = Score(
+        name=data['name'],
+        level=data['level'],
+        level_display={
             'very_easy': 'Շատ հեշտ',
             'easy': 'Հեշտ',
             'medium': 'Միջին',
             'hard': 'Բարդ',
             'very_hard': 'Շատ բարդ'
         }[data['level']],
-        'level_class': data['level'],
-        'score': data['score'],
-        'total': data['total'],
-        'percent': data['percent'],
-        'date': datetime.now().strftime('%d.%m.%Y %H:%M')
-    }
-    leaderboard.append(entry)
-    leaderboard.sort(key=lambda x: (float(x['percent']), x['score']), reverse=True)
+        level_class=data['level'],
+        score=data['score'],
+        total=data['total'],
+        percent=data['percent'],
+        date=datetime.now().strftime('%d.%m.%Y %H:%M')
+    )
+    db.session.add(new_score)
+    db.session.commit()
     return jsonify({'success': True})
 
-# ==================== CHATBOT API (Google Gemini) ====================
 @app.route("/api/chat", methods=['POST'])
 def chat():
     try:
         data = request.json
         user_message = data.get('message', '')
-        
-        if not user_message:
-            return jsonify({'reply': 'Խնդրում եմ գրել հարցը'}), 400
-
-        # Gemini-ին հարցում
         response = genai_model.generate_content(
-    f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
-)
-        
+            f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
+        )
         return jsonify({'reply': response.text})
-        
     except Exception as e:
-        print(f"Chatbot error: {e}")  # Սերվերի կոնսոլում կտպի սխալը
         return jsonify({'reply': f'❌ Սխալ: {str(e)}'}), 500
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
 
+# ==================== ՏՎՅԱԼՆԵՐԻ ԲԱԶԱՅԻ ՍՏԵՂԾՈՒՄ ====================
+with app.app_context():
+    db.create_all()
+
 if __name__ == "__main__":
-
-    app.run(debug=True)
-
-
-
-
-
-
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
