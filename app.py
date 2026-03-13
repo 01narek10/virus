@@ -338,31 +338,18 @@ def save_score():
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-
     try:
-
         data = request.json
-
         message = data.get("message","")
-
         response = genai_model.generate_content(
-
             f"Դու վիրուսաբանության փորձագետ ես։ Պատասխանիր հայերեն։ Հարց՝ {message}"
-
         )
-
         return jsonify({
-
             "reply":response.text
-
         })
-
     except Exception as e:
-
         return jsonify({
-
             "reply":f"Սխալ: {str(e)}"
-
         })
 
 # ================= ERROR =================
@@ -392,6 +379,7 @@ if __name__ == "__main__":
         port=port
 
     )
+
 
 
 
