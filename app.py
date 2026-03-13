@@ -5,6 +5,13 @@ import google.generativeai as genai
 import os
 import sys
 
+level_display = {
+    'very_easy': 'Շատ հեշտ',
+    'easy': 'Հեշտ',
+    'medium': 'Միջին',
+    'hard': 'Բարդ',
+    'very_hard': 'Շատ բարդ'
+}[data['level']]
 
 print("=== DATABASE DEBUG ===")
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -363,6 +370,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=port
     )
+
 
 
 
