@@ -1054,6 +1054,69 @@ function sendMessage() {
     });
 }
 
+ function toggleChat() {
+        const window = document.getElementById('chatbotWindow');
+        const button = document.getElementById('chatbotButton');
+        if (window.style.display === 'flex') {
+            window.style.display = 'none';
+        } else {
+            window.style.display = 'flex';
+        }
+    }
+
+    function addMessage(text, sender) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return messageDiv;
+    }
+
+    function addThinking() {
+        const messagesDiv = document.getElementById('chatMessages');
+        const thinkingDiv = document.createElement('div');
+        thinkingDiv.className = 'message bot thinking';
+        thinkingDiv.id = 'thinking-' + Date.now();
+        thinkingDiv.innerHTML = `<div class="message-content">⏳ Մտածում եմ...</div>`;
+        messagesDiv.appendChild(thinkingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return thinkingDiv.id;
+    }
+
+    function removeThinking(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        if (message === '') return;
+
+        addMessage(message, 'user');
+        input.value = '';
+
+        const thinkingId = addThinking();
+
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        })
+        .then(res => res.json())
+        .then(data => {
+            removeThinking(thinkingId);
+            addMessage(data.reply, 'bot');
+        })
+        .catch(error => {
+            removeThinking(thinkingId);
+            addMessage('❌ Ցանցային սխալ: Փորձիր կրկին', 'bot');
+            console.error('Chat error:', error);
+        });
+    }
+    
 </script>
 
 <!-- Ավելացնել մտածողության ոճը -->
@@ -1073,6 +1136,7 @@ function sendMessage() {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 
 
 
