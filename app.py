@@ -322,7 +322,7 @@ def chat():
         data = request.json
         user_message = data.get('message', '')
         response = groq_client.chat.completions.create(
-            model="llama3-8b-8192",  # Արագ և որակյալ
+            model="mixtral-8x7b-32768",  # Արագ և որակյալ
             messages=[
                 {
                     "role": "system", 
@@ -427,6 +427,7 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
