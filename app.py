@@ -4,6 +4,13 @@ import google.generativeai as genai
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+
+print("=== API KEY DIAGNOSTICS ===")
+print(f"GENAI_API_KEY exists: {os.environ.get('GENAI_API_KEY') is not None}")
+print(f"GENAI_API_KEY length: {len(os.environ.get('GENAI_API_KEY', ''))}")
+print(f"GOOGLE_API_KEY exists: {os.environ.get('GOOGLE_API_KEY') is not None}")
+print("============================")
+
 app = Flask(__name__)
 app.secret_key = "virus-secret-2026"
 
@@ -407,4 +414,5 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
