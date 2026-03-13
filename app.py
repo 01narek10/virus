@@ -310,14 +310,19 @@ def quiz(level):
 
 
 @app.route("/leaderboard")
-def leaderboard():
+def show_leaderboard():
+    scores = Score.query.order_by(Score.percent.desc(), Score.score.desc()).limit(50).all()
+    return render_template("leaderboard.html", leaderboard=[s.to_dict() for s in scores])
 
-    scores = Score.query.order_by(Score.score.desc()).limit(50).all()
-
-    return render_template(
-        "leaderboard.html",
-        leaderboard=[s.to_dict() for s in scores]
-    )
+def show_leaderboard():
+    scores = Score.query.order_by(Score.percent.desc(), Score.score.desc()).limit(50).all()
+    print("=== LEADERBOARD DATA COUNT ===")
+    print(f"Number of scores: {len(scores)}")
+    for s in scores:
+        print(f"ID: {s.id}, Name: {s.name}, Level: {s.level}, Display: {s.level_display}, Score: {s.score}")
+    leaderboard_data = [s.to_dict() for s in scores]
+    print(f"First item: {leaderboard_data[0] if leaderboard_data else 'No data'}")
+    return render_template("leaderboard.html", leaderboard=leaderboard_data)
 
 # ================= SAVE SCORE =================
 
@@ -362,6 +367,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=port
     )
+
 
 
 
