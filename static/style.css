@@ -3363,3 +3363,206 @@ p, li, .card p, .timeline-content p, .fact-item p {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: var(--dark);
 }
+
+/* ===== LEADERBOARD ULTIMATE READABILITY ===== */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(6, 20, 45, 0.98) !important;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    margin: 30px 0;
+}
+
+.leaderboard-table thead tr {
+    background: linear-gradient(135deg, #1a3a6a, #0e2b4f) !important;
+}
+
+.leaderboard-table th {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 18px 16px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-bottom: 3px solid #2cc3ff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    background: transparent !important;
+}
+
+.leaderboard-table td {
+    padding: 14px 16px;
+    color: #ffffff !important;
+    font-weight: 500;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(44, 195, 255, 0.25);
+    background: rgba(10, 25, 47, 0.9) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.leaderboard-table tr:last-child td {
+    border-bottom: none;
+}
+
+.leaderboard-table tr:hover td {
+    background: rgba(44, 195, 255, 0.2) !important;
+    color: #ffffff !important;
+    transition: background 0.2s ease;
+}
+
+/* ----- Անվան սյունակ ----- */
+.leaderboard-table td:nth-child(2) {
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+/* ----- Միավորների սյունակ ----- */
+.leaderboard-table td:nth-child(4) {
+    font-weight: 700;
+    color: #6fcf97 !important;
+    text-shadow: 0 0 10px rgba(111, 207, 151, 0.3);
+}
+
+/* ----- Տոկոսի սյունակ ----- */
+.leaderboard-table td:nth-child(5) {
+    font-weight: 700;
+    color: #2cc3ff !important;
+    text-shadow: 0 0 10px rgba(44, 195, 255, 0.5);
+}
+
+/* ----- Ամսաթվի սյունակ ----- */
+.leaderboard-table td:nth-child(6) {
+    color: #ced4da !important;
+    font-size: 0.95rem;
+}
+
+/* ===== DIFFICULTY BADGES ===== */
+.difficulty-badge, .level-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-align: center;
+    min-width: 90px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Շատ հեշտ */
+.very-easy {
+    background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Հեշտ */
+.easy {
+    background: linear-gradient(135deg, #5cb85c, #3d8b3d) !important;
+    color: #ffffff !important;
+}
+
+/* Միջին */
+.medium {
+    background: linear-gradient(135deg, #ffc107, #b27a00) !important;
+    color: #0a192f !important;
+    text-shadow: none;
+    font-weight: 800;
+}
+
+/* Բարդ */
+.hard {
+    background: linear-gradient(135deg, #fd7e14, #c25e00) !important;
+    color: #ffffff !important;
+}
+
+/* Շատ բարդ */
+.very-hard {
+    background: linear-gradient(135deg, #dc3545, #a71d2a) !important;
+    color: #ffffff !important;
+}
+
+/* ===== RANK BADGES ===== */
+.rank-1, .rank-2, .rank-3 {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    min-width: 60px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.rank-1 {
+    background: linear-gradient(135deg, #ffd700, #b8860b) !important;
+    color: #0a192f !important;
+    border: 1px solid #ffd700;
+}
+
+.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0, #808080) !important;
+    color: #0a192f !important;
+    border: 1px solid #c0c0c0;
+}
+
+.rank-3 {
+    background: linear-gradient(135deg, #cd7f32, #8b4513) !important;
+    color: #ffffff !important;
+    border: 1px solid #cd7f32;
+}
+
+/* ===== EMPTY STATE ===== */
+.leaderboard-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(6, 20, 45, 0.7);
+    border-radius: 30px;
+    margin: 30px 0;
+}
+
+.leaderboard-empty p {
+    font-size: 1.3rem;
+    color: #ced4da;
+    margin: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .leaderboard-table {
+        font-size: 0.85rem;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 12px 8px;
+    }
+    
+    .difficulty-badge, .level-badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        min-width: 70px;
+    }
+    
+    .rank-1, .rank-2, .rank-3 {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        min-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 10px 5px;
+        font-size: 0.8rem;
+    }
+    
+    .difficulty-badge, .level-badge {
+        min-width: 60px;
+    }
+}
