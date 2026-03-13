@@ -3566,3 +3566,14 @@ p, li, .card p, .timeline-content p, .fact-item p {
         min-width: 60px;
     }
 }
+
+.message.bot.thinking .message-content {
+    background: rgba(44, 195, 255, 0.1);
+    border: 1px dashed #2cc3ff;
+    animation: thinkingPulse 1.5s infinite;
+}
+
+@keyframes thinkingPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
