@@ -1116,6 +1116,61 @@ function sendMessage() {
             console.error('Chat error:', error);
         });
     }
+
+function toggleChat() {
+    const window = document.getElementById('chatbotWindow');
+    const button = document.getElementById('chatbotButton');
+    window.style.display = window.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function addMessage(text, sender) {
+    const messagesDiv = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function addThinking() {
+    const messagesDiv = document.getElementById('chatMessages');
+    const thinkingDiv = document.createElement('div');
+    thinkingDiv.className = 'message bot thinking';
+    thinkingDiv.id = 'thinking-' + Date.now();
+    thinkingDiv.innerHTML = `<div class="message-content">⏳ Մտածում եմ...</div>`;
+    messagesDiv.appendChild(thinkingDiv);
+    return thinkingDiv.id;
+}
+
+function removeThinking(id) {
+    document.getElementById(id)?.remove();
+}
+
+function sendMessage() {
+    const input = document.getElementById('userInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage(message, 'user');
+    input.value = '';
+
+    const thinkingId = addThinking();
+
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        removeThinking(thinkingId);
+        addMessage(data.reply, 'bot');
+    })
+    .catch(error => {
+        removeThinking(thinkingId);
+        addMessage('❌ Ցանցային սխալ', 'bot');
+    });
+}
     
 </script>
 
@@ -1131,11 +1186,23 @@ function sendMessage() {
         0%, 100% { opacity: 0.7; }
         50% { opacity: 1; }
     }
+
+    .message.bot.thinking .message-content {
+    background: rgba(44,195,255,0.1);
+    border: 1px dashed #2cc3ff;
+    animation: thinkingPulse 1.5s infinite;
+}
+
+@keyframes thinkingPulse {
+    0%,100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
 </style>
 <!-- Bootstrap JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 
 
 
