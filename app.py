@@ -334,51 +334,26 @@ def save_score():
 
     return jsonify({"success":True})
 
-# ================= AI CHAT =================
-
-@app.route("/api/chat", methods=["POST"])
-def chat():
-    try:
-        data = request.json
-        message = data.get("message","")
-        response = genai_model.generate_content(
-            f"Դու վիրուսաբանության փորձագետ ես։ Պատասխանիր հայերեն։ Հարց՝ {message}"
-        )
-        return jsonify({
-            "reply":response.text
-        })
-    except Exception as e:
-        return jsonify({
-            "reply":f"Սխալ: {str(e)}"
-        })
-
 # ================= ERROR =================
 
 @app.errorhandler(404)
-
 def page_not_found(e):
-
     return render_template("404.html"),404
 
 # ================= CREATE DB =================
 
 with app.app_context():
-
     db.create_all()
 
 # ================= RUN =================
 
 if __name__ == "__main__":
-
     port = int(os.environ.get("PORT",5000))
-
     app.run(
-
         host="0.0.0.0",
-
         port=port
-
     )
+
 
 
 
