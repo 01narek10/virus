@@ -33,30 +33,26 @@ genai_model = genai.GenerativeModel("gemini-2.0-flash")
 # ================= SCORE MODEL =================
 
 class Score(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String(100))
-
-    level = db.Column(db.String(50))
-
+    name = db.Column(db.String(100), nullable=False)
+    level = db.Column(db.String(50), nullable=False)
+    level_display = db.Column(db.String(50))
+    level_class = db.Column(db.String(50))
     score = db.Column(db.Integer)
-
     total = db.Column(db.Integer)
-
     percent = db.Column(db.String(10))
-
     date = db.Column(db.String(50))
 
     def to_dict(self):
-
         return {
-            "name": self.name,
-            "level": self.level,
-            "score": self.score,
-            "total": self.total,
-            "percent": self.percent,
-            "date": self.date
+            'name': self.name,
+            'level': self.level,
+            'level_display': self.level_display,
+            'level_class': self.level_class,
+            'score': self.score,
+            'total': self.total,
+            'percent': self.percent,
+            'date': self.date
         }
 
 # ==================== ՎԻԿՏՈՐԻՆԱՅԻ ՀԱՐՑԵՐ ====================
@@ -367,6 +363,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=port
     )
+
 
 
 
