@@ -3654,3 +3654,39 @@ p, li, .card p, .timeline-content p, .fact-item p {
 .styled-table tbody tr:hover:not(.highlight-user) {
     background-color: #e9e9e9;
 }
+
+/* Շատ հեշտ */
+.very-easy {
+    background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+    color: #ffffff !important;
+}
+
+/* Հեշտ */
+.easy {
+    background: linear-gradient(135deg, #5cb85c, #3d8b3d) !important;
+    color: #ffffff !important;
+}
+
+/* Միջին */
+.medium {
+    background: linear-gradient(135deg, #ffc107, #b27a00) !important;
+    color: #0a192f !important;
+}
+
+/* Բարդ */
+.hard {
+    background: linear-gradient(135deg, #fd7e14, #c25e00) !important;
+    color: #ffffff !important;
+}
+
+/* Շատ բարդ */
+.very-hard {
+    background: linear-gradient(135deg, #dc3545, #a71d2a) !important;
+    color: #ffffff !important;
+}
+
+.very-easy { background: linear-gradient(135deg, #6fcf97, #27ae60); }
+.easy { background: linear-gradient(135deg, #f2c94c, #f2994a); }
+.medium { background: linear-gradient(135deg, #f2994a, #eb5757); }
+.hard { background: linear-gradient(135deg, #eb5757, #c0392b); }
+.very-hard { background: linear-gradient(135deg, #c0392b, #8e44ad); }
