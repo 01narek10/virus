@@ -4,6 +4,17 @@ import google.generativeai as genai
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+print("=== DIAGNOSTICS ===")
+print(f"GENAI_API_KEY exists: {os.environ.get('GENAI_API_KEY') is not None}")
+print(f"GENAI_API_KEY length: {len(os.environ.get('GENAI_API_KEY', ''))}")
+print(f"GOOGLE_API_KEY exists: {os.environ.get('GOOGLE_API_KEY') is not None}")
+print("===================")
+
+# SQLite ֆայլը persistent disk-ում
+basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, 'data', 'scores.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
 # Google Gemini կոնֆիգուրացիա
 genai.configure(api_key=os.environ.get('GENAI_API_KEY', ''))
 genai_model = genai.GenerativeModel('gemini-2.0-flash')
@@ -433,6 +444,7 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
