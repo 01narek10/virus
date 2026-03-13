@@ -4,6 +4,8 @@ import google.generativeai as genai
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+app = Flask(__name__)
+
 print("=== DIAGNOSTICS ===")
 print(f"GENAI_API_KEY exists: {os.environ.get('GENAI_API_KEY') is not None}")
 print(f"GENAI_API_KEY length: {len(os.environ.get('GENAI_API_KEY', ''))}")
@@ -34,7 +36,6 @@ def chat():
     except Exception as e:
         return jsonify({'reply': f'❌ Սխալ: {str(e)}'}), 500
 
-app = Flask(__name__)
 app.secret_key = 'virus-site-secret-key-2026'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
@@ -444,6 +445,7 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
