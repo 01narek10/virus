@@ -4,6 +4,7 @@ from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 print("=== API KEY DIAGNOSTICS ===")
 print(f"GENAI_API_KEY exists: {os.environ.get('GENAI_API_KEY') is not None}")
@@ -20,9 +21,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# ================= GEMINI =================
-genai.configure(api_key=os.environ.get("GENAI_API_KEY", ""))
-genai_model = genai.GenerativeModel("gemini-2.0-flash")
 
 # ================= SCORE MODEL =================
 class Score(db.Model):
@@ -318,17 +316,32 @@ def save_score():
     db.session.commit()
     return jsonify({'success': True})
 
-# ================= CHATBOT API =================
 @app.route("/api/chat", methods=['POST'])
 def chat():
     try:
         data = request.json
         user_message = data.get('message', '')
-        response = genai_model.generate_content(
-            f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
+        response = groq_client.chat.completions.create(
+            model="llama3-8b-8192",  # Արագ և որակյալ
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ:"
+                },
+                {
+                    "role": "user", 
+                    "content": user_message
+                }
+            ],
+            temperature=0.7,
+            max_tokens=500
         )
-        return jsonify({'reply': response.text})
+        
+        reply = response.choices[0].message.content
+        return jsonify({'reply': reply})
+        
     except Exception as e:
+        print(f"Groq error: {e}")
         return jsonify({'reply': f'❌ Սխալ: {str(e)}'}), 500
 
 # ================= VIRUS DATA (for compare) =================
@@ -414,6 +427,7 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
