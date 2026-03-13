@@ -104,20 +104,21 @@ function initGrid() {
         grid[i][j] = STATES.INFECTED;
     }
     
-    // Պատվաստվածներ
-    const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) || 20;
-    const totalCells = rows * cols;
-    const vaccinatedCount = Math.floor(totalCells * vaccinatedPercent / 100);
-    
-    let vaccinated = 0;
-    while (vaccinated < vaccinatedCount) {
-        const i = Math.floor(Math.random() * rows);
-        const j = Math.floor(Math.random() * cols);
-        if (grid[i][j] === STATES.HEALTHY) {
-            grid[i][j] = STATES.RECOVERED;
-            vaccinated++;
+        // Պատվաստվածներ (առողջ, բայց իմունիտետով)
+        const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) || 20;
+        const totalCells = rows * cols;
+        const vaccinatedCount = Math.floor(totalCells * vaccinatedPercent / 100);
+        
+        let vaccinated = 0;
+        while (vaccinated < vaccinatedCount) {
+            const i = Math.floor(Math.random() * rows);
+            const j = Math.floor(Math.random() * cols);
+            if (grid[i][j] === STATES.HEALTHY) {
+                grid[i][j] = STATES.HEALTHY;  // թողնում ենք առողջ, բայց
+                // պետք է հետո չվարակվեն - սա ավելի բարդ է
+                vaccinated++;
+            }
         }
-    }
     
     drawGrid();
     updateStats();
