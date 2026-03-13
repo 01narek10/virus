@@ -3,7 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import google.generativeai as genai
 import os
+import sys
 
+
+print("=== DATABASE DEBUG ===")
+basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, 'data', 'scores.db')
+print(f"DB path: {db_path}")
+print(f"Directory exists: {os.path.exists(os.path.dirname(db_path))}")
+print(f"DB file exists: {os.path.exists(db_path)}")
+sys.stdout.flush()
 # ================= FLASK =================
 
 app = Flask(__name__)
@@ -353,6 +362,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=port
     )
+
 
 
 
