@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request, jsonify, redirect
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import google.generativeai as genai
+from flask_sqlalchemy import SQLAlchemy
 import os
-import sys
 
 level_display = {
     'very_easy': 'Շատ հեշտ',
@@ -329,27 +328,28 @@ def show_leaderboard():
 
 # ================= SAVE SCORE =================
 
-@app.route("/save_score", methods=["POST"])
+@app.route("/save_score", methods=['POST'])
 def save_score():
-
     data = request.json
-
     new_score = Score(
-
-        name=data["name"],
-        level=data["level"],
-        score=data["score"],
-        total=data["total"],
-        percent=data["percent"],
-        date=datetime.now().strftime("%d.%m.%Y %H:%M")
-
+        name=data['name'],
+        level=data['level'],
+        level_display={
+            'very_easy': 'Շատ հեշտ',
+            'easy': 'Հեշտ',
+            'medium': 'Միջին',
+            'hard': 'Բարդ',
+            'very_hard': 'Շատ բարդ'
+        }[data['level']],
+        level_class=data['level'],
+        score=data['score'],
+        total=data['total'],
+        percent=data['percent'],
+        date=datetime.now().strftime('%d.%m.%Y %H:%M')
     )
-
     db.session.add(new_score)
-
     db.session.commit()
-
-    return jsonify({"success":True})
+    return jsonify({'success': True})
 
 # ================= ERROR =================
 
@@ -370,6 +370,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=port
     )
+
 
 
 
