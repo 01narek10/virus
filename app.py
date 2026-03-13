@@ -4,6 +4,25 @@ import google.generativeai as genai
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+# Google Gemini կոնֆիգուրացիա
+genai.configure(api_key=os.environ.get('GENAI_API_KEY', ''))
+genai_model = genai.GenerativeModel('gemini-2.0-flash')
+
+@app.route("/api/chat", methods=['POST'])
+def chat():
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        
+        response = genai_model.generate_content(
+            f"Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ: Հարց: {user_message}"
+        )
+        
+        return jsonify({'reply': response.text})
+        
+    except Exception as e:
+        return jsonify({'reply': f'❌ Սխալ: {str(e)}'}), 500
+
 app = Flask(__name__)
 app.secret_key = 'virus-site-secret-key-2026'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -414,5 +433,6 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
