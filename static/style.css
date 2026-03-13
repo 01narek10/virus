@@ -1066,3 +1066,16 @@ nav {
     color: white !important;
     line-height: 1.6;
 }
+
+.image-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.image-content img {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.2);
+}
