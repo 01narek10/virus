@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, send_from_directory
 from datetime import datetime
 from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
@@ -422,6 +422,15 @@ def page_not_found(e):
 # ================= CREATE DB =================
 with app.app_context():
     db.create_all()
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('.', 'sitemap.xml')
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory('.', 'robots.txt')
 
 # ================= RUN =================
 if __name__ == "__main__":
