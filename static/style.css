@@ -3320,3 +3320,44 @@ footer::before {
         padding: 12px 15px;
     }
 }
+
+/* leaderboard.html-ի համար */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(6, 20, 45, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.leaderboard-table th {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: white !important;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.leaderboard-table td {
+    padding: 12px 15px;
+    color: white !important;  /* Սա է կարևորը */
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.leaderboard-table tr:hover td {
+    background: rgba(44, 195, 255, 0.2);
+}
+
+/* Հատուկ համարների և միավորների գույներ */
+.leaderboard-table td:first-child {
+    color: #ffd700 !important;  /* Ոսկեգույն #-ի համար */
+    font-weight: bold;
+}
+
+.leaderboard-table td:nth-child(4),
+.leaderboard-table td:nth-child(5) {
+    color: #6fcf97 !important;  /* Բաց կանաչ միավորների համար */
+    font-weight: bold;
+}
