@@ -48,6 +48,30 @@
         {% block content %}{% endblock %}
     </main>
 
+<!-- ===== CHATBOT ===== -->
+<div class="chatbot-container">
+    <div class="chatbot-button" onclick="toggleChat()">
+        💬
+    </div>
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <span>🦠 Վիրուսային օգնական</span>
+            <button onclick="toggleChat()">&times;</button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content">
+                    Բարև, ես վիրուսային օգնականն եմ: Կարող ես ինձ հարցնել վիրուսների մասին:
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="userInput" placeholder="Գրիր հարցդ..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+</div>
+    
     <footer>
         <div class="footer-content">
             <p>© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են</p>
