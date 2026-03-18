@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://viruses-q1gq.onrender.com/sitemap.xml
