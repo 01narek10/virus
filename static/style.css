@@ -1047,8 +1047,8 @@ a:hover::after {
 
 /* ===== CHATBOT BUTTON - 1.75x BIGGER ===== */
 .chatbot-button {
-    width: 114px;        /* 65px * 1.75 = 113.75px */
-    height: 114px;
+    width: 228px;        /* 65px * 1.75 = 113.75px */
+    height: 228px;
     background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
     border-radius: 50%;
     display: flex;
