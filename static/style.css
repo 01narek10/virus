@@ -1045,55 +1045,55 @@ a:hover::after {
     color: white;
 }
 
-/* ===== CHATBOT BUTTON - BIGGER ===== */
+/* ===== CHATBOT BUTTON - 1.75x BIGGER ===== */
 .chatbot-button {
-    width: 90px;
-    height: 90px;
+    width: 114px;        /* 65px * 1.75 = 113.75px */
+    height: 114px;
     background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3.5rem;
+    font-size: 4rem;      /* 2.2rem * 1.75 ≈ 3.85rem, կլորացրել ենք */
     color: white;
     cursor: pointer;
     box-shadow: 0 8px 25px rgba(44, 195, 255, 0.6);
     transition: transform 0.3s, box-shadow 0.3s;
-    border: 4px solid rgba(255, 255, 255, 0.4);
+    border: 5px solid rgba(255, 255, 255, 0.4);  /* 3px * 1.75 ≈ 5px */
     animation: pulse 2s infinite;
 }
 
 .chatbot-button:hover {
     transform: scale(1.2) rotate(8deg);
-    box-shadow: 0 0 50px rgba(44, 195, 255, 0.9);
+    box-shadow: 0 0 60px rgba(44, 195, 255, 0.9);
 }
 
 /* Desktop (≥1025px) */
 @media (min-width: 1025px) {
     .chatbot-button {
-        width: 100px;
-        height: 100px;
-        font-size: 4rem;
+        width: 123px;     /* 70px * 1.75 = 122.5px */
+        height: 123px;
+        font-size: 4.5rem; /* 2.6rem * 1.75 = 4.55rem */
     }
 }
 
 /* Tablet & Mobile (≤1024px) */
 @media (max-width: 1024px) {
     .chatbot-button {
-        width: 85px;
-        height: 85px;
-        font-size: 3.5rem;
-        border-width: 3px;
+        width: 105px;     /* 60px * 1.75 = 105px */
+        height: 105px;
+        font-size: 3.8rem; /* 2.2rem * 1.75 = 3.85rem */
+        border-width: 4px;  /* 2px * 1.75 = 3.5px → 4px */
     }
 }
 
 /* Small Mobile (≤480px) */
 @media (max-width: 480px) {
     .chatbot-button {
-        width: 75px;
-        height: 75px;
-        font-size: 3rem;
-        border-width: 3px;
+        width: 96px;      /* 55px * 1.75 = 96.25px */
+        height: 96px;
+        font-size: 3.5rem; /* 2rem * 1.75 = 3.5rem */
+        border-width: 4px;  /* 2px * 1.75 = 3.5px → 4px */
         bottom: 15px;
         right: 15px;
     }
@@ -1106,7 +1106,7 @@ a:hover::after {
     }
     50% {
         transform: scale(1.05);
-        box-shadow: 0 15px 35px rgba(44, 195, 255, 0.8);
+        box-shadow: 0 20px 45px rgba(44, 195, 255, 0.9);
     }
 }
 
