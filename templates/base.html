@@ -152,6 +152,26 @@
 
 
 <script>
+    function initDraggable() {
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const header = document.getElementById('chatbotHeader');
+    
+    if (!chatbotWindow || !header) return;
+    
+    // Միացնում ենք միայն desktop-ի վրա (1024px-ից մեծ)
+    if (window.innerWidth <= 1024) {
+        // Mobile-ի վրա համոզվում ենք, որ կենտրոնում է
+        chatbotWindow.style.position = 'fixed';
+        chatbotWindow.style.left = '50%';
+        chatbotWindow.style.top = '50%';
+        chatbotWindow.style.transform = 'translate(-50%, -50%)';
+        chatbotWindow.style.right = 'auto';
+        chatbotWindow.style.bottom = 'auto';
+        return;
+    }
+    
+    // Մնացած drag կոդը...
+}
 // ===== RESIZABLE & DRAGGABLE CHATBOT =====
 let isDragging = false;
 let offsetX, offsetY;
@@ -306,13 +326,23 @@ function saveChatbotPosition() {
 
 function loadChatbotPosition() {
     const saved = localStorage.getItem('chatbotPosition');
-    if (saved) {
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    
+    if (saved && window.innerWidth > 1024) {
         const pos = JSON.parse(saved);
-        const window = document.getElementById('chatbotWindow');
-        window.style.left = pos.left;
-        window.style.top = pos.top;
-        window.style.right = pos.right;
-        window.style.bottom = pos.bottom;
+        chatbotWindow.style.left = pos.left;
+        chatbotWindow.style.top = pos.top;
+        chatbotWindow.style.right = pos.right;
+        chatbotWindow.style.bottom = pos.bottom;
+        chatbotWindow.style.transform = 'none';
+    } else if (window.innerWidth <= 1024) {
+        // Mobile-ի վրա կենտրոնում
+        chatbotWindow.style.position = 'fixed';
+        chatbotWindow.style.left = '50%';
+        chatbotWindow.style.top = '50%';
+        chatbotWindow.style.transform = 'translate(-50%, -50%)';
+        chatbotWindow.style.right = 'auto';
+        chatbotWindow.style.bottom = 'auto';
     }
 }
 
@@ -343,13 +373,22 @@ function handleWindowResize() {
     const chatbotWindow = document.getElementById('chatbotWindow');
     
     if (!isDesktop) {
-        // Mobile-ի վրա անջատում ենք drag-ը
+        // Mobile-ի վրա կենտրոնում
         chatbotWindow.style.position = 'fixed';
         chatbotWindow.style.left = '50%';
         chatbotWindow.style.top = '50%';
         chatbotWindow.style.transform = 'translate(-50%, -50%)';
         chatbotWindow.style.right = 'auto';
         chatbotWindow.style.bottom = 'auto';
+        chatbotWindow.style.margin = '0';
+        
+        // Վերականգնում ենք mobile չափերը
+        chatbotWindow.style.width = window.innerWidth <= 480 ? '80vw' : '70vw';
+        chatbotWindow.style.height = '70vh';
+    } else {
+        // Desktop-ի վրա վերականգնում ենք պահպանված դիրքը
+        chatbotWindow.style.transform = 'none';
+        loadChatbotPosition();
     }
 }
 
