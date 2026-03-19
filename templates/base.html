@@ -998,206 +998,9 @@
 }
     ];
 
-    function addMessage(text, sender) {
-        const messagesDiv = document.getElementById('chatMessages');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return messageDiv;
-    }
-
-    function addThinking() {
-        const messagesDiv = document.getElementById('chatMessages');
-        const thinkingDiv = document.createElement('div');
-        thinkingDiv.className = 'message bot thinking';
-        thinkingDiv.id = 'thinking-' + Date.now();
-        thinkingDiv.innerHTML = `<div class="message-content">⏳ Մտածում եմ...</div>`;
-        messagesDiv.appendChild(thinkingDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return thinkingDiv.id;
-    }
-
-    function removeThinking(id) {
-        const el = document.getElementById(id);
-        if (el) el.remove();
-    }
-
-    function getLocalResponse(message) {
-        const lowerMessage = message.toLowerCase();
-        for (let item of knowledge) {
-            for (let keyword of item.keywords) {
-                if (lowerMessage.includes(keyword)) {
-                    return item.response;
-                }
-            }
-        }
-        return null;
-    }
-
-    function sendMessage() {
-        const input = document.getElementById('userInput');
-        const message = input.value.trim();
-        if (message === '') return;
-
-        // Ցույց տալ օգտատիրոջ հաղորդագրությունը
-        addMessage(message, 'user');
-        input.value = '';
-
-        // Ստուգել local knowledge base-ը (արագ պատասխանի համար)
-        const localResponse = getLocalResponse(message);
-        if (localResponse) {
-            setTimeout(() => {
-                addMessage(localResponse, 'bot');
-            }, 300);
-            return;
-        }
-
-        // Եթե local-ում չկա, փորձել API-ին
-        const thinkingId = addThinking();
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message })
-        })
-        .then(res => res.json())
-        .then(data => {
-            removeThinking(thinkingId);
-            if (data.reply) {
-                addMessage(data.reply, 'bot');
-            } else {
-                addMessage('❓ Չհաջողվեց ստանալ պատասխան', 'bot');
-            }
-        })
-        .catch(error => {
-            removeThinking(thinkingId);
-            addMessage('❌ Ցանցային սխալ: Փորձիր կրկին', 'bot');
-            console.error('Chat error:', error);
-        });
-    }
-
-function sendMessage() {
-    const input = document.getElementById('userInput');
-    const message = input.value.trim();
-    if (message === '') return;
-
-    // Ցույց տալ օգտատիրոջ հաղորդագրությունը
-    addMessage(message, 'user');
-    input.value = '';
-
-    // Ստուգել local knowledge base-ը (արագ պատասխանի համար)
-    const localResponse = getLocalResponse(message);
-    if (localResponse) {
-        setTimeout(() => {
-            addMessage(localResponse, 'bot');
-        }, 300);
-        return;
-    }
-
-    // Եթե local-ում չկա, փորձել API-ին
-    const thinkingId = addThinking();
-
-    fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message })
-    })
-    .then(async res => {
-        const data = await res.json();
-        
-        // Հատուկ ստուգում 429 սխալի համար
-        if (res.status === 429) {
-            removeThinking(thinkingId);
-            addMessage('⏳ Օրական թույլատրելի հարցումների քանակը սպառվել է: Խնդրում եմ փորձել կրկին մի փոքր ուշ կամ վաղը:', 'bot');
-            return;
-        }
-        
-        // Այլ սխալների դեպքում
-        if (!res.ok) {
-            removeThinking(thinkingId);
-            addMessage('❌ Տեխնիկական սխալ: Խնդրում եմ փորձել կրկին:', 'bot');
-            return;
-        }
-        
-        removeThinking(thinkingId);
-        addMessage(data.reply, 'bot');
-    })
-    .catch(error => {
-        removeThinking(thinkingId);
-        addMessage('❌ Ցանցային սխալ: Ստուգիր ինտերնետ կապը և փորձիր կրկին:', 'bot');
-        console.error('Chat error:', error);
-    });
-}
-
- function toggleChat() {
-        const window = document.getElementById('chatbotWindow');
-        const button = document.getElementById('chatbotButton');
-        if (window.style.display === 'flex') {
-            window.style.display = 'none';
-        } else {
-            window.style.display = 'flex';
-        }
-    }
-
-    function addMessage(text, sender) {
-        const messagesDiv = document.getElementById('chatMessages');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${sender}`;
-        messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return messageDiv;
-    }
-
-    function addThinking() {
-        const messagesDiv = document.getElementById('chatMessages');
-        const thinkingDiv = document.createElement('div');
-        thinkingDiv.className = 'message bot thinking';
-        thinkingDiv.id = 'thinking-' + Date.now();
-        thinkingDiv.innerHTML = `<div class="message-content">⏳ Մտածում եմ...</div>`;
-        messagesDiv.appendChild(thinkingDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return thinkingDiv.id;
-    }
-
-    function removeThinking(id) {
-        const el = document.getElementById(id);
-        if (el) el.remove();
-    }
-
-    function sendMessage() {
-        const input = document.getElementById('userInput');
-        const message = input.value.trim();
-        if (message === '') return;
-
-        addMessage(message, 'user');
-        input.value = '';
-
-        const thinkingId = addThinking();
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message })
-        })
-        .then(res => res.json())
-        .then(data => {
-            removeThinking(thinkingId);
-            addMessage(data.reply, 'bot');
-        })
-        .catch(error => {
-            removeThinking(thinkingId);
-            addMessage('❌ Ցանցային սխալ: Փորձիր կրկին', 'bot');
-            console.error('Chat error:', error);
-        });
-    }
-
 function toggleChat() {
     const window = document.getElementById('chatbotWindow');
-    const button = document.getElementById('chatbotButton');
-    window.style.display = window.style.display === 'flex' ? 'none' : 'flex';
+    window.classList.toggle('show');
 }
 
 function addMessage(text, sender) {
@@ -1216,11 +1019,13 @@ function addThinking() {
     thinkingDiv.id = 'thinking-' + Date.now();
     thinkingDiv.innerHTML = `<div class="message-content">⏳ Մտածում եմ...</div>`;
     messagesDiv.appendChild(thinkingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
     return thinkingDiv.id;
 }
 
 function removeThinking(id) {
-    document.getElementById(id)?.remove();
+    const el = document.getElementById(id);
+    if (el) el.remove();
 }
 
 function sendMessage() {
@@ -1236,7 +1041,7 @@ function sendMessage() {
     fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message: message })
     })
     .then(res => res.json())
     .then(data => {
@@ -1246,7 +1051,9 @@ function sendMessage() {
     .catch(error => {
         removeThinking(thinkingId);
         addMessage('❌ Ցանցային սխալ', 'bot');
+        console.error('Chat error:', error);
     });
+}
 }
 
 <!-- Bootstrap JavaScript -->
