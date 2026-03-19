@@ -3,38 +3,7 @@
 <head>
 
     <style>
-/* ===== CHATBOT - PERFECT FOR ALL DEVICES ===== */
-.chatbot-container {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.chatbot-button {
-    width: 65px;
-    height: 65px;
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.2rem;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(44, 195, 255, 0.5);
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-}
-
-.chatbot-button:hover {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 0 30px rgba(44, 195, 255, 0.9);
-}
-
+/* ===== RESIZABLE CHATBOT ===== */
 .chatbot-window {
     background: #0a192f;
     border: 2px solid #2cc3ff;
@@ -44,57 +13,22 @@
     overflow: hidden;
     margin-bottom: 15px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-}
-
-.chatbot-window.show {
-    display: flex;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    resize: both;              /* Սա է հրաշքը */
+    overflow: auto;            /* Պարտադիր resize-ի համար */
+    min-width: 300px;          /* Նվազագույն չափ */
+    min-height: 400px;         /* Նվազագույն չափ */
+    max-width: 800px;          /* Առավելագույն չափ */
+    max-height: 800px;         /* Առավելագույն չափ */
 }
 
 /* ===== DESKTOP (≥1025px) ===== */
 @media (min-width: 1025px) {
     .chatbot-window {
-        width: 1020px;
-        height: 1480px;
+        width: 520px;
+        height: 680px;
         position: absolute;
         bottom: 80px;
         right: 0;
-    }
-    
-    .chatbot-button {
-        width: 70px;
-        height: 70px;
-        font-size: 2.4rem;
-    }
-    
-    .chatbot-messages {
-        padding: 25px;
-    }
-    
-    .message-content {
-        max-width: 75%;
-        font-size: 1.1rem;
-        padding: 14px 18px;
-    }
-    
-    .chatbot-input {
-        padding: 18px;
-    }
-    
-    .chatbot-input input {
-        padding: 14px 18px;
-        font-size: 1.1rem;
-    }
-    
-    .chatbot-input button {
-        width: 52px;
-        height: 52px;
-        font-size: 1.3rem;
     }
 }
 
@@ -107,144 +41,31 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        border-radius: 30px;
-        border: 3px solid #2cc3ff;
-        margin-bottom: 0;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
-    }
-    
-    .chatbot-button {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 10001;
-    }
-    
-    .chatbot-container {
-        bottom: 0;
-        right: 0;
-    }
-    
-    .chatbot-header {
-        padding: 18px 22px;
-        font-size: 1.2rem;
-    }
-    
-    .chatbot-header button {
-        width: 38px;
-        height: 38px;
-        font-size: 1.8rem;
-    }
-    
-    .chatbot-messages {
-        padding: 22px;
-    }
-    
-    .message-content {
-        max-width: 80%;
-        font-size: 1rem;
-        padding: 12px 16px;
-    }
-    
-    .chatbot-input {
-        padding: 16px;
-    }
-    
-    .chatbot-input input {
-        padding: 12px 16px;
-        font-size: 1rem;
-    }
-    
-    .chatbot-input button {
-        width: 48px;
-        height: 48px;
-        font-size: 1.2rem;
+        resize: both;
+        min-width: 250px;
+        min-height: 300px;
+        max-width: 90vw;
+        max-height: 90vh;
     }
 }
-
-/* ===== SMALL MOBILE (≤480px) ===== */
-@media (max-width: 480px) {
-    .chatbot-window {
-        width: 80vw;
-        height: 70vh;
-        border-radius: 25px;
-    }
-    
-    .chatbot-button {
-        width: 55px;
-        height: 55px;
-        font-size: 1.8rem;
-        bottom: 15px;
-        right: 15px;
-    }
-    
-    .chatbot-header {
-        padding: 15px 18px;
-        font-size: 1.1rem;
-    }
-    
-    .chatbot-header button {
-        width: 34px;
-        height: 34px;
-        font-size: 1.6rem;
-    }
-    
-    .chatbot-messages {
-        padding: 15px;
-    }
-    
-    .message-content {
-        max-width: 85%;
-        font-size: 0.95rem;
-        padding: 10px 14px;
-    }
-    
-    .chatbot-input {
-        padding: 12px;
-    }
-    
-    .chatbot-input input {
-        padding: 10px 14px;
-        font-size: 0.95rem;
-    }
-    
-    .chatbot-input button {
-        width: 42px;
-        height: 42px;
-        font-size: 1.1rem;
-    }
+        /* ===== RESIZE HANDLE ===== */
+.chatbot-window::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, transparent 50%, #2cc3ff 50%);
+    border-radius: 0 0 24px 0;
+    pointer-events: none;
+    opacity: 0.7;
+    z-index: 10;
 }
 
-/* ===== EXTRA LARGE SCREENS (≥1440px) ===== */
-@media (min-width: 1440px) {
-    .chatbot-window {
-        width: 550px;
-        height: 720px;
-    }
-    
-    .chatbot-button {
-        width: 75px;
-        height: 75px;
-        font-size: 2.6rem;
-    }
-}
-
-/* Scrollbar */
-.chatbot-messages::-webkit-scrollbar {
-    width: 8px;
-}
-
-.chatbot-messages::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
-.chatbot-messages::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    border-radius: 10px;
+.chatbot-window:hover::after {
+    opacity: 1;
+    background: linear-gradient(135deg, transparent 50%, #ff2c6d 50%);
 }
 }
 </style>
@@ -361,6 +182,39 @@ function removeThinking(id) {
     if (el) el.remove();
 }
 
+// Պահպանել չափը, երբ փոխվում է
+function saveChatbotSize() {
+    const window = document.getElementById('chatbotWindow');
+    const size = {
+        width: window.offsetWidth,
+        height: window.offsetHeight
+    };
+    localStorage.setItem('chatbotSize', JSON.stringify(size));
+}
+
+// Վերականգնել պահպանված չափը
+function loadChatbotSize() {
+    const saved = localStorage.getItem('chatbotSize');
+    if (saved) {
+        const size = JSON.parse(saved);
+        const window = document.getElementById('chatbotWindow');
+        window.style.width = size.width + 'px';
+        window.style.height = size.height + 'px';
+    }
+}
+
+// Կանչել էջը բեռնելիս
+window.addEventListener('load', loadChatbotSize);
+
+// Հետևել resize-ին
+window.addEventListener('resize', function() {
+    // Դատարկ, որպեսզի չխանգարի
+});
+
+// Պահպանել, երբ փոխվում է
+const observer = new ResizeObserver(saveChatbotSize);
+observer.observe(document.getElementById('chatbotWindow'));
+    
 function sendMessage() {
     const input = document.getElementById('userInput');
     const message = input.value.trim();
