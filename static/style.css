@@ -3585,3 +3585,30 @@ footer::before {
     }
 }
 
+.chatbot-header {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: #0a192f;
+    padding: 18px 22px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;  /* Սա է կարևորը */
+    user-select: none;  /* Կանխում է տեքստի ընտրությունը */
+}
+
+.chatbot-header:active {
+    cursor: grabbing;
+    opacity: 0.9;
+}
+.chatbot-window {
+    transition: box-shadow 0.3s, opacity 0.3s;
+    /* resize-ի transition չենք ավելացնում, որ դանդաղ չլինի */
+}
+
+.chatbot-window.dragging {
+    opacity: 0.9;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+    transition: none;  /* drag-ի ժամանակ անցումներ պետք չեն */
+}
