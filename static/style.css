@@ -1071,9 +1071,9 @@ a:hover::after {
 /* Desktop (≥1025px) */
 @media (min-width: 1025px) {
     .chatbot-button {
-        width: 123px;     /* 70px * 1.75 = 122.5px */
-        height: 123px;
-        font-size: 4.5rem; /* 2.6rem * 1.75 = 4.55rem */
+        width: 150px;     /* 70px * 1.75 = 122.5px */
+        height: 150px;
+        font-size: 4.7rem; /* 2.6rem * 1.75 = 4.55rem */
     }
 }
 
