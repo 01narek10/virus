@@ -1045,103 +1045,53 @@ a:hover::after {
     color: white;
 }
 
-/* ----- 19. CHATBOT ----- */
+/* ===== CHATBOT BUTTON BIGGER ===== */
 .chatbot-button {
-    background: var(--gradient-1);
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 3rem;
     color: white;
     cursor: pointer;
-    box-shadow: var(--shadow-lg), 0 0 30px rgba(37, 99, 235, 0.5);
-    animation: pulse 2s infinite;
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(44, 195, 255, 0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .chatbot-button:hover {
-    transform: scale(1.1);
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 0 40px rgba(44, 195, 255, 0.9);
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(37, 99, 235, 0.5); }
-    50% { transform: scale(1.1); box-shadow: 0 0 50px rgba(37, 99, 235, 0.8); }
+/* Desktop (≥1025px) */
+@media (min-width: 1025px) {
+    .chatbot-button {
+        width: 90px;
+        height: 90px;
+        font-size: 3.5rem;
+    }
 }
 
-.chatbot-window {
-    background: rgba(6, 20, 45, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(37, 99, 235, 0.3);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
+/* Tablet & Mobile (≤1024px) */
+@media (max-width: 1024px) {
+    .chatbot-button {
+        width: 70px;
+        height: 70px;
+        font-size: 2.8rem;
+    }
 }
 
-.chatbot-messages {
-    flex: 1;
-    padding: var(--spacing-4);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.message.bot .message-content {
-    background: rgba(37, 99, 235, 0.2);
-    border: 1px solid rgba(37, 99, 235, 0.3);
-    border-radius: 1.2rem 1.2rem 1.2rem 0.3rem;
-    color: white;
-}
-
-.message.user .message-content {
-    background: var(--gradient-1);
-    border-radius: 1.2rem 1.2rem 0.3rem 1.2rem;
-    color: white;
-}
-
-.message.bot.thinking .message-content {
-    background: rgba(37, 99, 235, 0.1);
-    border: 1px dashed var(--primary);
-    animation: thinkingPulse 1.5s infinite;
-}
-
-@keyframes thinkingPulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-}
-
-.chatbot-input input {
-    background: rgba(255,255,255,0.1);
-    border: 2px solid var(--primary);
-    border-radius: var(--radius-full);
-    color: white;
-    padding: var(--spacing-2) var(--spacing-4);
-}
-
-.chatbot-input input:focus {
-    border-color: var(--secondary);
-    box-shadow: 0 0 10px rgba(124,58,237,0.3);
-    outline: none;
-}
-
-.chatbot-input button {
-    background: var(--gradient-1);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.chatbot-input button:hover {
-    transform: scale(1.1);
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+    .chatbot-button {
+        width: 65px;
+        height: 65px;
+        font-size: 2.5rem;
+    }
 }
 
 /* ----- 20. BACTERIOPHAGE SECTION ----- */
