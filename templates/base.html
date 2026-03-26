@@ -421,15 +421,17 @@ function sendMessage() {
     input.value = '';
 
     const thinkingId = addThinking();
-    const t = translations[currentLang];
+
+    // Get current language from the page
+    const currentLang = document.querySelector('.lang-btn.active').innerText.includes('Հայ') ? 'hy' :
+                        document.querySelector('.lang-btn.active').innerText.includes('Рус') ? 'ru' : 'en';
 
     fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             message: message,
-            language: currentLang,
-            systemPrompt: getSystemPrompt()
+            language: currentLang
         })
     })
     .then(res => res.json())
@@ -439,7 +441,7 @@ function sendMessage() {
     })
     .catch(error => {
         removeThinking(thinkingId);
-        addMessage(t.error, 'bot');
+        addMessage('❌ Network error', 'bot');
         console.error('Chat error:', error);
     });
 }
