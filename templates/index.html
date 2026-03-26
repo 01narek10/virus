@@ -1,23 +1,236 @@
 {% extends "base.html" %}
-{% block title %}Վիրուսների հանրագիտարան 2026{% endblock %}
+{% block title %}
+    {% if lang == 'hy' %}Վիրուսների հանրագիտարան 2026
+    {% elif lang == 'ru' %}Энциклопедия вирусов 2026
+    {% else %}Virus Encyclopedia 2026{% endif %}
+{% endblock %}
 
 {% block content %}
+<!-- HERO SECTION -->
 <div class="hero-section">
     <div class="hero-content">
-        <h1 class="glitch">🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ</h1>
-        <p class="hero-subtitle">Բացահայտիր անտեսանելի թշնամուն. 2026 թվականի ամենաթարմ տվյալներ</p>
+        <h1 class="glitch">
+            {% if lang == 'hy' %}🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ
+            {% elif lang == 'ru' %}🦠 МИР ВИРУСОВ
+            {% else %}🦠 WORLD OF VIRUSES{% endif %}
+        </h1>
+        <p class="hero-subtitle">
+            {% if lang == 'hy' %}Բացահայտիր անտեսանելի թշնամուն. 2026 թվականի ամենաթարմ տվյալներ
+            {% elif lang == 'ru' %}Открой невидимого врага. Самые свежие данные 2026 года
+            {% else %}Discover the invisible enemy. Latest data for 2026{% endif %}
+        </p>
         <div class="hero-stats">
-            <div class="hero-stat"><span class="stat-number">219+</span><span>Մարդկային վիրուսներ</span></div>
-            <div class="hero-stat"><span class="stat-number">7M+</span><span>Հետազոտություններ</span></div>
-            <div class="hero-stat"><span class="stat-number">48</span><span>Պատվաստանյութեր</span></div>
+            <div class="hero-stat"><span class="stat-number">219+</span><span>
+                {% if lang == 'hy' %}Մարդկային վիրուսներ
+                {% elif lang == 'ru' %}Вирусов человека
+                {% else %}Human viruses{% endif %}
+            </span></div>
+            <div class="hero-stat"><span class="stat-number">7M+</span><span>
+                {% if lang == 'hy' %}Հետազոտություններ
+                {% elif lang == 'ru' %}Исследований
+                {% else %}Research{% endif %}
+            </span></div>
+            <div class="hero-stat"><span class="stat-number">48</span><span>
+                {% if lang == 'hy' %}Պատվաստանյութեր
+                {% elif lang == 'ru' %}Вакцин
+                {% else %}Vaccines{% endif %}
+            </span></div>
         </div>
     </div>
 </div>
 
+<!-- ԻՆՉ ԵՆ ՎԻՐՈՒՍՆԵՐԸ -->
+<div class="card glass-card">
+    <h2>
+        {% if lang == 'hy' %}🔬 Ի՞նչ են վիրուսները
+        {% elif lang == 'ru' %}🔬 Что такое вирусы
+        {% else %}🔬 What are viruses{% endif %}
+    </h2>
+    <div class="content-with-image">
+        <div class="text-content">
+            <p>
+                {% if lang == 'hy' %}Վիրուսները միկրոսկոպիկ ինֆեկցիոն ագենտներ են, որոնք կարող են վարակել բոլոր կենդանի օրգանիզմները։ Դրանք կանգնած են կենդանի և ոչ կենդանի սահմանին․ չեն կարող բազմանալ ինքնուրույն, սակայն ունեն գենետիկ նյութ։
+                {% elif lang == 'ru' %}Вирусы — это микроскопические инфекционные агенты, которые могут заражать все живые организмы. Они находятся на грани живого и неживого: не могут размножаться самостоятельно, но имеют генетический материал.
+                {% else %}Viruses are microscopic infectious agents that can infect all living organisms. They stand on the border between living and non-living: cannot reproduce on their own, but have genetic material.{% endif %}
+            </p>
+            <p>
+                {% if lang == 'hy' %}2026 թ․ հայտնի է 6590 վիրուս, որից 219-ը մարդկային։ Ամեն օր հայտնաբերվում է 2-3 նոր վիրուս։
+                {% elif lang == 'ru' %}В 2026 году известно 6590 вирусов, из которых 219 — человеческие. Каждый день обнаруживается 2-3 новых вируса.
+                {% else %}In 2026, 6,590 viruses are known, of which 219 are human. 2-3 new viruses are discovered every day.{% endif %}
+            </p>
+            <div class="fact-badge"><span class="badge-icon">🧬</span><span>
+                {% if lang == 'hy' %}Վիրուսները 100 անգամ փոքր են բակտերիաներից
+                {% elif lang == 'ru' %}Вирусы в 100 раз меньше бактерий
+                {% else %}Viruses are 100 times smaller than bacteria{% endif %}
+            </span></div>
+        </div>
+        <div class="image-content" style="max-width: 400px; margin: 0 auto;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Rotavirus_Reconstruction.jpg/500px-Rotavirus_Reconstruction.jpg" alt="Rotavirus" style="width: 100%; height: 250px; object-fit: contain; border-radius: 12px;">
+            <img src="https://www.news-medical.net/image-handler/ts/20240626013048/ri/950/src/images/Article_Images/ImageForArticle_1250_17193798420466760.jpg" alt="Viruses" style="width: 100%; height: 250px; object-fit: contain; border-radius: 12px;">
+        </div>
+    </div>
+</div>
+
+<!-- 3D ՖԼԻՓ ՔԱՐՏԵՐ -->
 <div class="card">
-    <h2>🔬 Ի՞նչ են վիրուսները</h2>
-    <p>Վիրուսները միկրոսկոպիկ ինֆեկցիոն ագենտներ են, որոնք կարող են վարակել բոլոր կենդանի օրգանիզմները։</p>
-    <p>2026 թ․ հայտնի է 6590 վիրուս, որից 219-ը մարդկային։ Ամեն օր հայտնաբերվում է 2-3 նոր վիրուս։</p>
-    <div class="fact-badge"><span class="badge-icon">🧬</span><span>Վիրուսները 100 անգամ փոքր են բակտերիաներից</span></div>
+    <h2>
+        {% if lang == 'hy' %}🦠 Վիրուսների պատկերասրահ
+        {% elif lang == 'ru' %}🦠 Галерея вирусов
+        {% else %}🦠 Virus Gallery{% endif %}
+    </h2>
+    <div class="flip-card-container">
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png" alt="COVID"><h3>COVID-19</h3></div><div class="flip-card-back"><h3>🔴 Facts</h3><p>• 7M+ deaths worldwide</p><p>• 3 variants</p><p>• New JN.1 variant</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg" alt="Ebola"><h3>Ebola</h3></div><div class="flip-card-back"><h3>⚠️ Danger</h3><p>• 50-90% mortality</p><p>• Blood transmission</p><p>• 2025 outbreak</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" alt="HIV"><h3>HIV</h3></div><div class="flip-card-back"><h3>📊 Statistics</h3><p>• 38M living with HIV</p><p>• 40M deaths</p><p>• No cure, therapy exists</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg" alt="Flu"><h3>Flu</h3></div><div class="flip-card-back"><h3>📅 Seasonal</h3><p>• 1M deaths/year</p><p>• H1N1, H3N2, H5N1</p><p>• Yearly vaccine</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg" alt="Rotavirus"><h3>Rotavirus</h3></div><div class="flip-card-back"><h3>💩 Children</h3><p>• 200,000+ deaths/year</p><p>• Fecal-oral transmission</p><p>• Vaccine available</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg" alt="Adenovirus"><h3>Adenovirus</h3></div><div class="flip-card-back"><h3>🤧 Respiratory</h3><p>• 50+ types</p><p>• Cold, sore throat</p><p>• Conjunctivitis</p></div></div></div>
+    </div>
+</div>
+
+<!-- 10 ՀԵՏԱՔՐՔԻՐ ՓԱՍՏ -->
+<div class="card">
+    <h2>
+        {% if lang == 'hy' %}🧠 10 ՓԱՍՏ, ՈՐ ՉԳԻՏԵԻՐ
+        {% elif lang == 'ru' %}🧠 10 ФАКТОВ, КОТОРЫХ ВЫ НЕ ЗНАЛИ
+        {% else %}🧠 10 FACTS YOU DIDN'T KNOW{% endif %}
+    </h2>
+    <div class="facts-grid">
+        <div class="fact-item"><span class="fact-number">1</span><p>
+            {% if lang == 'hy' %}Վիրուսները ամենաշատ կենսաբանական օբյեկտներն են օվկիանոսում․ 1 լիտր ծովաջրում կա 10 միլիարդ վիրուս։
+            {% elif lang == 'ru' %}Вирусы — самые многочисленные биологические объекты в океане: в 1 литре морской воды содержится 10 миллиардов вирусов.
+            {% else %}Viruses are the most abundant biological objects in the ocean; 1 liter of seawater contains 10 billion viruses.{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">2</span><p>
+            {% if lang == 'hy' %}Ամենափոքր վիրուսը պարվովիրուսն է (20 նմ), ամենամեծը՝ պիթովիրուսը (1.5 մկմ)։
+            {% elif lang == 'ru' %}Самый маленький вирус — парвовирус (20 нм), самый большой — питовирус (1.5 мкм).
+            {% else %}The smallest virus is parvovirus (20 nm), the largest is pithovirus (1.5 μm).{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">3</span><p>
+            {% if lang == 'hy' %}Վիրուսների 80%-ը բակտերիոֆագեր են, որոնք վարակում են բակտերիաներին, ոչ թե մարդկանց։
+            {% elif lang == 'ru' %}80% вирусов — это бактериофаги, которые заражают бактерии, а не людей.
+            {% else %}80% of viruses are bacteriophages that infect bacteria, not humans.{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">4</span><p>
+            {% if lang == 'hy' %}Առաջին պատվաստանյութը ստեղծվել է 1796թ․ ջրծաղիկի դեմ (Էդվարդ Ջեններ)։
+            {% elif lang == 'ru' %}Первая вакцина была создана в 1796 году против оспы (Эдвард Дженнер).
+            {% else %}The first vaccine was created in 1796 for smallpox (Edward Jenner).{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">5</span><p>
+            {% if lang == 'hy' %}Վիրուսները կարող են ապրել ծայրահեղ պայմաններում՝ տաք աղբյուրներում (80°C) և Անտարկտիդայում։
+            {% elif lang == 'ru' %}Вирусы могут жить в экстремальных условиях: в горячих источниках (80°C) и Антарктиде.
+            {% else %}Viruses can survive in extreme conditions: hot springs (80°C) and Antarctica.{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">6</span><p>
+            {% if lang == 'hy' %}Մոծակները փոխանցում են 20+ վիրուս՝ դենգե, զիկա, արևմտյան Նեղոսի վիրուս։
+            {% elif lang == 'ru' %}Комары переносят 20+ вирусов: денге, Зика, вирус Западного Нила.
+            {% else %}Mosquitoes transmit 20+ viruses: dengue, Zika, West Nile virus.{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">7</span><p>
+            {% if lang == 'hy' %}Ջրծաղիկը միակ վիրուսն է, որը լիովին վերացվել է մարդկությունից (1980)։
+            {% elif lang == 'ru' %}Оспа — единственный вирус, полностью искорененный человечеством (1980).
+            {% else %}Smallpox is the only virus completely eradicated from humanity (1980).{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">8</span><p>
+            {% if lang == 'hy' %}Հերպեսի վիրուսը մնում է օրգանիզմում ամբողջ կյանք և ակտիվանում է իմունիտետի թուլացումից։
+            {% elif lang == 'ru' %}Вирус герпеса остается в организме на всю жизнь и активируется при ослаблении иммунитета.
+            {% else %}Herpes virus remains in the body for life and activates when immunity weakens.{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">9</span><p>
+            {% if lang == 'hy' %}Վիրուսները չեն համարվում կենդանի, քանի որ չեն կարող ինքնուրույն բազմանալ։
+            {% elif lang == 'ru' %}Вирусы не считаются живыми, так как не могут размножаться самостоятельно.
+            {% else %}Viruses are not considered living because they cannot reproduce on their own.{% endif %}
+        </p></div>
+        <div class="fact-item"><span class="fact-number">10</span><p>
+            {% if lang == 'hy' %}Ամեն տարի հայտնաբերվում է 500+ նոր վիրուս, հիմնականում կենդանիներից։
+            {% elif lang == 'ru' %}Каждый год обнаруживается 500+ новых вирусов, в основном от животных.
+            {% else %}500+ new viruses are discovered every year, mostly from animals.{% endif %}
+        </p></div>
+    </div>
+</div>
+
+<!-- ԲԱԿՏԵՐԻՈՖԱԳԵՐ -->
+<div class="card">
+    <h2>
+        {% if lang == 'hy' %}🧪 Բակտերիոֆագեր. վիրուսներ, որոնք որսում են բակտերիաներ
+        {% elif lang == 'ru' %}🧪 Бактериофаги — вирусы, охотящиеся на бактерии
+        {% else %}🧪 Bacteriophages - viruses that hunt bacteria{% endif %}
+    </h2>
+    <div class="phage-grid">
+        <div class="phage-item"><span class="phage-icon">🦠</span><h3>
+            {% if lang == 'hy' %}Ի՞նչ են բակտերիոֆագերը
+            {% elif lang == 'ru' %}Что такое бактериофаги
+            {% else %}What are bacteriophages{% endif %}
+        </h3><p>
+            {% if lang == 'hy' %}Բակտերիոֆագերը (ֆագեր) վիրուսներ են, որոնք հատուկ վարակում են բակտերիաները։ Դրանք ամենատարածված կենսաբանական օբյեկտներն են Երկրի վրա. մեկ կաթիլ ջրում կարող են լինել միլիոնավոր ֆագեր։
+            {% elif lang == 'ru' %}Бактериофаги (фаги) — это вирусы, которые заражают бактерии. Они являются самыми распространенными биологическими объектами на Земле: в одной капле воды могут быть миллионы фагов.
+            {% else %}Bacteriophages (phages) are viruses that specifically infect bacteria. They are the most common biological objects on Earth: one drop of water can contain millions of phages.{% endif %}
+        </p></div>
+        <div class="phage-item"><span class="phage-icon">🧬</span><h3>
+            {% if lang == 'hy' %}Կառուցվածքը
+            {% elif lang == 'ru' %}Строение
+            {% else %}Structure{% endif %}
+        </h3><p>
+            {% if lang == 'hy' %}Ֆագերն ունեն բարդ կառուցվածք՝ գլխիկ (որտեղ պահվում է գենետիկ նյութը), պոչ և պոչի թելիկներ, որոնք օգնում են ճանաչել բակտերիային։
+            {% elif lang == 'ru' %}Фаги имеют сложное строение: головка (где хранится генетический материал), хвост и хвостовые нити, которые помогают распознать бактерию.
+            {% else %}Phages have a complex structure: a head (where the genetic material is stored), a tail, and tail fibers that help recognize the bacteria.{% endif %}
+        </p></div>
+        <div class="phage-item"><span class="phage-icon">⚙️</span><h3>
+            {% if lang == 'hy' %}Ինչպես են աշխատում
+            {% elif lang == 'ru' %}Как работают
+            {% else %}How they work{% endif %}
+        </h3><p>
+            {% if lang == 'hy' %}Ֆագերը կպչում են բակտերիայի մակերեսին, ներարկում իրենց ԴՆԹ-ն, և բակտերիան սկսում է արտադրել նոր ֆագեր, մինչև պայթի և ազատի դրանք։
+            {% elif lang == 'ru' %}Фаги прикрепляются к поверхности бактерии, впрыскивают свою ДНК, и бактерия начинает производить новые фаги, пока не лопнет и не выпустит их.
+            {% else %}Phages attach to the bacterial surface, inject their DNA, and the bacteria starts producing new phages until it bursts and releases them.{% endif %}
+        </p></div>
+        <div class="phage-item"><span class="phage-icon">💊</span><h3>
+            {% if lang == 'hy' %}Ֆագային թերապիա
+            {% elif lang == 'ru' %}Фаговая терапия
+            {% else %}Phage therapy{% endif %}
+        </h3><p>
+            {% if lang == 'hy' %}Օգտագործվում է բակտերիալ ինֆեկցիաների բուժման համար, հատկապես երբ բակտերիաները կայուն են հակաբիոտիկների նկատմամբ։
+            {% elif lang == 'ru' %}Используется для лечения бактериальных инфекций, особенно когда бактерии устойчивы к антибиотикам.
+            {% else %}Used to treat bacterial infections, especially when bacteria are resistant to antibiotics.{% endif %}
+        </p></div>
+    </div>
+</div>
+
+<!-- ՊԱՏՄԱԿԱՆ ԱՄԵՆԱՄԱՀԱԲԵՐ ՀԱՄԱՃԱՐԱԿՆԵՐ -->
+<div class="card">
+    <h2>
+        {% if lang == 'hy' %}📜 Պատմական ամենամահաբեր համաճարակները (մ.թ.ա. - 2023)
+        {% elif lang == 'ru' %}📜 Самые смертоносные пандемии в истории (до н.э. - 2023)
+        {% else %}📜 Deadliest pandemics in history (BC - 2023){% endif %}
+    </h2>
+    <div class="timeline">
+        <div class="timeline-item"><div class="timeline-year">430-426 BC</div><div class="timeline-content"><h3>
+            {% if lang == 'hy' %}Աթենքի ժանտախտ
+            {% elif lang == 'ru' %}Чума Афин
+            {% else %}Plague of Athens{% endif %}
+        </h3><p>💀 75,000-100,000 victims (25% of Athens population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">165-180</div><div class="timeline-content"><h3>
+            {% if lang == 'hy' %}Անտոնինյան ժանտախտ
+            {% elif lang == 'ru' %}Антонинова чума
+            {% else %}Antonine Plague{% endif %}
+        </h3><p>💀 5-10 million victims</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">541-542</div><div class="timeline-content"><h3>
+            {% if lang == 'hy' %}Հուստինիանոսի ժանտախտ
+            {% elif lang == 'ru' %}Чума Юстиниана
+            {% else %}Plague of Justinian{% endif %}
+        </h3><p>💀 25-50 million victims (15-25% of world population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">1347-1351</div><div class="timeline-content"><h3>
+            {% if lang == 'hy' %}Սև մահ
+            {% elif lang == 'ru' %}Черная смерть
+            {% else %}Black Death{% endif %}
+        </h3><p>💀 75-200 million victims (30-60% of Europe population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">1918-1920</div><div class="timeline-content"><h3>
+            {% if lang == 'hy' %}Իսպանական գրիպ (H1N1)
+            {% elif lang == 'ru' %}Испанский грипп (H1N1)
+            {% else %}Spanish Flu (H1N1){% endif %}
+        </h3><p>💀 50-100 million victims (3-5% of world population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">1981-present</div><div class="timeline-content"><h3>HIV/AIDS</h3><p>💀 40+ million victims. 38 million people living with HIV</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">2019-2023</div><div class="timeline-content"><h3>COVID-19</h3><p>💀 7+ million victims, 700+ million cases</p></div></div>
+    </div>
 </div>
 {% endblock %}
