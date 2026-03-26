@@ -21,6 +21,12 @@
     max-height: 800px;         /* Առավելագույն չափ */
 }
 
+.language-selector .lang-btn.active {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: #0a192f;
+    font-weight: bold;
+}
+        
 .language-selector {
     display: flex;
     gap: 5px;
@@ -251,11 +257,15 @@
     </div>
 </nav>
 <!-- ===== LANGUAGE SELECTOR ===== -->
-<div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
-    <button onclick="setLanguage('hy')" class="lang-btn active" id="lang-hy">🇦🇲 Հայ</button>
-    <button onclick="setLanguage('ru')" class="lang-btn" id="lang-ru">🇷🇺 Рус</button>
-    <button onclick="setLanguage('en')" class="lang-btn" id="lang-en">🇬🇧 En</button>
+<div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; gap: 5px; background: rgba(10,25,47,0.9); padding: 8px 12px; border-radius: 40px; backdrop-filter: blur(10px); border: 1px solid #2cc3ff;">
+    <a href="/set_language/hy" class="lang-btn {% if lang == 'hy' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇦🇲 Հայ</a>
+    <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇷🇺 Рус</a>
+    <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇬🇧 En</a>
 </div>
+
+
+
+
     
     <main class="container">
         {% block content %}{% endblock %}
