@@ -79,173 +79,133 @@
     </h2>
     <div class="flip-card-container">
         
-        <!-- COVID-19 (Թարգմանված) -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png" alt="COVID"><h3>COVID-19</h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}🔴 Փաստեր
-            {% elif lang == 'ru' %}🔴 Факты
-            {% else %}🔴 Facts{% endif %}
-        </h3><p>• 7M+ 
-            {% if lang == 'hy' %}մահ ամբողջ աշխարհում
-            {% elif lang == 'ru' %}смертей по всему миру
-            {% else %}deaths worldwide{% endif %}
-        </p><p>• 3 
-            {% if lang == 'hy' %}տարբերակ
-            {% elif lang == 'ru' %}варианта
-            {% else %}variants{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}JN.1 տարբերակ (2026)
-            {% elif lang == 'ru' %}вариант JN.1 (2026)
-            {% else %}JN.1 variant (2026){% endif %}
-        </p></div></div></div>
+        <!-- 1. COVID-19 -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png" alt="COVID-19">
+                    <h3>COVID-19</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}🔴 Փաստեր{% elif lang == 'ru' %}🔴 Факты{% else %}🔴 Facts{% endif %}</h3>
+                    <p>• 7M+ {% if lang == 'hy' %}մահ ամբողջ աշխարհում{% elif lang == 'ru' %}смертей по всему миру{% else %}deaths worldwide{% endif %}</p>
+                    <p>• 3 {% if lang == 'hy' %}տարբերակ{% elif lang == 'ru' %}варианта{% else %}variants{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}JN.1 տարբերակ (2026){% elif lang == 'ru' %}вариант JN.1 (2026){% else %}JN.1 variant (2026){% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- Էբոլա (Թարգմանված) -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg" alt="Ebola"><h3>Ebola</h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}⚠️ Վտանգ
-            {% elif lang == 'ru' %}⚠️ Опасность
-            {% else %}⚠️ Danger{% endif %}
-        </h3><p>• 50-90% 
-            {% if lang == 'hy' %}մահացություն
-            {% elif lang == 'ru' %}смертность
-            {% else %}mortality{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Փոխանցվում է արյունով
-            {% elif lang == 'ru' %}Передается через кровь
-            {% else %}Blood transmission{% endif %}
-        </p><p>• 2025 
-            {% if lang == 'hy' %}բռնկում Կոնգոյում
-            {% elif lang == 'ru' %}вспышка в Конго
-            {% else %}outbreak in Congo{% endif %}
-        </p></div></div></div>
+        <!-- 2. Էբոլա -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg" alt="Ebola">
+                    <h3>Ebola</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}⚠️ Վտանգ{% elif lang == 'ru' %}⚠️ Опасность{% else %}⚠️ Danger{% endif %}</h3>
+                    <p>• 50-90% {% if lang == 'hy' %}մահացություն{% elif lang == 'ru' %}смертность{% else %}mortality{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Փոխանցվում է արյունով{% elif lang == 'ru' %}Передается через кровь{% else %}Blood transmission{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}2025-ին բռնկում Կոնգոյում{% elif lang == 'ru' %}вспышка в Конго (2025){% else %}outbreak in Congo (2025){% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- ՄԻԱՎ (Թարգմանված) -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" alt="HIV"><h3>HIV</h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}📊 Վիճակագրություն
-            {% elif lang == 'ru' %}📊 Статистика
-            {% else %}📊 Statistics{% endif %}
-        </h3><p>• 38M 
-            {% if lang == 'hy' %}ապրում են ՄԻԱՎ-ով
-            {% elif lang == 'ru' %}живут с ВИЧ
-            {% else %}living with HIV{% endif %}
-        </p><p>• 40M 
-            {% if lang == 'hy' %}մահ ՁԻԱՀ-ից
-            {% elif lang == 'ru' %}смертей от СПИДа
-            {% else %}deaths from AIDS{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Բուժում չկա, կա թերապիա
-            {% elif lang == 'ru' %}Лечения нет, есть терапия
-            {% else %}No cure, therapy exists{% endif %}
-        </p></div></div></div>
+        <!-- 3. ՄԻԱՎ -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" alt="HIV">
+                    <h3>HIV</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}📊 Վիճակագրություն{% elif lang == 'ru' %}📊 Статистика{% else %}📊 Statistics{% endif %}</h3>
+                    <p>• 38M {% if lang == 'hy' %}ապրում են ՄԻԱՎ-ով{% elif lang == 'ru' %}живут с ВИЧ{% else %}living with HIV{% endif %}</p>
+                    <p>• 40M {% if lang == 'hy' %}մահ ՁԻԱՀ-ից{% elif lang == 'ru' %}смертей от СПИДа{% else %}deaths from AIDS{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Բուժում չկա, կա թերապիա{% elif lang == 'ru' %}Лечения нет, есть терапия{% else %}No cure, therapy exists{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- Գրիպ -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg" alt="Flu"><h3>
-            {% if lang == 'hy' %}Գրիպ
-            {% elif lang == 'ru' %}Грипп
-            {% else %}Flu{% endif %}
-        </h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}📅 Սեզոնային
-            {% elif lang == 'ru' %}📅 Сезонный
-            {% else %}📅 Seasonal{% endif %}
-        </h3><p>• 1M 
-            {% if lang == 'hy' %}մահ/տարի
-            {% elif lang == 'ru' %}смертей/год
-            {% else %}deaths/year{% endif %}
-        </p><p>• H1N1, H3N2, H5N1</p><p>• 
-            {% if lang == 'hy' %}Պատվաստանյութ ամեն տարի
-            {% elif lang == 'ru' %}Вакцина каждый год
-            {% else %}Yearly vaccine{% endif %}
-        </p></div></div></div>
+        <!-- 4. Գրիպ -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg" alt="Flu">
+                    <h3>{% if lang == 'hy' %}Գրիպ{% elif lang == 'ru' %}Грипп{% else %}Flu{% endif %}</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}📅 Սեզոնային{% elif lang == 'ru' %}📅 Сезонный{% else %}📅 Seasonal{% endif %}</h3>
+                    <p>• 1M {% if lang == 'hy' %}մահ/տարի{% elif lang == 'ru' %}смертей/год{% else %}deaths/year{% endif %}</p>
+                    <p>• H1N1, H3N2, H5N1</p>
+                    <p>• {% if lang == 'hy' %}Պատվաստանյութ ամեն տարի{% elif lang == 'ru' %}Вакцина каждый год{% else %}Yearly vaccine{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- Ռոտավիրուս -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg" alt="Rotavirus"><h3>
-            {% if lang == 'hy' %}Ռոտավիրուս
-            {% elif lang == 'ru' %}Ротавирус
-            {% else %}Rotavirus{% endif %}
-        </h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}💩 Մանկական
-            {% elif lang == 'ru' %}💩 Детский
-            {% else %}💩 Children{% endif %}
-        </h3><p>• 200,000+ 
-            {% if lang == 'hy' %}մահ/տարի
-            {% elif lang == 'ru' %}смертей/год
-            {% else %}deaths/year{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Ֆեկալ-օրալ
-            {% elif lang == 'ru' %}Фекально-оральный
-            {% else %}Fecal-oral{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Կա պատվաստանյութ
-            {% elif lang == 'ru' %}Есть вакцина
-            {% else %}Vaccine available{% endif %}
-        </p></div></div></div>
+        <!-- 5. Ռոտավիրուս -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg" alt="Rotavirus">
+                    <h3>{% if lang == 'hy' %}Ռոտավիրուս{% elif lang == 'ru' %}Ротавирус{% else %}Rotavirus{% endif %}</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}💩 Մանկական{% elif lang == 'ru' %}💩 Детский{% else %}💩 Children{% endif %}</h3>
+                    <p>• 200,000+ {% if lang == 'hy' %}մահ/տարի{% elif lang == 'ru' %}смертей/год{% else %}deaths/year{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Ֆեկալ-օրալ{% elif lang == 'ru' %}Фекально-оральный{% else %}Fecal-oral{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Կա պատվաստանյութ{% elif lang == 'ru' %}Есть вакцина{% else %}Vaccine available{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- Ադենովիրուս -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg" alt="Adenovirus"><h3>
-            {% if lang == 'hy' %}Ադենովիրուս
-            {% elif lang == 'ru' %}Аденовирус
-            {% else %}Adenovirus{% endif %}
-        </h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}🤧 Շնչառական
-            {% elif lang == 'ru' %}🤧 Респираторный
-            {% else %}🤧 Respiratory{% endif %}
-        </h3><p>• 50+ 
-            {% if lang == 'hy' %}տեսակ
-            {% elif lang == 'ru' %}типов
-            {% else %}types{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Մրսածություն, կոկորդի ցավ
-            {% elif lang == 'ru' %}Простуда, боль в горле
-            {% else %}Cold, sore throat{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Կոնյուկտիվիտ
-            {% elif lang == 'ru' %}Конъюнктивит
-            {% else %}Conjunctivitis{% endif %}
-        </p></div></div></div>
+        <!-- 6. Ադենովիրուս -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg" alt="Adenovirus">
+                    <h3>{% if lang == 'hy' %}Ադենովիրուս{% elif lang == 'ru' %}Аденовирус{% else %}Adenovirus{% endif %}</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}🤧 Շնչառական{% elif lang == 'ru' %}🤧 Респираторный{% else %}🤧 Respiratory{% endif %}</h3>
+                    <p>• 50+ {% if lang == 'hy' %}տեսակ{% elif lang == 'ru' %}типов{% else %}types{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Մրսածություն, կոկորդի ցավ{% elif lang == 'ru' %}Простуда, боль в горле{% else %}Cold, sore throat{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Կոնյուկտիվիտ{% elif lang == 'ru' %}Конъюнктивит{% else %}Conjunctivitis{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- Զիկա (Նկարը վերականգնված) -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Zika_virus_%283D_rendering%29.jpg/500px-Zika_virus_%283D_rendering%29.jpg" alt="Zika"><h3>
-            {% if lang == 'hy' %}Զիկա
-            {% elif lang == 'ru' %}Зика
-            {% else %}Zika{% endif %}
-        </h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}🦟 Մոծակներով
-            {% elif lang == 'ru' %}🦟 Комары
-            {% else %}🦟 Mosquitoes{% endif %}
-        </h3><p>• 
-            {% if lang == 'hy' %}Վտանգավոր հղիների համար
-            {% elif lang == 'ru' %}Опасно для беременных
-            {% else %}Dangerous for pregnant{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Առաջացնում է միկրոցեֆալիա
-            {% elif lang == 'ru' %}Вызывает микроцефалию
-            {% else %}Causes microcephaly{% endif %}
-        </p><p>• 2015-2016 
-            {% if lang == 'hy' %}համաճարակ
-            {% elif lang == 'ru' %}эпидемия
-            {% else %}epidemic{% endif %}
-        </p></div></div></div>
+        <!-- 7. Զիկա -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Zika_virus_%283D_rendering%29.jpg/500px-Zika_virus_%283D_rendering%29.jpg" alt="Zika">
+                    <h3>{% if lang == 'hy' %}Զիկա{% elif lang == 'ru' %}Зика{% else %}Zika{% endif %}</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}🦟 Մոծակներով{% elif lang == 'ru' %}🦟 Комары{% else %}🦟 Mosquitoes{% endif %}</h3>
+                    <p>• {% if lang == 'hy' %}Վտանգավոր հղիների համար{% elif lang == 'ru' %}Опасно для беременных{% else %}Dangerous for pregnant{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Առաջացնում է միկրոցեֆալիա{% elif lang == 'ru' %}Вызывает микроцефалию{% else %}Causes microcephaly{% endif %}</p>
+                    <p>• 2015-2016 {% if lang == 'hy' %}համաճարակ{% elif lang == 'ru' %}эпидемия{% else %}epidemic{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
-        <!-- Հերպես (Նկարը վերականգնված) -->
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Herpes_simplex_virus_%28HSV%29.jpg/500px-Herpes_simplex_virus_%28HSV%29.jpg" alt="Herpes"><h3>
-            {% if lang == 'hy' %}Հերպես
-            {% elif lang == 'ru' %}Герпес
-            {% else %}Herpes{% endif %}
-        </h3></div><div class="flip-card-back"><h3>
-            {% if lang == 'hy' %}😷 Մշտական
-            {% elif lang == 'ru' %}😷 Постоянный
-            {% else %}😷 Permanent{% endif %}
-        </h3><p>• 2 
-            {% if lang == 'hy' %}տեսակ՝ HSV-1, HSV-2
-            {% elif lang == 'ru' %}типа: HSV-1, HSV-2
-            {% else %}types: HSV-1, HSV-2{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Մնում է օրգանիզմում ամբողջ կյանք
-            {% elif lang == 'ru' %}Остается в организме на всю жизнь
-            {% else %}Remains in body for life{% endif %}
-        </p><p>• 
-            {% if lang == 'hy' %}Պարբերական ակտիվացում
-            {% elif lang == 'ru' %}Периодическая активация
-            {% else %}Periodic activation{% endif %}
-        </p></div></div></div>
+        <!-- 8. Հերպես -->
+        <div class="flip-card-3d">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Herpes_simplex_virus_%28HSV%29.jpg/500px-Herpes_simplex_virus_%28HSV%29.jpg" alt="Herpes">
+                    <h3>{% if lang == 'hy' %}Հերպես{% elif lang == 'ru' %}Герпес{% else %}Herpes{% endif %}</h3>
+                </div>
+                <div class="flip-card-back">
+                    <h3>{% if lang == 'hy' %}😷 Մշտական{% elif lang == 'ru' %}😷 Постоянный{% else %}😷 Permanent{% endif %}</h3>
+                    <p>• 2 {% if lang == 'hy' %}տեսակ՝ HSV-1, HSV-2{% elif lang == 'ru' %}типа: HSV-1, HSV-2{% else %}types: HSV-1, HSV-2{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Մնում է օրգանիզմում ամբողջ կյանք{% elif lang == 'ru' %}Остается в организме на всю жизнь{% else %}Remains in body for life{% endif %}</p>
+                    <p>• {% if lang == 'hy' %}Պարբերական ակտիվացում{% elif lang == 'ru' %}Периодическая активация{% else %}Periodic activation{% endif %}</p>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
