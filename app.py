@@ -553,7 +553,14 @@ def chat():
         data = request.json
         user_message = data.get('message', '')
         language = data.get('language', 'hy')
-        system_prompt = data.get('systemPrompt', '')
+        
+        # System prompt based on language
+        prompts = {
+            'hy': "Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ:",
+            'ru': "Ты эксперт по вирусологии: Отвечай на русском языке, кратко и четко:",
+            'en': "You are a virology expert: Answer in English, concisely and clearly:"
+        }
+        system_prompt = prompts.get(language, prompts['hy'])
         
         response = groq_client.chat.completions.create(
             model="llama-3.1-8b-instant",
@@ -570,7 +577,7 @@ def chat():
         
     except Exception as e:
         print(f"Groq error: {e}")
-        return jsonify({'reply': f'❌ Սխալ: {str(e)}'}), 500
+        return jsonify({'reply': f'❌ Error: {str(e)}'}), 500
 
 # ================= VIRUS DATA (for compare) =================
 virus_data = {
