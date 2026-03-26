@@ -78,7 +78,8 @@
         {% else %}🦠 Virus Gallery{% endif %}
     </h2>
     <div class="flip-card-container">
-        <!-- COVID-19 -->
+        
+        <!-- COVID-19 (Թարգմանված) -->
         <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png" alt="COVID"><h3>COVID-19</h3></div><div class="flip-card-back"><h3>
             {% if lang == 'hy' %}🔴 Փաստեր
             {% elif lang == 'ru' %}🔴 Факты
@@ -88,16 +89,16 @@
             {% elif lang == 'ru' %}смертей по всему миру
             {% else %}deaths worldwide{% endif %}
         </p><p>• 3 
-            {% if lang == 'hy' %}տարբերակ՝ Alpha, Delta, Omicron
-            {% elif lang == 'ru' %}варианта: Alpha, Delta, Omicron
-            {% else %}variants: Alpha, Delta, Omicron{% endif %}
-        </p><p>• 2026-ին 
-            {% if lang == 'hy' %}նոր JN.1 տարբերակ
-            {% elif lang == 'ru' %}новый вариант JN.1
-            {% else %}new JN.1 variant{% endif %}
+            {% if lang == 'hy' %}տարբերակ
+            {% elif lang == 'ru' %}варианта
+            {% else %}variants{% endif %}
+        </p><p>• 
+            {% if lang == 'hy' %}JN.1 տարբերակ (2026)
+            {% elif lang == 'ru' %}вариант JN.1 (2026)
+            {% else %}JN.1 variant (2026){% endif %}
         </p></div></div></div>
 
-        <!-- Էբոլա -->
+        <!-- Էբոլա (Թարգմանված) -->
         <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg" alt="Ebola"><h3>Ebola</h3></div><div class="flip-card-back"><h3>
             {% if lang == 'hy' %}⚠️ Վտանգ
             {% elif lang == 'ru' %}⚠️ Опасность
@@ -110,13 +111,13 @@
             {% if lang == 'hy' %}Փոխանցվում է արյունով
             {% elif lang == 'ru' %}Передается через кровь
             {% else %}Blood transmission{% endif %}
-        </p><p>• 2025-ին 
+        </p><p>• 2025 
             {% if lang == 'hy' %}բռնկում Կոնգոյում
             {% elif lang == 'ru' %}вспышка в Конго
             {% else %}outbreak in Congo{% endif %}
         </p></div></div></div>
 
-        <!-- ՄԻԱՎ -->
+        <!-- ՄԻԱՎ (Թարգմանված) -->
         <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" alt="HIV"><h3>HIV</h3></div><div class="flip-card-back"><h3>
             {% if lang == 'hy' %}📊 Վիճակագրություն
             {% elif lang == 'ru' %}📊 Статистика
@@ -168,9 +169,9 @@
             {% elif lang == 'ru' %}смертей/год
             {% else %}deaths/year{% endif %}
         </p><p>• 
-            {% if lang == 'hy' %}Ֆեկալ-օրալ փոխանցում
-            {% elif lang == 'ru' %}Фекально-оральная передача
-            {% else %}Fecal-oral transmission{% endif %}
+            {% if lang == 'hy' %}Ֆեկալ-օրալ
+            {% elif lang == 'ru' %}Фекально-оральный
+            {% else %}Fecal-oral{% endif %}
         </p><p>• 
             {% if lang == 'hy' %}Կա պատվաստանյութ
             {% elif lang == 'ru' %}Есть вакцина
@@ -200,7 +201,7 @@
             {% else %}Conjunctivitis{% endif %}
         </p></div></div></div>
 
-        <!-- Զիկա -->
+        <!-- Զիկա (Նկարը վերականգնված) -->
         <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Zika_virus_%283D_rendering%29.jpg/500px-Zika_virus_%283D_rendering%29.jpg" alt="Zika"><h3>
             {% if lang == 'hy' %}Զիկա
             {% elif lang == 'ru' %}Зика
@@ -223,7 +224,7 @@
             {% else %}epidemic{% endif %}
         </p></div></div></div>
 
-        <!-- Հերպես -->
+        <!-- Հերպես (Նկարը վերականգնված) -->
         <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Herpes_simplex_virus_%28HSV%29.jpg/500px-Herpes_simplex_virus_%28HSV%29.jpg" alt="Herpes"><h3>
             {% if lang == 'hy' %}Հերպես
             {% elif lang == 'ru' %}Герпес
@@ -245,6 +246,7 @@
             {% elif lang == 'ru' %}Периодическая активация
             {% else %}Periodic activation{% endif %}
         </p></div></div></div>
+
     </div>
 </div>
 
