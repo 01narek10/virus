@@ -1,8 +1,73 @@
-from flask import Flask, render_template, request, jsonify, redirect, send_from_directory
+from flask import Flask, render_template, request, jsonify, redirect, session
 from datetime import datetime
 from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
 import os
+
+app = Flask(__name__)
+app.secret_key = "virus-secret-2026"
+
+# ===== LANGUAGE SUPPORT =====
+def get_lang():
+    # Ստուգել URL-ի լեզուն (/hy/, /ru/, /en/)
+    lang = request.path.split('/')[1] if len(request.path.split('/')) > 1 else ''
+    if lang in ['hy', 'ru', 'en']:
+        session['lang'] = lang
+        return lang
+    # Եթե session-ում կա, վերցնել այն
+    if 'lang' in session:
+        return session['lang']
+    # Լռելյայն հայերեն
+    return 'hy'
+
+def get_translations(lang):
+    translations = {
+        'hy': {
+            'title': 'Վիրուսների հանրագիտարան 2026',
+            'home': '🏠 Գլխավոր',
+            'map': '🗺️ Քարտեզ',
+            'quiz': '🧪 Վիկտորինա',
+            'leaderboard': '🏆 Ցուցակ',
+            'simulator': '🧬 Սիմուլյատոր',
+            'compare': '🔍 Համեմատել',
+            'footer': '© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են',
+            'footer_update': 'Տվյալները թարմացվել են՝ 2026 մարտի 7',
+            # Ավելացնել մնացած թարգմանությունները...
+        },
+        'ru': {
+            'title': 'Энциклопедия вирусов 2026',
+            'home': '🏠 Главная',
+            'map': '🗺️ Карта',
+            'quiz': '🧪 Викторина',
+            'leaderboard': '🏆 Таблица',
+            'simulator': '🧬 Симулятор',
+            'compare': '🔍 Сравнить',
+            'footer': '© 2026 Платформа изучения вирусов | Все права защищены',
+            'footer_update': 'Данные обновлены: 7 марта 2026',
+        },
+        'en': {
+            'title': 'Virus Encyclopedia 2026',
+            'home': '🏠 Home',
+            'map': '🗺️ Map',
+            'quiz': '🧪 Quiz',
+            'leaderboard': '🏆 Leaderboard',
+            'simulator': '🧬 Simulator',
+            'compare': '🔍 Compare',
+            'footer': '© 2026 Virus Study Platform | All rights reserved',
+            'footer_update': 'Data updated: March 7, 2026',
+        }
+    }
+    return translations.get(lang, translations['hy'])
+
+@app.context_processor
+def inject_lang():
+    lang = get_lang()
+    t = get_translations(lang)
+    return {
+        'lang': lang,
+        't': t,
+        'get_lang': get_lang
+    }
 
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
