@@ -216,17 +216,40 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/">🏠 Գլխավոր</a></li>
-                <li class="nav-item"><a class="nav-link" href="/map">🗺️ Քարտեզ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/quiz">🧪 Վիկտորինա</a></li>
-                <li class="nav-item"><a class="nav-link" href="/leaderboard">🏆 Ցուցակ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/simulator">🧬 Սիմուլյատոր</a></li>
-                <li class="nav-item"><a class="nav-link" href="/compare">🔍 Համեմատել</a></li>
+                <li class="nav-item"><a class="nav-link" href="/">
+                    {% if lang == 'hy' %}🏠 Գլխավոր
+                    {% elif lang == 'ru' %}🏠 Главная
+                    {% else %}🏠 Home{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/map">
+                    {% if lang == 'hy' %}🗺️ Քարտեզ
+                    {% elif lang == 'ru' %}🗺️ Карта
+                    {% else %}🗺️ Map{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/quiz">
+                    {% if lang == 'hy' %}🧪 Վիկտորինա
+                    {% elif lang == 'ru' %}🧪 Викторина
+                    {% else %}🧪 Quiz{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/leaderboard">
+                    {% if lang == 'hy' %}🏆 Ցուցակ
+                    {% elif lang == 'ru' %}🏆 Таблица
+                    {% else %}🏆 Leaderboard{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/simulator">
+                    {% if lang == 'hy' %}🧬 Սիմուլյատոր
+                    {% elif lang == 'ru' %}🧬 Симулятор
+                    {% else %}🧬 Simulator{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/compare">
+                    {% if lang == 'hy' %}🔍 Համեմատել
+                    {% elif lang == 'ru' %}🔍 Сравнить
+                    {% else %}🔍 Compare{% endif %}
+                </a></li>
             </ul>
         </div>
     </div>
 </nav>
-
 <!-- ===== LANGUAGE SELECTOR ===== -->
 <div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
     <button onclick="setLanguage('hy')" class="lang-btn active" id="lang-hy">🇦🇲 Հայ</button>
