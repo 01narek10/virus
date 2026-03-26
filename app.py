@@ -182,14 +182,9 @@ def get_translations(lang):
     return translations.get(lang, translations['hy'])
 
 @app.context_processor
-def inject_lang():
-    lang = get_lang()
-    t = get_translations(lang)
-    return {
-        'lang': lang,
-        't': t,
-        'get_lang': get_lang
-    }
+def inject_translations():
+    lang = session.get('lang', 'hy')
+    return {'t': translations.get(lang, translations['hy'])}
 
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
