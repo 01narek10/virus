@@ -4,6 +4,10 @@ from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+app = Flask(__name__)
+app.secret_key = "virus-secret-2026"
+
+
 # ===== TRANSLATIONS =====
 translations = {
     'hy': {
@@ -167,24 +171,25 @@ app.secret_key = "virus-secret-2026"
 
 # ===== LANGUAGE SUPPORT =====
 def get_lang():
-    # Ստուգել URL-ի լեզուն (/hy/, /ru/, /en/)
-    lang = request.path.split('/')[1] if len(request.path.split('/')) > 1 else ''
+    # 1. Check URL parameter
+    lang = request.args.get('lang')
     if lang in ['hy', 'ru', 'en']:
         session['lang'] = lang
         return lang
-    # Եթե session-ում կա, վերցնել այն
+    # 2. Check session
     if 'lang' in session:
         return session['lang']
-    # Լռելյայն հայերեն
+    # 3. Default Armenian
     return 'hy'
+
 
 def get_translations(lang):
     return translations.get(lang, translations['hy'])
 
 @app.context_processor
-def inject_translations():
-    lang = session.get('lang', 'hy')
-    return {'t': translations.get(lang, translations['hy'])}
+def inject_lang():
+    lang = get_lang()
+    return {'lang': lang}
 
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
@@ -203,7 +208,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in ['hy', 'ru', 'en']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('home'))
+    
 # ================= SCORE MODEL =================
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
