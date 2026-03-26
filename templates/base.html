@@ -21,6 +21,41 @@
     max-height: 800px;         /* Առավելագույն չափ */
 }
 
+.language-selector {
+    display: flex;
+    gap: 5px;
+    background: rgba(10, 25, 47, 0.9);
+    padding: 8px 12px;
+    border-radius: 40px;
+    backdrop-filter: blur(10px);
+    border: 1px solid #2cc3ff;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    background: rgba(44, 195, 255, 0.2);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: #0a192f;
+    font-weight: bold;
+}
+        
 /* ===== DESKTOP (≥1025px) ===== */
 @media (min-width: 1025px) {
     .chatbot-window {
@@ -113,6 +148,13 @@
     </div>
 </nav>
 
+<!-- ===== LANGUAGE SELECTOR ===== -->
+<div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+    <button onclick="setLanguage('hy')" class="lang-btn active" id="lang-hy">🇦🇲 Հայ</button>
+    <button onclick="setLanguage('ru')" class="lang-btn" id="lang-ru">🇷🇺 Рус</button>
+    <button onclick="setLanguage('en')" class="lang-btn" id="lang-en">🇬🇧 En</button>
+</div>
+    
     <main class="container">
         {% block content %}{% endblock %}
     </main>
@@ -152,6 +194,68 @@
 
 
 <script>
+    // ===== MULTI-LANGUAGE CHATBOT =====
+let currentLang = localStorage.getItem('chatLang') || 'hy';
+
+// Լեզուների տեքստեր
+const translations = {
+    hy: {
+        welcome: "Բարև, ես վիրուսային օգնականն եմ:",
+        placeholder: "Գրիր հարցդ...",
+        thinking: "⏳ Մտածում եմ...",
+        error: "❌ Ցանցային սխալ",
+        systemPrompt: "Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ:"
+    },
+    ru: {
+        welcome: "Привет, я вирусный помощник:",
+        placeholder: "Напишите ваш вопрос...",
+        thinking: "⏳ Думаю...",
+        error: "❌ Ошибка сети",
+        systemPrompt: "Ты эксперт по вирусологии: Отвечай на русском языке, кратко и четко:"
+    },
+    en: {
+        welcome: "Hello, I'm your virus assistant:",
+        placeholder: "Type your question...",
+        thinking: "⏳ Thinking...",
+        error: "❌ Network error",
+        systemPrompt: "You are a virology expert: Answer in English, concisely and clearly:"
+    }
+};
+
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('chatLang', lang);
+    
+    // Թարմացնել ակտիվ կոճակը
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`lang-${lang}`).classList.add('active');
+    
+    // Թարմացնել chatbot-ի տեքստերը
+    updateChatbotTexts();
+}
+
+function updateChatbotTexts() {
+    const t = translations[currentLang];
+    
+    // Թարմացնել ողջույնի հաղորդագրությունը
+    const welcomeMsg = document.querySelector('#chatMessages .message.bot .message-content');
+    if (welcomeMsg) {
+        welcomeMsg.textContent = t.welcome;
+    }
+    
+    // Թարմացնել placeholder-ը
+    const input = document.getElementById('userInput');
+    if (input) {
+        input.placeholder = t.placeholder;
+    }
+}
+
+function getSystemPrompt() {
+    return translations[currentLang].systemPrompt;
+}
+    
     function initDraggable() {
     const chatbotWindow = document.getElementById('chatbotWindow');
     const header = document.getElementById('chatbotHeader');
@@ -195,12 +299,11 @@ function addThinking() {
     const thinkingDiv = document.createElement('div');
     thinkingDiv.className = 'message bot thinking';
     thinkingDiv.id = 'thinking-' + Date.now();
-    thinkingDiv.innerHTML = `<div class="message-content">⏳ Մտածում եմ...</div>`;
+    thinkingDiv.innerHTML = `<div class="message-content">${translations[currentLang].thinking}</div>`;
     messagesDiv.appendChild(thinkingDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     return thinkingDiv.id;
 }
-
 function removeThinking(id) {
     const el = document.getElementById(id);
     if (el) el.remove();
@@ -215,11 +318,16 @@ function sendMessage() {
     input.value = '';
 
     const thinkingId = addThinking();
+    const t = translations[currentLang];
 
     fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message })
+        body: JSON.stringify({ 
+            message: message,
+            language: currentLang,
+            systemPrompt: getSystemPrompt()
+        })
     })
     .then(res => res.json())
     .then(data => {
@@ -228,7 +336,7 @@ function sendMessage() {
     })
     .catch(error => {
         removeThinking(thinkingId);
-        addMessage('❌ Ցանցային սխալ', 'bot');
+        addMessage(t.error, 'bot');
         console.error('Chat error:', error);
     });
 }
@@ -399,7 +507,15 @@ window.addEventListener('load', function() {
     initDraggable();
     initResizeObserver();
     
-    // Desktop-ի դեպքում համոզվում ենք, որ դիրքը ճիշտ է
+    // ===== ԱՎԵԼԱՑՐՈՒՑ ԱՅՍ 3 ՏՈՂԵՐԸ =====
+    const savedLang = localStorage.getItem('chatLang');
+    if (savedLang) {
+        setLanguage(savedLang);
+    } else {
+        setLanguage('hy');
+    }
+    // ===================================
+    
     if (window.innerWidth > 1024) {
         const savedPos = localStorage.getItem('chatbotPosition');
         if (!savedPos) {
