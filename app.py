@@ -4,6 +4,164 @@ from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+# ===== TRANSLATIONS =====
+translations = {
+    'hy': {
+        # Navbar
+        'home': '🏠 Գլխավոր',
+        'map': '🗺️ Քարտեզ',
+        'quiz': '🧪 Վիկտորինա',
+        'leaderboard': '🏆 Ցուցակ',
+        'simulator': '🧬 Սիմուլյատոր',
+        'compare': '🔍 Համեմատել',
+        
+        # Footer
+        'footer': '© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են',
+        'footer_update': 'Տվյալները թարմացվել են՝ 2026 մարտի 7',
+        
+        # Hero
+        'hero_title': '🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ',
+        'hero_subtitle': 'Բացահայտիր անտեսանելի թշնամուն. 2026 թվականի ամենաթարմ տվյալներ',
+        'hero_stat1': 'Մարդկային վիրուսներ',
+        'hero_stat2': 'Հետազոտություններ',
+        'hero_stat3': 'Պատվաստանյութեր',
+        
+        # What are viruses
+        'what_are_viruses': '🔬 Ի՞նչ են վիրուսները',
+        'virus_desc1': 'Վիրուսները միկրոսկոպիկ ինֆեկցիոն ագենտներ են, որոնք կարող են վարակել բոլոր կենդանի օրգանիզմները։',
+        'virus_desc2': 'Դրանք կանգնած են կենդանի և ոչ կենդանի սահմանին․ չեն կարող բազմանալ ինքնուրույն, սակայն ունեն գենետիկ նյութ։',
+        'virus_desc3': '2026 թ․ հայտնի է 6590 վիրուս, որից 219-ը մարդկային։ Ամեն օր հայտնաբերվում է 2-3 նոր վիրուս։',
+        'virus_fact': 'Վիրուսները 100 անգամ փոքր են բակտերիաներից',
+        
+        # Gallery
+        'gallery': '🦠 Վիրուսների պատկերասրահ',
+        'covid_facts': '🔴 Փաստեր',
+        'ebola_facts': '⚠️ Վտանգ',
+        'hiv_facts': '📊 Վիճակագրություն',
+        'flu_facts': '📅 Սեզոնային',
+        
+        # Facts
+        'facts_title': '🧠 10 ՓԱՍՏ, ՈՐ ՉԳԻՏԵԻՐ',
+        
+        # Bacteriophages
+        'phage_title': '🧪 Բակտերիոֆագեր. վիրուսներ, որոնք որսում են բակտերիաներ',
+        'phage_what': 'Ի՞նչ են բակտերիոֆագերը',
+        'phage_what_text': 'Բակտերիոֆագերը (ֆագեր) վիրուսներ են, որոնք հատուկ վարակում են բակտերիաները։ Դրանք ամենատարածված կենսաբանական օբյեկտներն են Երկրի վրա. մեկ կաթիլ ջրում կարող են լինել միլիոնավոր ֆագեր։',
+        'phage_structure': 'Կառուցվածքը',
+        'phage_structure_text': 'Ֆագերն ունեն բարդ կառուցվածք՝ գլխիկ (որտեղ պահվում է գենետիկ նյութը), պոչ և պոչի թելիկներ, որոնք օգնում են ճանաչել բակտերիային։',
+        'phage_work': 'Ինչպես են աշխատում',
+        'phage_work_text': 'Ֆագերը կպչում են բակտերիայի մակերեսին, ներարկում իրենց ԴՆԹ-ն, և բակտերիան սկսում է արտադրել նոր ֆագեր, մինչև պայթի և ազատի դրանք։',
+        'phage_therapy': 'Ֆագային թերապիա',
+        'phage_therapy_text': 'Օգտագործվում է բակտերիալ ինֆեկցիաների բուժման համար, հատկապես երբ բակտերիաները կայուն են հակաբիոտիկների նկատմամբ։',
+        
+        # Timeline
+        'timeline_title': '📜 Պատմական ամենամահաբեր համաճարակները (մ.թ.ա. - 2023)',
+    },
+    'ru': {
+        # Navbar
+        'home': '🏠 Главная',
+        'map': '🗺️ Карта',
+        'quiz': '🧪 Викторина',
+        'leaderboard': '🏆 Таблица',
+        'simulator': '🧬 Симулятор',
+        'compare': '🔍 Сравнить',
+        
+        # Footer
+        'footer': '© 2026 Платформа изучения вирусов | Все права защищены',
+        'footer_update': 'Данные обновлены: 7 марта 2026',
+        
+        # Hero
+        'hero_title': '🦠 МИР ВИРУСОВ',
+        'hero_subtitle': 'Открой невидимого врага. Самые свежие данные 2026 года',
+        'hero_stat1': 'Вирусов человека',
+        'hero_stat2': 'Исследований',
+        'hero_stat3': 'Вакцин',
+        
+        # What are viruses
+        'what_are_viruses': '🔬 Что такое вирусы',
+        'virus_desc1': 'Вирусы — это микроскопические инфекционные агенты, которые могут заражать все живые организмы.',
+        'virus_desc2': 'Они находятся на грани живого и неживого: не могут размножаться самостоятельно, но имеют генетический материал.',
+        'virus_desc3': 'В 2026 году известно 6590 вирусов, из которых 219 — человеческие. Каждый день обнаруживается 2-3 новых вируса.',
+        'virus_fact': 'Вирусы в 100 раз меньше бактерий',
+        
+        # Gallery
+        'gallery': '🦠 Галерея вирусов',
+        'covid_facts': '🔴 Факты',
+        'ebola_facts': '⚠️ Опасность',
+        'hiv_facts': '📊 Статистика',
+        'flu_facts': '📅 Сезонный',
+        
+        # Facts
+        'facts_title': '🧠 10 ФАКТОВ, КОТОРЫХ ВЫ НЕ ЗНАЛИ',
+        
+        # Bacteriophages
+        'phage_title': '🧪 Бактериофаги — вирусы, охотящиеся на бактерии',
+        'phage_what': 'Что такое бактериофаги',
+        'phage_what_text': 'Бактериофаги (фаги) — это вирусы, которые заражают бактерии. Они являются самыми распространенными биологическими объектами на Земле: в одной капле воды могут быть миллионы фагов.',
+        'phage_structure': 'Строение',
+        'phage_structure_text': 'Фаги имеют сложное строение: головка (где хранится генетический материал), хвост и хвостовые нити, которые помогают распознать бактерию.',
+        'phage_work': 'Как работают',
+        'phage_work_text': 'Фаги прикрепляются к поверхности бактерии, впрыскивают свою ДНК, и бактерия начинает производить новые фаги, пока не лопнет и не выпустит их.',
+        'phage_therapy': 'Фаговая терапия',
+        'phage_therapy_text': 'Используется для лечения бактериальных инфекций, особенно когда бактерии устойчивы к антибиотикам.',
+        
+        # Timeline
+        'timeline_title': '📜 Самые смертоносные пандемии в истории (до н.э. - 2023)',
+    },
+    'en': {
+        # Navbar
+        'home': '🏠 Home',
+        'map': '🗺️ Map',
+        'quiz': '🧪 Quiz',
+        'leaderboard': '🏆 Leaderboard',
+        'simulator': '🧬 Simulator',
+        'compare': '🔍 Compare',
+        
+        # Footer
+        'footer': '© 2026 Virus Study Platform | All rights reserved',
+        'footer_update': 'Data updated: March 7, 2026',
+        
+        # Hero
+        'hero_title': '🦠 WORLD OF VIRUSES',
+        'hero_subtitle': 'Discover the invisible enemy. Latest data for 2026',
+        'hero_stat1': 'Human viruses',
+        'hero_stat2': 'Research',
+        'hero_stat3': 'Vaccines',
+        
+        # What are viruses
+        'what_are_viruses': '🔬 What are viruses',
+        'virus_desc1': 'Viruses are microscopic infectious agents that can infect all living organisms.',
+        'virus_desc2': 'They stand on the border between living and non-living: cannot reproduce on their own, but have genetic material.',
+        'virus_desc3': 'In 2026, 6,590 viruses are known, of which 219 are human. 2-3 new viruses are discovered every day.',
+        'virus_fact': 'Viruses are 100 times smaller than bacteria',
+        
+        # Gallery
+        'gallery': '🦠 Virus Gallery',
+        'covid_facts': '🔴 Facts',
+        'ebola_facts': '⚠️ Danger',
+        'hiv_facts': '📊 Statistics',
+        'flu_facts': '📅 Seasonal',
+        
+        # Facts
+        'facts_title': '🧠 10 FACTS YOU DIDN\'T KNOW',
+        
+        # Bacteriophages
+        'phage_title': '🧪 Bacteriophages - viruses that hunt bacteria',
+        'phage_what': 'What are bacteriophages',
+        'phage_what_text': 'Bacteriophages (phages) are viruses that specifically infect bacteria. They are the most common biological objects on Earth: one drop of water can contain millions of phages.',
+        'phage_structure': 'Structure',
+        'phage_structure_text': 'Phages have a complex structure: a head (where the genetic material is stored), a tail, and tail fibers that help recognize the bacteria.',
+        'phage_work': 'How they work',
+        'phage_work_text': 'Phages attach to the bacterial surface, inject their DNA, and the bacteria starts producing new phages until it bursts and releases them.',
+        'phage_therapy': 'Phage therapy',
+        'phage_therapy_text': 'Used to treat bacterial infections, especially when bacteria are resistant to antibiotics.',
+        
+        # Timeline
+        'timeline_title': '📜 Deadliest pandemics in history (BC - 2023)',
+    }
+}
+
+
 app = Flask(__name__)
 app.secret_key = "virus-secret-2026"
 
@@ -21,42 +179,6 @@ def get_lang():
     return 'hy'
 
 def get_translations(lang):
-    translations = {
-        'hy': {
-            'title': 'Վիրուսների հանրագիտարան 2026',
-            'home': '🏠 Գլխավոր',
-            'map': '🗺️ Քարտեզ',
-            'quiz': '🧪 Վիկտորինա',
-            'leaderboard': '🏆 Ցուցակ',
-            'simulator': '🧬 Սիմուլյատոր',
-            'compare': '🔍 Համեմատել',
-            'footer': '© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են',
-            'footer_update': 'Տվյալները թարմացվել են՝ 2026 մարտի 7',
-            # Ավելացնել մնացած թարգմանությունները...
-        },
-        'ru': {
-            'title': 'Энциклопедия вирусов 2026',
-            'home': '🏠 Главная',
-            'map': '🗺️ Карта',
-            'quiz': '🧪 Викторина',
-            'leaderboard': '🏆 Таблица',
-            'simulator': '🧬 Симулятор',
-            'compare': '🔍 Сравнить',
-            'footer': '© 2026 Платформа изучения вирусов | Все права защищены',
-            'footer_update': 'Данные обновлены: 7 марта 2026',
-        },
-        'en': {
-            'title': 'Virus Encyclopedia 2026',
-            'home': '🏠 Home',
-            'map': '🗺️ Map',
-            'quiz': '🧪 Quiz',
-            'leaderboard': '🏆 Leaderboard',
-            'simulator': '🧬 Simulator',
-            'compare': '🔍 Compare',
-            'footer': '© 2026 Virus Study Platform | All rights reserved',
-            'footer_update': 'Data updated: March 7, 2026',
-        }
-    }
     return translations.get(lang, translations['hy'])
 
 @app.context_processor
