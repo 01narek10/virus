@@ -500,7 +500,11 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=port)
 
 
-
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in ['hy', 'ru', 'en']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('home'))
 
 
 
