@@ -138,6 +138,41 @@
     color: #0a192f;
     font-weight: bold;
 }
+        .language-selector {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    gap: 5px;
+    background: rgba(10, 25, 47, 0.9);
+    padding: 8px 12px;
+    border-radius: 40px;
+    backdrop-filter: blur(10px);
+    border: 1px solid #2cc3ff;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    background: rgba(44, 195, 255, 0.2);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: #0a192f;
+    font-weight: bold;
+}
 }
 </style>
     <meta name="google-site-verification" content="Zj0hJ-4cJB2uGESTPj3qNoUEzFcaVQ1s0pW1AUOwbhI" />
