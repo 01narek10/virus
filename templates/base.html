@@ -273,21 +273,15 @@
 
 
 <!-- ===== CHATBOT ===== -->
-<div class="chatbot-container">
-    <div class="chatbot-button" onclick="toggleChat()">
-        💬
-    </div>
+<div class="chatbot-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end;">
+    <div class="chatbot-button" onclick="toggleChat()">💬</div>
     <div class="chatbot-window" id="chatbotWindow">
         <div class="chatbot-header" id="chatbotHeader">
-            <span>🦠 Վիրուսային օգնական</span>
+            <span id="chatbotTitle">🦠 Վիրուսային օգնական</span>
             <button onclick="toggleChat()">&times;</button>
         </div>
         <div class="chatbot-messages" id="chatMessages">
-            <div class="message bot">
-                <div class="message-content">
-                    Բարև, ես վիրուսային օգնականն եմ:
-                </div>
-            </div>
+            <div class="message bot"><div class="message-content" id="welcomeMessage">Բարև, ես վիրուսային օգնականն եմ:</div></div>
         </div>
         <div class="chatbot-input">
             <input type="text" id="userInput" placeholder="Գրիր հարցդ..." onkeypress="if(event.key === 'Enter') sendMessage()">
@@ -317,30 +311,39 @@
     // ===== MULTI-LANGUAGE CHATBOT =====
 let currentLang = localStorage.getItem('chatLang') || 'hy';
 
-// Լեզուների տեքստեր
-const translations = {
+// ===== CHATBOT TRANSLATIONS =====
+const chatTranslations = {
     hy: {
         welcome: "Բարև, ես վիրուսային օգնականն եմ:",
         placeholder: "Գրիր հարցդ...",
         thinking: "⏳ Մտածում եմ...",
-        error: "❌ Ցանցային սխալ",
-        systemPrompt: "Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ:"
+        error: "❌ Ցանցային սխալ"
     },
     ru: {
         welcome: "Привет, я вирусный помощник:",
         placeholder: "Напишите ваш вопрос...",
         thinking: "⏳ Думаю...",
-        error: "❌ Ошибка сети",
-        systemPrompt: "Ты эксперт по вирусологии: Отвечай на русском языке, кратко и четко:"
+        error: "❌ Ошибка сети"
     },
     en: {
         welcome: "Hello, I'm your virus assistant:",
         placeholder: "Type your question...",
         thinking: "⏳ Thinking...",
-        error: "❌ Network error",
-        systemPrompt: "You are a virology expert: Answer in English, concisely and clearly:"
+        error: "❌ Network error"
     }
 };
+
+function updateChatbotLanguage() {
+    const lang = document.documentElement.lang || 'hy';
+    const t = chatTranslations[lang];
+    
+    const welcomeMsg = document.querySelector('#chatMessages .message.bot .message-content');
+    if (welcomeMsg) welcomeMsg.textContent = t.welcome;
+    
+    const input = document.getElementById('userInput');
+    if (input) input.placeholder = t.placeholder;
+}
+
 
 function setLanguage(lang) {
     currentLang = lang;
