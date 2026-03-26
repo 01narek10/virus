@@ -73,9 +73,7 @@
 </div>
 
 <script>
-// ==================== 1000+ OUTBREAKS (FULL DATA) ====================
 var outbreaks = [
-    // ===== AFRICA =====
     { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
     { lat: -4.33, lon: 15.32, name: "Kinshasa (Limete), DRC", virus: "Ebola", cases: 45, deaths: 23, risk: "medium" },
     { lat: -4.38, lon: 15.41, name: "Kinshasa (Ngiri-Ngiri), DRC", virus: "Ebola", cases: 78, deaths: 34, risk: "high" },
@@ -132,8 +130,6 @@ var outbreaks = [
     { lat: -4.05, lon: 39.67, name: "Mombasa, Kenya", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
     { lat: -0.28, lon: 36.07, name: "Nakuru, Kenya", virus: "Mpox", cases: 78, deaths: 3, risk: "low" },
     { lat: 6.45, lon: 7.49, name: "Enugu, Nigeria", virus: "Lassa", cases: 145, deaths: 23, risk: "medium" },
-    
-    // ===== ASIA (400+ locations) =====
     { lat: 20.59, lon: 78.96, name: "Nagpur, India", virus: "Nipah", cases: 78, deaths: 34, risk: "high" },
     { lat: 21.15, lon: 79.09, name: "Nagpur (Manewada), India", virus: "Nipah", cases: 23, deaths: 12, risk: "medium" },
     { lat: 21.14, lon: 79.11, name: "Nagpur (Khapa), India", virus: "Nipah", cases: 12, deaths: 5, risk: "low" },
@@ -227,8 +223,6 @@ var outbreaks = [
     { lat: 33.52, lon: 36.31, name: "Damascus (Abu Rummaneh), Syria", virus: "COVID-19", cases: 234, deaths: 12, risk: "low" },
     { lat: 34.01, lon: 36.20, name: "Baalbek, Lebanon", virus: "Cholera", cases: 567, deaths: 34, risk: "medium" },
     { lat: 33.27, lon: 35.20, name: "Tyre, Lebanon", virus: "Cholera", cases: 234, deaths: 12, risk: "medium" },
-    
-    // ===== EUROPE =====
     { lat: 51.51, lon: -0.13, name: "London, UK", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
     { lat: 48.86, lon: 2.35, name: "Paris, France", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
     { lat: 52.52, lon: 13.40, name: "Berlin, Germany", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
@@ -253,8 +247,6 @@ var outbreaks = [
     { lat: 44.43, lon: 26.10, name: "Bucharest, Romania", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
     { lat: 42.70, lon: 23.32, name: "Sofia, Bulgaria", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
     { lat: 32.08, lon: 34.78, name: "Tel Aviv, Israel", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-    
-    // ===== NORTH AMERICA =====
     { lat: 40.71, lon: -74.01, name: "New York (Manhattan), USA", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
     { lat: 34.05, lon: -118.24, name: "Los Angeles, USA", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
     { lat: 41.88, lon: -87.63, name: "Chicago, USA", virus: "Mpox", cases: 234, deaths: 5, risk: "medium" },
@@ -269,8 +261,6 @@ var outbreaks = [
     { lat: 47.61, lon: -122.33, name: "Seattle, USA", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
     { lat: 42.36, lon: -71.06, name: "Boston, USA", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
     { lat: 39.95, lon: -75.16, name: "Philadelphia, USA", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-    
-    // ===== SOUTH AMERICA =====
     { lat: -23.55, lon: -46.63, name: "Sao Paulo, Brazil", virus: "Dengue", cases: 12500, deaths: 430, risk: "high" },
     { lat: -22.91, lon: -43.20, name: "Rio de Janeiro, Brazil", virus: "Oropouche", cases: 3456, deaths: 23, risk: "medium" },
     { lat: -15.79, lon: -47.88, name: "Brasilia, Brazil", virus: "Zika", cases: 567, deaths: 5, risk: "low" },
@@ -286,8 +276,6 @@ var outbreaks = [
     { lat: -16.41, lon: -71.53, name: "Arequipa, Peru", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
     { lat: -2.18, lon: -79.88, name: "Guayaquil, Ecuador", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
     { lat: 10.50, lon: -66.91, name: "Caracas, Venezuela", virus: "COVID-19", cases: 4567, deaths: 234, risk: "high" },
-    
-    // ===== AUSTRALIA & OCEANIA =====
     { lat: -33.87, lon: 151.21, name: "Sydney, Australia", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
     { lat: -37.81, lon: 144.96, name: "Melbourne, Australia", virus: "Ross River", cases: 1890, deaths: 2, risk: "low" },
     { lat: -27.47, lon: 153.02, name: "Brisbane, Australia", virus: "Japanese encephalitis", cases: 23, deaths: 4, risk: "low" },
@@ -301,8 +289,6 @@ var outbreaks = [
     { lat: -17.75, lon: 168.30, name: "Port Vila, Vanuatu", virus: "Dengue", cases: 890, deaths: 12, risk: "low" },
     { lat: -18.14, lon: 178.44, name: "Suva, Fiji", virus: "Dengue", cases: 1234, deaths: 23, risk: "medium" },
     { lat: -6.92, lon: 147.00, name: "Lae, Papua New Guinea", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    
-    // ===== MIDDLE EAST =====
     { lat: 25.07, lon: 55.31, name: "Dubai, UAE", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
     { lat: 24.45, lon: 54.38, name: "Abu Dhabi, UAE", virus: "COVID-19", cases: 3456, deaths: 56, risk: "medium" },
     { lat: 25.28, lon: 51.52, name: "Doha, Qatar", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
@@ -310,8 +296,6 @@ var outbreaks = [
     { lat: 21.54, lon: 39.17, name: "Jeddah, Saudi Arabia", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
     { lat: 24.63, lon: 46.71, name: "Riyadh, Saudi Arabia", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
     { lat: 15.61, lon: 32.53, name: "Khartoum, Sudan", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" },
-    // ==================== ADDITIONAL 624 OUTBREAKS ====================[
-    // ===== AFRICA (+120 new) =====
     { lat: -4.20, lon: 15.40, name: "Kinshasa (Kalamu), DRC", virus: "Ebola", cases: 156, deaths: 45, risk: "medium" },
     { lat: -4.45, lon: 15.50, name: "Kinshasa (Masina), DRC", virus: "Ebola", cases: 89, deaths: 23, risk: "medium" },
     { lat: -4.30, lon: 15.35, name: "Kinshasa (Kasa-Vubu), DRC", virus: "Ebola", cases: 67, deaths: 12, risk: "low" },
@@ -343,8 +327,6 @@ var outbreaks = [
     { lat: 8.00, lon: 47.00, name: "Las Anod, Somalia", virus: "Mpox", cases: 45, deaths: 2, risk: "low" },
     { lat: 9.00, lon: 44.00, name: "Hargeisa, Somaliland", virus: "COVID-19", cases: 567, deaths: 23, risk: "medium" },
     { lat: 10.00, lon: 43.00, name: "Berbera, Somaliland", virus: "COVID-19", cases: 234, deaths: 7, risk: "low" },
-    
-    // ===== ASIA (+200 new) =====
     { lat: 28.50, lon: 77.00, name: "Gurugram, India", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
     { lat: 28.70, lon: 77.10, name: "Faridabad, India", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
     { lat: 28.80, lon: 77.20, name: "Ghaziabad, India", virus: "COVID-19", cases: 1890, deaths: 45, risk: "medium" },
@@ -398,8 +380,6 @@ var outbreaks = [
     { lat: 10.00, lon: 124.00, name: "Cagayan de Oro, Philippines", virus: "Dengue", cases: 2345, deaths: 34, risk: "medium" },
     { lat: 7.00, lon: 125.00, name: "Davao City, Philippines", virus: "Dengue", cases: 3456, deaths: 56, risk: "high" },
     { lat: 6.00, lon: 124.00, name: "General Santos, Philippines", virus: "Dengue", cases: 1234, deaths: 23, risk: "medium" },
-    
-    // ===== EUROPE (+100 new) =====
     { lat: 51.50, lon: -0.10, name: "London (Camden), UK", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
     { lat: 51.45, lon: -0.20, name: "London (Wandsworth), UK", virus: "COVID-19", cases: 1567, deaths: 28, risk: "medium" },
     { lat: 51.55, lon: -0.05, name: "London (Hackney), UK", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
@@ -425,8 +405,6 @@ var outbreaks = [
     { lat: 47.50, lon: 19.10, name: "Budapest (Castle District), Hungary", virus: "H3N2", cases: 567, deaths: 8, risk: "low" },
     { lat: 50.10, lon: 14.50, name: "Prague (Old Town), Czechia", virus: "Mpox", cases: 23, deaths: 1, risk: "low" },
     { lat: 59.30, lon: 18.10, name: "Stockholm (Gamla Stan), Sweden", virus: "COVID-19", cases: 456, deaths: 5, risk: "low" },
-    
-    // ===== NORTH AMERICA (+75 new) =====
     { lat: 40.70, lon: -73.90, name: "New York (Brooklyn), USA", virus: "COVID-19", cases: 12345, deaths: 189, risk: "high" },
     { lat: 40.80, lon: -73.90, name: "New York (Bronx), USA", virus: "COVID-19", cases: 8900, deaths: 134, risk: "high" },
     { lat: 40.60, lon: -73.80, name: "New York (Queens), USA", virus: "COVID-19", cases: 7890, deaths: 123, risk: "high" },
@@ -445,8 +423,6 @@ var outbreaks = [
     { lat: 19.40, lon: -99.20, name: "Mexico City (Polanco), Mexico", virus: "COVID-19", cases: 3456, deaths: 78, risk: "high" },
     { lat: 19.50, lon: -99.10, name: "Mexico City (Coyoacan), Mexico", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
     { lat: 20.60, lon: -103.40, name: "Guadalajara (Tlaquepaque), Mexico", virus: "Dengue", cases: 1234, deaths: 34, risk: "medium" },
-    
-    // ===== SOUTH AMERICA (+60 new) =====
     { lat: -23.60, lon: -46.70, name: "Sao Paulo (Jardins), Brazil", virus: "Dengue", cases: 4567, deaths: 89, risk: "high" },
     { lat: -23.50, lon: -46.60, name: "Sao Paulo (Moema), Brazil", virus: "Dengue", cases: 2345, deaths: 45, risk: "medium" },
     { lat: -23.00, lon: -43.30, name: "Rio de Janeiro (Copacabana), Brazil", virus: "Oropouche", cases: 1234, deaths: 12, risk: "medium" },
@@ -465,8 +441,6 @@ var outbreaks = [
     { lat: -2.20, lon: -79.90, name: "Guayaquil (Samborondon), Ecuador", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
     { lat: -0.20, lon: -78.50, name: "Quito (La Carolina), Ecuador", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
     { lat: 10.50, lon: -66.90, name: "Caracas (Altamira), Venezuela", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    
-    // ===== AUSTRALIA & OCEANIA (+30 new) =====
     { lat: -33.90, lon: 151.30, name: "Sydney (Bondi), Australia", virus: "COVID-19", cases: 1234, deaths: 12, risk: "low" },
     { lat: -33.80, lon: 151.20, name: "Sydney (Manly), Australia", virus: "COVID-19", cases: 890, deaths: 8, risk: "low" },
     { lat: -37.80, lon: 145.00, name: "Melbourne (St Kilda), Australia", virus: "Ross River", cases: 567, deaths: 1, risk: "low" },
@@ -477,8 +451,6 @@ var outbreaks = [
     { lat: -41.30, lon: 174.80, name: "Wellington (Te Aro), NZ", virus: "COVID-19", cases: 345, deaths: 3, risk: "low" },
     { lat: -36.80, lon: 174.80, name: "Auckland (Ponsonby), NZ", virus: "COVID-19", cases: 678, deaths: 8, risk: "low" },
     { lat: -43.50, lon: 172.60, name: "Christchurch (Riccarton), NZ", virus: "COVID-19", cases: 234, deaths: 2, risk: "low" },
-    
-    // ===== MIDDLE EAST (+39 new) =====
     { lat: 25.20, lon: 55.30, name: "Dubai (Marina), UAE", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
     { lat: 25.10, lon: 55.20, name: "Dubai (Jumeirah), UAE", virus: "COVID-19", cases: 1567, deaths: 23, risk: "medium" },
     { lat: 24.50, lon: 54.40, name: "Abu Dhabi (Corniche), UAE", virus: "COVID-19", cases: 1234, deaths: 18, risk: "medium" },
@@ -489,9 +461,6 @@ var outbreaks = [
     { lat: 15.60, lon: 32.60, name: "Khartoum (Bahri), Sudan", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" }
 ];
 
-// Merge additional outbreaks into main outbreaks array
-outbreaks.push(...additionalOutbreaks);
-];
 
 // ==================== MAP INITIALIZATION ====================
 var map = L.map('main-map').setView([20, 0], 2);
