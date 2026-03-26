@@ -143,7 +143,7 @@
     <meta name="google-site-verification" content="Zj0hJ-4cJB2uGESTPj3qNoUEzFcaVQ1s0pW1AUOwbhI" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.5, user-scalable=yes">
-    <title>{% block title %}Վիրուսների հանրագիտարան 2026{% endblock %}</title>
+    <title>{{ t.title }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block extra_head %}{% endblock %}
@@ -166,29 +166,38 @@
 </div>
 <div class="moving-grid"></div>
 <div class="spotlight"></div>
-<nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <!-- ===== LANGUAGE SELECTOR ===== -->
+           <!-- ===== LANGUAGE SELECTOR ===== -->
 <div class="language-selector">
     <a href="{{ url_for('set_language', lang='hy') }}" class="lang-btn {% if lang == 'hy' %}active{% endif %}">🇦🇲 Հայ</a>
     <a href="{{ url_for('set_language', lang='ru') }}" class="lang-btn {% if lang == 'ru' %}active{% endif %}">🇷🇺 Рус</a>
     <a href="{{ url_for('set_language', lang='en') }}" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/">🏠 Գլխավոր</a></li>
-                <li class="nav-item"><a class="nav-link" href="/map">🗺️ Քարտեզ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/quiz">🧪 Վիկտորինա</a></li>
-                <li class="nav-item"><a class="nav-link" href="/leaderboard">🏆 Ցուցակ</a></li>
-                <li class="nav-item"><a class="nav-link" href="/simulator">🧬 Սիմուլյատոր</a></li>
-                <li class="nav-item"><a class="nav-link" href="/compare">🔍 Համեմատել</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">{{ t.home }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('map_page') }}">{{ t.map }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('quiz_choice') }}">{{ t.quiz }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('show_leaderboard') }}">{{ t.leaderboard }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('simulator') }}">{{ t.simulator }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('compare') }}">{{ t.compare }}</a></li>
             </ul>
         </div>
     </div>
 </nav>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <p>{{ t.footer }}</p>
+        <p>{{ t.footer_update }}</p>
+    </div>
+</footer>
 
 <!-- ===== LANGUAGE SELECTOR ===== -->
 <div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
