@@ -321,17 +321,14 @@ def chat():
     try:
         data = request.json
         user_message = data.get('message', '')
+        language = data.get('language', 'hy')
+        system_prompt = data.get('systemPrompt', '')
+        
         response = groq_client.chat.completions.create(
-           model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
-                {
-                    "role": "system", 
-                    "content": "Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ:"
-                },
-                {
-                    "role": "user", 
-                    "content": user_message
-                }
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
             ],
             temperature=0.7,
             max_tokens=500
