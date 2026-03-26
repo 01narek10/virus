@@ -306,6 +306,29 @@ a:hover::after {
     box-shadow: var(--shadow-lg);
 }
 
+.video-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid rgba(44,195,255,0.2);
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(44,195,255,0.3);
+    border-color: #2cc3ff;
+}
+
+.video-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2cc3ff;
+    text-align: center;
+}
+
+
 .navbar .container-fluid {
     max-width: var(--container-max);
     margin: 0 auto;
