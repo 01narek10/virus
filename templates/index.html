@@ -1,86 +1,87 @@
 {% extends "base.html" %}
-{% block title %}Վիրուսների հանրագիտարան 2026{% endblock %}
+{% block title %}{{ t.hero_title }}{% endblock %}
 
 {% block content %}
 <!-- HERO SECTION -->
 <div class="hero-section">
     <div class="hero-content">
-        <h1 class="glitch" data-text="🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ">🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ</h1>
-        <p class="hero-subtitle">Բացահայտիր անտեսանելի թշնամուն. 2026 թվականի ամենաթարմ տվյալներ</p>
+        <h1 class="glitch">{{ t.hero_title }}</h1>
+        <p class="hero-subtitle">{{ t.hero_subtitle }}</p>
         <div class="hero-stats">
-            <div class="hero-stat"><span class="stat-number">219+</span><span>Մարդկային վիրուսներ</span></div>
-            <div class="hero-stat"><span class="stat-number">7M+</span><span>Հետազոտություններ</span></div>
-            <div class="hero-stat"><span class="stat-number">48</span><span>Պատվաստանյութեր</span></div>
+            <div class="hero-stat"><span class="stat-number">219+</span><span>{{ t.hero_stat1 }}</span></div>
+            <div class="hero-stat"><span class="stat-number">7M+</span><span>{{ t.hero_stat2 }}</span></div>
+            <div class="hero-stat"><span class="stat-number">48</span><span>{{ t.hero_stat3 }}</span></div>
         </div>
     </div>
 </div>
 
-<!-- ԻՆՉ ԵՆ ՎԻՐՈՒՍՆԵՐԸ -->
+<!-- WHAT ARE VIRUSES -->
 <div class="card glass-card">
-    <h2>🔬 Ի՞նչ են վիրուսները</h2>
+    <h2>{{ t.what_are_viruses }}</h2>
     <div class="content-with-image">
         <div class="text-content">
-            <p>Վիրուսները միկրոսկոպիկ ինֆեկցիոն ագենտներ են, որոնք կարող են վարակել բոլոր կենդանի օրգանիզմները։ Դրանք կանգնած են կենդանի և ոչ կենդանի սահմանին․ չեն կարող բազմանալ ինքնուրույն, սակայն ունեն գենետիկ նյութ։</p>
-            <p><strong>2026 թ․</strong> հայտնի է 6590 վիրուս, որից 219-ը մարդկային։ Ամեն օր հայտնաբերվում է 2-3 նոր վիրուս։</p>
-            <div class="fact-badge"><span class="badge-icon">🧬</span><span>Վիրուսները 100 անգամ փոքր են բակտերիաներից</span></div>
+            <p>{{ t.virus_desc1 }}</p>
+            <p>{{ t.virus_desc2 }}</p>
+            <p>{{ t.virus_desc3 }}</p>
+            <div class="fact-badge"><span class="badge-icon">🧬</span><span>{{ t.virus_fact }}</span></div>
         </div>
         <div class="image-content" style="max-width: 400px; margin: 0 auto;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Rotavirus_Reconstruction.jpg/500px-Rotavirus_Reconstruction.jpg" alt="Ռոտավիրուս" style="width: 100%; height: 250px; object-fit: contain; border-radius: 12px;">
-            <img src="https://www.news-medical.net/image-handler/ts/20240626013048/ri/950/src/images/Article_Images/ImageForArticle_1250_17193798420466760.jpg" alt="Վիրուսներ" style="width: 100%; height: 250px; object-fit: contain; border-radius: 12px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Rotavirus_Reconstruction.jpg/500px-Rotavirus_Reconstruction.jpg" alt="Rotavirus" style="width: 100%; height: 250px; object-fit: contain; border-radius: 12px;">
+            <img src="https://www.news-medical.net/image-handler/ts/20240626013048/ri/950/src/images/Article_Images/ImageForArticle_1250_17193798420466760.jpg" alt="Viruses" style="width: 100%; height: 250px; object-fit: contain; border-radius: 12px;">
         </div>
     </div>
 </div>
 
-<!-- 3D ՖԼԻՓ ՔԱՐՏԵՐ -->
+<!-- GALLERY -->
 <div class="card">
-    <h2>🦠 Վիրուսների պատկերասրահ</h2>
+    <h2>{{ t.gallery }}</h2>
     <div class="flip-card-container">
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png" alt="COVID"><h3>COVID-19</h3></div><div class="flip-card-back"><h3>🔴 Փաստեր</h3><p>• 7M+ մահ ամբողջ աշխարհում</p><p>• 3 տարբերակ՝ Alpha, Delta, Omicron</p><p>• 2026-ին նոր JN.1 տարբերակ</p></div></div></div>
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg" alt="Ebola"><h3>Էբոլա</h3></div><div class="flip-card-back"><h3>⚠️ Վտանգ</h3><p>• 50-90% մահացություն</p><p>• Փոխանցվում է արյունով</p><p>• 2025-ին բռնկում Կոնգոյում</p></div></div></div>
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" alt="HIV"><h3>ՄԻԱՎ</h3></div><div class="flip-card-back"><h3>📊 Վիճակագրություն</h3><p>• 38M ապրում են ՄԻԱՎ-ով</p><p>• 40M մահ ՁԻԱՀ-ից</p><p>• Բուժում չկա, կա թերապիա</p></div></div></div>
-        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg" alt="Flu"><h3>Գրիպ</h3></div><div class="flip-card-back"><h3>📅 Սեզոնային</h3><p>• 1M մահ/տարի</p><p>• H1N1, H3N2, H5N1</p><p>• Պատվաստանյութ ամեն տարի</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png" alt="COVID"><h3>COVID-19</h3></div><div class="flip-card-back"><h3>{{ t.covid_facts }}</h3><p>• 7M+ deaths worldwide</p><p>• 3 variants: Alpha, Delta, Omicron</p><p>• New JN.1 variant in 2026</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg" alt="Ebola"><h3>Ebola</h3></div><div class="flip-card-back"><h3>{{ t.ebola_facts }}</h3><p>• 50-90% mortality</p><p>• Transmitted through blood</p><p>• 2025 outbreak in Congo</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg" alt="HIV"><h3>HIV</h3></div><div class="flip-card-back"><h3>{{ t.hiv_facts }}</h3><p>• 38M living with HIV</p><p>• 40M deaths from AIDS</p><p>• No cure, but therapy exists</p></div></div></div>
+        <div class="flip-card-3d"><div class="flip-card-inner"><div class="flip-card-front"><img src="https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg" alt="Flu"><h3>Flu</h3></div><div class="flip-card-back"><h3>{{ t.flu_facts }}</h3><p>• 1M deaths/year</p><p>• H1N1, H3N2, H5N1</p><p>• Yearly vaccine</p></div></div></div>
     </div>
 </div>
 
-<!-- 10 ՀԵՏԱՔՐՔԻՐ ՓԱՍՏ -->
+<!-- FACTS -->
 <div class="card">
-    <h2>🧠 10 ՓԱՍՏ, ՈՐ ՉԳԻՏԵԻՐ</h2>
+    <h2>{{ t.facts_title }}</h2>
     <div class="facts-grid">
-        <div class="fact-item"><span class="fact-number">1</span><p>Վիրուսները ամենաշատ կենսաբանական օբյեկտներն են օվկիանոսում․ 1 լիտր ծովաջրում կա 10 միլիարդ վիրուս։</p></div>
-        <div class="fact-item"><span class="fact-number">2</span><p>Ամենափոքր վիրուսը պարվովիրուսն է (20 նմ), ամենամեծը՝ պիթովիրուսը (1.5 մկմ)։</p></div>
-        <div class="fact-item"><span class="fact-number">3</span><p>Վիրուսների 80%-ը բակտերիոֆագեր են, որոնք վարակում են բակտերիաներին, ոչ թե մարդկանց։</p></div>
-        <div class="fact-item"><span class="fact-number">4</span><p>Առաջին պատվաստանյութը ստեղծվել է 1796թ․ ջրծաղիկի դեմ (Էդվարդ Ջեններ)։</p></div>
-        <div class="fact-item"><span class="fact-number">5</span><p>Վիրուսները կարող են ապրել ծայրահեղ պայմաններում՝ տաք աղբյուրներում (80°C) և Անտարկտիդայում։</p></div>
-        <div class="fact-item"><span class="fact-number">6</span><p>Մոծակները փոխանցում են 20+ վիրուս՝ դենգե, զիկա, արևմտյան Նեղոսի վիրուս։</p></div>
-        <div class="fact-item"><span class="fact-number">7</span><p>Ջրծաղիկը միակ վիրուսն է, որը լիովին վերացվել է մարդկությունից (1980)։</p></div>
-        <div class="fact-item"><span class="fact-number">8</span><p>Հերպեսի վիրուսը մնում է օրգանիզմում ամբողջ կյանք և ակտիվանում է իմունիտետի թուլացումից։</p></div>
-        <div class="fact-item"><span class="fact-number">9</span><p>Վիրուսները չեն համարվում կենդանի, քանի որ չեն կարող ինքնուրույն բազմանալ։</p></div>
-        <div class="fact-item"><span class="fact-number">10</span><p>Ամեն տարի հայտնաբերվում է 500+ նոր վիրուս, հիմնականում կենդանիներից։</p></div>
+        <div class="fact-item"><span class="fact-number">1</span><p>Viruses are the most abundant biological objects in the ocean; 1 liter of seawater contains 10 billion viruses.</p></div>
+        <div class="fact-item"><span class="fact-number">2</span><p>The smallest virus is parvovirus (20 nm), the largest is pithovirus (1.5 μm).</p></div>
+        <div class="fact-item"><span class="fact-number">3</span><p>80% of viruses are bacteriophages that infect bacteria, not humans.</p></div>
+        <div class="fact-item"><span class="fact-number">4</span><p>The first vaccine was created in 1796 for smallpox (Edward Jenner).</p></div>
+        <div class="fact-item"><span class="fact-number">5</span><p>Viruses can survive in extreme conditions: hot springs (80°C) and Antarctica.</p></div>
+        <div class="fact-item"><span class="fact-number">6</span><p>Mosquitoes transmit 20+ viruses: dengue, Zika, West Nile virus.</p></div>
+        <div class="fact-item"><span class="fact-number">7</span><p>Smallpox is the only virus completely eradicated from humanity (1980).</p></div>
+        <div class="fact-item"><span class="fact-number">8</span><p>Herpes virus remains in the body for life and activates when immunity weakens.</p></div>
+        <div class="fact-item"><span class="fact-number">9</span><p>Viruses are not considered living because they cannot reproduce on their own.</p></div>
+        <div class="fact-item"><span class="fact-number">10</span><p>500+ new viruses are discovered every year, mostly from animals.</p></div>
     </div>
 </div>
 
-<!-- ԲԱԿՏԵՐԻՈՖԱԳԵՐ -->
+<!-- BACTERIOPHAGES -->
 <div class="card">
-    <h2>🧪 Բակտերիոֆագեր. վիրուսներ, որոնք որսում են բակտերիաներ</h2>
+    <h2>{{ t.phage_title }}</h2>
     <div class="phage-grid">
-        <div class="phage-item"><span class="phage-icon">🦠</span><h3>Ի՞նչ են բակտերիոֆագերը</h3><p>Բակտերիոֆագերը (ֆագեր) վիրուսներ են, որոնք հատուկ վարակում են բակտերիաները։ Դրանք ամենատարածված կենսաբանական օբյեկտներն են Երկրի վրա. մեկ կաթիլ ջրում կարող են լինել միլիոնավոր ֆագեր։</p></div>
-        <div class="phage-item"><span class="phage-icon">🧬</span><h3>Կառուցվածքը</h3><p>Ֆագերն ունեն բարդ կառուցվածք՝ գլխիկ (որտեղ պահվում է գենետիկ նյութը), պոչ և պոչի թելիկներ, որոնք օգնում են ճանաչել բակտերիային։</p></div>
-        <div class="phage-item"><span class="phage-icon">⚙️</span><h3>Ինչպես են աշխատում</h3><p>Ֆագերը կպչում են բակտերիայի մակերեսին, ներարկում իրենց ԴՆԹ-ն, և բակտերիան սկսում է արտադրել նոր ֆագեր, մինչև պայթի և ազատի դրանք։</p></div>
-        <div class="phage-item"><span class="phage-icon">💊</span><h3>Ֆագային թերապիա</h3><p>Օգտագործվում է բակտերիալ ինֆեկցիաների բուժման համար, հատկապես երբ բակտերիաները կայուն են հակաբիոտիկների նկատմամբ։</p></div>
+        <div class="phage-item"><span class="phage-icon">🦠</span><h3>{{ t.phage_what }}</h3><p>{{ t.phage_what_text }}</p></div>
+        <div class="phage-item"><span class="phage-icon">🧬</span><h3>{{ t.phage_structure }}</h3><p>{{ t.phage_structure_text }}</p></div>
+        <div class="phage-item"><span class="phage-icon">⚙️</span><h3>{{ t.phage_work }}</h3><p>{{ t.phage_work_text }}</p></div>
+        <div class="phage-item"><span class="phage-icon">💊</span><h3>{{ t.phage_therapy }}</h3><p>{{ t.phage_therapy_text }}</p></div>
     </div>
 </div>
 
-<!-- ՊԱՏՄԱԿԱՆ ԱՄԵՆԱՄԱՀԱԲԵՐ ՀԱՄԱՃԱՐԱԿՆԵՐ -->
+<!-- TIMELINE -->
 <div class="card">
-    <h2>📜 Պատմական ամենամահաբեր համաճարակները (մ.թ.ա. - 2023)</h2>
+    <h2>{{ t.timeline_title }}</h2>
     <div class="timeline">
-        <div class="timeline-item"><div class="timeline-year">մ.թ.ա. 430-426</div><div class="timeline-content"><h3>Աթենքի ժանտախտ</h3><p>💀 75,000-100,000 զոհ (Աթենքի բնակչության 25%-ը):</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">165-180</div><div class="timeline-content"><h3>Անտոնինյան ժանտախտ</h3><p>💀 5-10 միլիոն զոհ: Հռոմեական կայսրություն:</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">541-542</div><div class="timeline-content"><h3>Հուստինիանոսի ժանտախտ</h3><p>💀 25-50 միլիոն զոհ (աշխարհի բնակչության 15-25%-ը):</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">1347-1351</div><div class="timeline-content"><h3>Սև մահ (ժանտախտ)</h3><p>💀 75-200 միլիոն զոհ (Եվրոպայի բնակչության 30-60%-ը):</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">1918-1920</div><div class="timeline-content"><h3>Իսպանական գրիպ (H1N1)</h3><p>💀 50-100 միլիոն զոհ (աշխարհի բնակչության 3-5%-ը):</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">1981-ներկա</div><div class="timeline-content"><h3>ՄԻԱՎ/ՁԻԱՀ</h3><p>💀 40+ միլիոն զոհ: 38 միլիոն մարդ ապրում են ՄԻԱՎ-ով:</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">2019-2023</div><div class="timeline-content"><h3>COVID-19</h3><p>💀 7+ միլիոն զոհ, 700+ միլիոն դեպք:</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">430-426 BC</div><div class="timeline-content"><h3>Plague of Athens</h3><p>💀 75,000-100,000 victims (25% of Athens population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">165-180</div><div class="timeline-content"><h3>Antonine Plague</h3><p>💀 5-10 million victims</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">541-542</div><div class="timeline-content"><h3>Plague of Justinian</h3><p>💀 25-50 million victims (15-25% of world population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">1347-1351</div><div class="timeline-content"><h3>Black Death</h3><p>💀 75-200 million victims (30-60% of Europe population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">1918-1920</div><div class="timeline-content"><h3>Spanish Flu (H1N1)</h3><p>💀 50-100 million victims (3-5% of world population)</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">1981-present</div><div class="timeline-content"><h3>HIV/AIDS</h3><p>💀 40+ million victims. 38 million people living with HIV</p></div></div>
+        <div class="timeline-item"><div class="timeline-year">2019-2023</div><div class="timeline-content"><h3>COVID-19</h3><p>💀 7+ million victims, 700+ million cases</p></div></div>
     </div>
 </div>
 {% endblock %}
