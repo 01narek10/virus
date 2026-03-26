@@ -196,6 +196,59 @@
     </div>
 </div>
 
+<!-- ՎԻԴԵՈՆԵՐ -->
+<div class="card">
+    <h2>
+        {% if lang == 'hy' %}📺 ՈՒՍՈՒՄՆԱԿԱՆ ՎԻԴԵՈՆԵՐ
+        {% elif lang == 'ru' %}📺 ОБРАЗОВАТЕЛЬНЫЕ ВИДЕО
+        {% else %}📺 EDUCATIONAL VIDEOS{% endif %}
+    </h2>
+    <div class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+        
+        <!-- ՎԻԴԵՈ 1 - Վիրուսները մեր մարմնում -->
+        <div class="video-card">
+            <div class="video-title">
+                {% if lang == 'hy' %}🧬 Վիրուսները մեր մարմնում
+                {% elif lang == 'ru' %}🧬 Вирусы в нашем теле
+                {% else %}🧬 Viruses in our body{% endif %}
+            </div>
+            <iframe width="100%" height="200" src="https://www.youtube.com/embed/Nh7zMbL_p38" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius: 12px;"></iframe>
+        </div>
+
+        <!-- ՎԻԴԵՈ 2 - Վիրուսների տեսակները -->
+        <div class="video-card">
+            <div class="video-title">
+                {% if lang == 'hy' %}🦠 Վիրուսների տեսակները
+                {% elif lang == 'ru' %}🦠 Типы вирусов
+                {% else %}🦠 Types of viruses{% endif %}
+            </div>
+            <iframe width="100%" height="200" src="https://www.youtube.com/embed/rsMn1pqtxCw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius: 12px;"></iframe>
+        </div>
+
+        <!-- ՎԻԴԵՈ 3 - COVID-19 -->
+        <div class="video-card">
+            <div class="video-title">
+                {% if lang == 'hy' %}😷 COVID-19
+                {% elif lang == 'ru' %}😷 COVID-19
+                {% else %}😷 COVID-19{% endif %}
+            </div>
+            <iframe width="100%" height="200" src="https://www.youtube.com/embed/NtFgPcIL7gk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius: 12px;"></iframe>
+        </div>
+
+        <!-- ՎԻԴԵՈ 4 - Իմունիտետ -->
+        <div class="video-card">
+            <div class="video-title">
+                {% if lang == 'hy' %}🛡️ Իմունիտետ
+                {% elif lang == 'ru' %}🛡️ Иммунитет
+                {% else %}🛡️ Immunity{% endif %}
+            </div>
+            <iframe width="100%" height="200" src="https://www.youtube.com/embed/2YbzmUR3Zbg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius: 12px;"></iframe>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- ՊԱՏՄԱԿԱՆ ԱՄԵՆԱՄԱՀԱԲԵՐ ՀԱՄԱՃԱՐԱԿՆԵՐ -->
 <div class="card">
     <h2>
