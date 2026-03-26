@@ -288,8 +288,16 @@
     
         <footer>
             <div class="footer-content">
-                <p>{{ t.footer }}</p>
-                <p>{{ t.footer_update }}</p>
+                <p>
+                    {% if lang == 'hy' %}© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են
+                    {% elif lang == 'ru' %}© 2026 Платформа изучения вирусов | Все права защищены
+                    {% else %}© 2026 Virus Study Platform | All rights reserved{% endif %}
+                </p>
+                <p>
+                    {% if lang == 'hy' %}Տվյալները թարմացվել են՝ 2026 մարտի 7
+                    {% elif lang == 'ru' %}Данные обновлены: 7 марта 2026
+                    {% else %}Data updated: March 7, 2026{% endif %}
+                </p>
             </div>
         </footer>
 
