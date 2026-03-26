@@ -102,6 +102,42 @@
     opacity: 1;
     background: linear-gradient(135deg, transparent 50%, #ff2c6d 50%);
 }
+
+        .language-selector {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    gap: 5px;
+    background: rgba(10, 25, 47, 0.9);
+    padding: 8px 12px;
+    border-radius: 40px;
+    backdrop-filter: blur(10px);
+    border: 1px solid #2cc3ff;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    background: rgba(44, 195, 255, 0.2);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: #0a192f;
+    font-weight: bold;
+}
 }
 </style>
     <meta name="google-site-verification" content="Zj0hJ-4cJB2uGESTPj3qNoUEzFcaVQ1s0pW1AUOwbhI" />
@@ -135,6 +171,12 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
+        <!-- ===== LANGUAGE SELECTOR ===== -->
+<div class="language-selector">
+    <a href="{{ url_for('set_language', lang='hy') }}" class="lang-btn {% if lang == 'hy' %}active{% endif %}">🇦🇲 Հայ</a>
+    <a href="{{ url_for('set_language', lang='ru') }}" class="lang-btn {% if lang == 'ru' %}active{% endif %}">🇷🇺 Рус</a>
+    <a href="{{ url_for('set_language', lang='en') }}" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
+</div>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/">🏠 Գլխավոր</a></li>
