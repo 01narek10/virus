@@ -29,13 +29,11 @@ def get_lang():
 def inject_lang():
     return {'lang': get_lang()}
 
-# ===== THIS IS THE ONLY ONE - KEEP THIS =====
 @app.route('/set_language/<lang>')
 def set_language(lang):
     if lang in ['hy', 'ru', 'en']:
         session['lang'] = lang
     return redirect(request.referrer or url_for('home'))
-# ===========================================
 
 # ===== SCORE MODEL =====
 class Score(db.Model):
