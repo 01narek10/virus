@@ -1,193 +1,6 @@
 <!DOCTYPE html>
-<html lang="hy">
+<html lang="{{ lang }}">
 <head>
-
-    <style>
-/* ===== RESIZABLE CHATBOT ===== */
-.chatbot-window {
-    background: #0a192f;
-    border: 2px solid #2cc3ff;
-    border-radius: 24px;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    margin-bottom: 15px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-    resize: both;              /* Սա է հրաշքը */
-    overflow: auto;            /* Պարտադիր resize-ի համար */
-    min-width: 300px;          /* Նվազագույն չափ */
-    min-height: 400px;         /* Նվազագույն չափ */
-    max-width: 800px;          /* Առավելագույն չափ */
-    max-height: 800px;         /* Առավելագույն չափ */
-}
-
-.language-selector .lang-btn.active {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    color: #0a192f;
-    font-weight: bold;
-}
-        
-.language-selector {
-    display: flex;
-    gap: 5px;
-    background: rgba(10, 25, 47, 0.9);
-    padding: 8px 12px;
-    border-radius: 40px;
-    backdrop-filter: blur(10px);
-    border: 1px solid #2cc3ff;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-}
-
-.lang-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 5px 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-}
-
-.lang-btn:hover {
-    background: rgba(44, 195, 255, 0.2);
-}
-
-.lang-btn.active {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    color: #0a192f;
-    font-weight: bold;
-}
-        
-/* ===== DESKTOP (≥1025px) ===== */
-@media (min-width: 1025px) {
-    .chatbot-window {
-        width: 520px;
-        height: 680px;
-        position: absolute;
-        bottom: 80px;
-        right: 0;
-    }
-}
-
-/* ===== TABLET & MOBILE (≤1024px) ===== */
-@media (max-width: 1024px) {
-    .chatbot-window {
-        width: 70vw;
-        height: 70vh;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        resize: both;
-        min-width: 250px;
-        min-height: 300px;
-        max-width: 90vw;
-        max-height: 90vh;
-    }
-}
-        /* ===== RESIZE HANDLE ===== */
-.chatbot-window::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, transparent 50%, #2cc3ff 50%);
-    border-radius: 0 0 24px 0;
-    pointer-events: none;
-    opacity: 0.7;
-    z-index: 10;
-}
-
-.chatbot-window:hover::after {
-    opacity: 1;
-    background: linear-gradient(135deg, transparent 50%, #ff2c6d 50%);
-}
-
-        .language-selector {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    gap: 5px;
-    background: rgba(10, 25, 47, 0.9);
-    padding: 8px 12px;
-    border-radius: 40px;
-    backdrop-filter: blur(10px);
-    border: 1px solid #2cc3ff;
-}
-
-.lang-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 5px 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.3s;
-}
-
-.lang-btn:hover {
-    background: rgba(44, 195, 255, 0.2);
-}
-
-.lang-btn.active {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    color: #0a192f;
-    font-weight: bold;
-}
-        
-.language-selector .lang-btn.active {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    color: #0a192f;
-    font-weight: bold;
-}
-        
- .language-selector {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
-    gap: 5px;
-    background: rgba(10, 25, 47, 0.9);
-    padding: 8px 12px;
-    border-radius: 40px;
-    backdrop-filter: blur(10px);
-    border: 1px solid #2cc3ff;
-}
-
-.lang-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    padding: 5px 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.3s;
-}
-
-.lang-btn:hover {
-    background: rgba(44, 195, 255, 0.2);
-}
-
-.lang-btn.active {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    color: #0a192f;
-    font-weight: bold;
-}
-}
-</style>
     <meta name="google-site-verification" content="Zj0hJ-4cJB2uGESTPj3qNoUEzFcaVQ1s0pW1AUOwbhI" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.5, user-scalable=yes">
@@ -195,34 +8,248 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block extra_head %}{% endblock %}
+    <style>
+        /* ===== CHATBOT STYLES ===== */
+        .chatbot-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
 
+        .chatbot-button {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(44, 195, 255, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(44, 195, 255, 0.9);
+        }
+
+        .chatbot-window {
+            background: #0a192f;
+            border: 2px solid #2cc3ff;
+            border-radius: 24px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            resize: both;
+            overflow: auto;
+            min-width: 300px;
+            min-height: 400px;
+            max-width: 800px;
+            max-height: 800px;
+        }
+
+        .chatbot-window.show {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            color: #0a192f;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+
+        .chatbot-header button {
+            background: rgba(0,0,0,0.2);
+            border: none;
+            color: #0a192f;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #0a192f;
+        }
+
+        .message {
+            display: flex;
+        }
+        .message.bot { justify-content: flex-start; }
+        .message.user { justify-content: flex-end; }
+
+        .message-content {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .message.bot .message-content {
+            background: #1e3a6b;
+            border: 1px solid #2cc3ff;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            color: #0a192f;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 12px;
+            background: #0a192f;
+            border-top: 1px solid #2cc3ff;
+            gap: 8px;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #2cc3ff;
+            border-radius: 40px;
+            background: #1e2f4a;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .chatbot-input button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            border: none;
+            color: #0a192f;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Desktop */
+        @media (min-width: 1025px) {
+            .chatbot-window {
+                width: 520px;
+                height: 680px;
+                position: absolute;
+                bottom: 80px;
+                right: 0;
+            }
+            .chatbot-button {
+                width: 80px;
+                height: 80px;
+                font-size: 2.8rem;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 1024px) {
+            .chatbot-window {
+                width: 85vw;
+                height: 70vh;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                resize: both;
+                min-width: 280px;
+                min-height: 400px;
+                max-width: 95vw;
+                max-height: 85vh;
+            }
+            .chatbot-button {
+                width: 65px;
+                height: 65px;
+                font-size: 2.2rem;
+                bottom: 20px;
+                right: 20px;
+                position: fixed;
+            }
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 5px;
+            background: rgba(10, 25, 47, 0.9);
+            padding: 8px 12px;
+            border-radius: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #2cc3ff;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(44, 195, 255, 0.2);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            color: #0a192f;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 <div class="virus-background">
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="virus"></div>
-    <div class="bacteriophage"></div>
-    <div class="bacteriophage"></div>
+    <div class="virus"></div><div class="virus"></div><div class="virus"></div>
+    <div class="virus"></div><div class="virus"></div><div class="virus"></div>
+    <div class="virus"></div><div class="virus"></div><div class="virus"></div>
+    <div class="virus"></div><div class="bacteriophage"></div><div class="bacteriophage"></div>
 </div>
 <div class="moving-grid"></div>
 <div class="spotlight"></div>
 
-<!-- ===== LANGUAGE SELECTOR ===== -->
-<div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; gap: 5px; background: rgba(10,25,47,0.9); padding: 8px 12px; border-radius: 40px; backdrop-filter: blur(10px); border: 1px solid #2cc3ff;">
-    <a href="/set_language/hy" class="lang-btn {% if lang == 'hy' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇦🇲 Հայ</a>
-    <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇷🇺 Рус</a>
-    <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇬🇧 En</a>
+<!-- LANGUAGE SELECTOR -->
+<div class="language-selector">
+    <a href="/set_language/hy" class="lang-btn {% if lang == 'hy' %}active{% endif %}">🇦🇲 Հայ</a>
+    <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}">🇷🇺 Рус</a>
+    <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
 
-    
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -240,36 +267,32 @@
         </div>
     </div>
 </nav>
-<!-- ===== LANGUAGE SELECTOR ===== -->
-<div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; gap: 5px; background: rgba(10,25,47,0.9); padding: 8px 12px; border-radius: 40px; backdrop-filter: blur(10px); border: 1px solid #2cc3ff;">
-    <a href="/set_language/hy" class="lang-btn {% if lang == 'hy' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇦🇲 Հայ</a>
-    <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇷🇺 Рус</a>
-    <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇬🇧 En</a>
-</div>
 
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
 
-
-
-    
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
-
-
-<div class="chatbot-header" id="chatbotHeader">
-    <span id="chatbotTitle">{{ t.chatbot_title }}</span>
-    <button onclick="toggleChat()">&times;</button>
-</div>
-<div class="chatbot-messages" id="chatMessages">
-    <div class="message bot">
-        <div class="message-content" id="welcomeMessage">{{ t.chatbot_welcome }}</div>
+<!-- CHATBOT -->
+<div class="chatbot-container">
+    <div class="chatbot-button" onclick="toggleChat()">✉️</div>
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header" id="chatbotHeader">
+            <span id="chatbotTitle">{{ t.chatbot_title }}</span>
+            <button onclick="toggleChat()">&times;</button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content" id="welcomeMessage">{{ t.chatbot_welcome }}</div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="userInput" placeholder="{{ t.chatbot_placeholder }}" onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">➤</button>
+        </div>
     </div>
 </div>
-<div class="chatbot-input">
-    <input type="text" id="userInput" placeholder="{{ t.chatbot_placeholder }}" onkeypress="if(event.key === 'Enter') sendMessage()">
-    <button onclick="sendMessage()">➤</button>
-</div>
-    
+
+<!-- FOOTER -->
 <footer>
     <div class="footer-content">
         <p>{{ t.footer }}</p>
@@ -277,104 +300,8 @@
     </div>
 </footer>
 
-
-
 <script>
-    // ===== MULTI-LANGUAGE CHATBOT =====
-let currentLang = localStorage.getItem('chatLang') || 'hy';
-
-// ===== CHATBOT TRANSLATIONS =====
-const chatTranslations = {
-    hy: {
-        welcome: "Բարև, ես վիրուսային օգնականն եմ:",
-        placeholder: "Գրիր հարցդ...",
-        thinking: "⏳ Մտածում եմ...",
-        error: "❌ Ցանցային սխալ"
-    },
-    ru: {
-        welcome: "Привет, я вирусный помощник:",
-        placeholder: "Напишите ваш вопрос...",
-        thinking: "⏳ Думаю...",
-        error: "❌ Ошибка сети"
-    },
-    en: {
-        welcome: "Hello, I'm your virus assistant:",
-        placeholder: "Type your question...",
-        thinking: "⏳ Thinking...",
-        error: "❌ Network error"
-    }
-};
-
-function updateChatbotLanguage() {
-    const lang = document.documentElement.lang || 'hy';
-    const t = chatTranslations[lang];
-    
-    const welcomeMsg = document.querySelector('#chatMessages .message.bot .message-content');
-    if (welcomeMsg) welcomeMsg.textContent = t.welcome;
-    
-    const input = document.getElementById('userInput');
-    if (input) input.placeholder = t.placeholder;
-}
-
-
-function setLanguage(lang) {
-    currentLang = lang;
-    localStorage.setItem('chatLang', lang);
-    
-    // Թարմացնել ակտիվ կոճակը
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.getElementById(`lang-${lang}`).classList.add('active');
-    
-    // Թարմացնել chatbot-ի տեքստերը
-    updateChatbotTexts();
-}
-
-function updateChatbotTexts() {
-    const t = translations[currentLang];
-    
-    // Թարմացնել ողջույնի հաղորդագրությունը
-    const welcomeMsg = document.querySelector('#chatMessages .message.bot .message-content');
-    if (welcomeMsg) {
-        welcomeMsg.textContent = t.welcome;
-    }
-    
-    // Թարմացնել placeholder-ը
-    const input = document.getElementById('userInput');
-    if (input) {
-        input.placeholder = t.placeholder;
-    }
-}
-
-function getSystemPrompt() {
-    return translations[currentLang].systemPrompt;
-}
-    
-    function initDraggable() {
-    const chatbotWindow = document.getElementById('chatbotWindow');
-    const header = document.getElementById('chatbotHeader');
-    
-    if (!chatbotWindow || !header) return;
-    
-    // Միացնում ենք միայն desktop-ի վրա (1024px-ից մեծ)
-    if (window.innerWidth <= 1024) {
-        // Mobile-ի վրա համոզվում ենք, որ կենտրոնում է
-        chatbotWindow.style.position = 'fixed';
-        chatbotWindow.style.left = '50%';
-        chatbotWindow.style.top = '50%';
-        chatbotWindow.style.transform = 'translate(-50%, -50%)';
-        chatbotWindow.style.right = 'auto';
-        chatbotWindow.style.bottom = 'auto';
-        return;
-    }
-    
-    // Մնացած drag կոդը...
-}
-// ===== RESIZABLE & DRAGGABLE CHATBOT =====
-let isDragging = false;
-let offsetX, offsetY;
-
+// ===== CHATBOT FUNCTIONS =====
 function toggleChat() {
     const window = document.getElementById('chatbotWindow');
     window.classList.toggle('show');
@@ -394,11 +321,14 @@ function addThinking() {
     const thinkingDiv = document.createElement('div');
     thinkingDiv.className = 'message bot thinking';
     thinkingDiv.id = 'thinking-' + Date.now();
-    thinkingDiv.innerHTML = `<div class="message-content">${translations[currentLang].thinking}</div>`;
+    const lang = '{{ lang }}';
+    const thinkingText = lang === 'hy' ? '⏳ Մտածում եմ...' : (lang === 'ru' ? '⏳ Думаю...' : '⏳ Thinking...');
+    thinkingDiv.innerHTML = `<div class="message-content">${thinkingText}</div>`;
     messagesDiv.appendChild(thinkingDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     return thinkingDiv.id;
 }
+
 function removeThinking(id) {
     const el = document.getElementById(id);
     if (el) el.remove();
@@ -413,18 +343,12 @@ function sendMessage() {
     input.value = '';
 
     const thinkingId = addThinking();
-
-    // Get current language from the page
-    const currentLang = document.querySelector('.lang-btn.active').innerText.includes('Հայ') ? 'hy' :
-                        document.querySelector('.lang-btn.active').innerText.includes('Рус') ? 'ru' : 'en';
+    const lang = '{{ lang }}';
 
     fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            message: message,
-            language: currentLang
-        })
+        body: JSON.stringify({ message: message, language: lang })
     })
     .then(res => res.json())
     .then(data => {
@@ -433,78 +357,81 @@ function sendMessage() {
     })
     .catch(error => {
         removeThinking(thinkingId);
-        addMessage('❌ Network error', 'bot');
-        console.error('Chat error:', error);
+        const errorText = lang === 'hy' ? '❌ Ցանցային սխալ' : (lang === 'ru' ? '❌ Ошибка сети' : '❌ Network error');
+        addMessage(errorText, 'bot');
     });
 }
 
-// ===== DRAGGABLE FUNCTIONS =====
+// ===== DRAGGABLE =====
+let isDragging = false;
+let offsetX, offsetY;
+
 function initDraggable() {
     const chatbotWindow = document.getElementById('chatbotWindow');
     const header = document.getElementById('chatbotHeader');
-    
     if (!chatbotWindow || !header) return;
-    
-    // Միացնում ենք միայն desktop-ի վրա (1024px-ից մեծ)
     if (window.innerWidth <= 1024) return;
-    
+
     header.addEventListener('mousedown', startDrag);
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', stopDrag);
-    
+
     function startDrag(e) {
         isDragging = true;
-        
         const rect = chatbotWindow.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
-        
         chatbotWindow.style.position = 'fixed';
         chatbotWindow.style.margin = '0';
-        chatbotWindow.classList.add('dragging');
-        
         header.style.cursor = 'grabbing';
         e.preventDefault();
     }
-    
+
     function drag(e) {
         if (!isDragging) return;
-        
         let newX = e.clientX - offsetX;
         let newY = e.clientY - offsetY;
-        
-        // Սահմանափակում ենք էկրանի սահմաններում
         const maxX = window.innerWidth - chatbotWindow.offsetWidth;
         const maxY = window.innerHeight - chatbotWindow.offsetHeight;
-        
         newX = Math.max(0, Math.min(newX, maxX));
         newY = Math.max(0, Math.min(newY, maxY));
-        
         chatbotWindow.style.left = newX + 'px';
         chatbotWindow.style.top = newY + 'px';
         chatbotWindow.style.right = 'auto';
         chatbotWindow.style.bottom = 'auto';
-        
         e.preventDefault();
     }
-    
+
     function stopDrag() {
         if (!isDragging) return;
-        
         isDragging = false;
         header.style.cursor = 'move';
-        chatbotWindow.classList.remove('dragging');
         saveChatbotPosition();
     }
 }
 
-// ===== SIZE & POSITION SAVE =====
+function saveChatbotPosition() {
+    const window = document.getElementById('chatbotWindow');
+    const position = { left: window.style.left, top: window.style.top };
+    localStorage.setItem('chatbotPosition', JSON.stringify(position));
+}
+
+function loadChatbotPosition() {
+    const saved = localStorage.getItem('chatbotPosition');
+    if (saved && window.innerWidth > 1024) {
+        const pos = JSON.parse(saved);
+        const window = document.getElementById('chatbotWindow');
+        window.style.left = pos.left;
+        window.style.top = pos.top;
+        window.style.right = 'auto';
+        window.style.bottom = 'auto';
+        window.style.transform = 'none';
+    }
+}
+
 function saveChatbotSize() {
     const window = document.getElementById('chatbotWindow');
-    const size = {
-        width: window.offsetWidth,
-        height: window.offsetHeight
-    };
+    const size = { width: window.offsetWidth, height: window.offsetHeight };
     localStorage.setItem('chatbotSize', JSON.stringify(size));
 }
 
@@ -518,135 +445,49 @@ function loadChatbotSize() {
     }
 }
 
-function saveChatbotPosition() {
-    const window = document.getElementById('chatbotWindow');
-    const position = {
-        left: window.style.left,
-        top: window.style.top,
-        right: window.style.right,
-        bottom: window.style.bottom
-    };
-    localStorage.setItem('chatbotPosition', JSON.stringify(position));
-}
-
-function loadChatbotPosition() {
-    const saved = localStorage.getItem('chatbotPosition');
-    const chatbotWindow = document.getElementById('chatbotWindow');
-    
-    if (saved && window.innerWidth > 1024) {
-        const pos = JSON.parse(saved);
-        chatbotWindow.style.left = pos.left;
-        chatbotWindow.style.top = pos.top;
-        chatbotWindow.style.right = pos.right;
-        chatbotWindow.style.bottom = pos.bottom;
-        chatbotWindow.style.transform = 'none';
-    } else if (window.innerWidth <= 1024) {
-        // Mobile-ի վրա կենտրոնում
-        chatbotWindow.style.position = 'fixed';
-        chatbotWindow.style.left = '50%';
-        chatbotWindow.style.top = '50%';
-        chatbotWindow.style.transform = 'translate(-50%, -50%)';
-        chatbotWindow.style.right = 'auto';
-        chatbotWindow.style.bottom = 'auto';
-    }
-}
-
-function resetChatbotPosition() {
-    const window = document.getElementById('chatbotWindow');
-    window.style.left = 'auto';
-    window.style.top = 'auto';
-    window.style.right = '0';
-    window.style.bottom = '80px';
-    window.style.position = 'absolute';
-    saveChatbotPosition();
-}
-
-// ===== RESIZE OBSERVER =====
-function initResizeObserver() {
-    const window = document.getElementById('chatbotWindow');
-    if (!window) return;
-    
-    const observer = new ResizeObserver(() => {
-        saveChatbotSize();
-    });
-    observer.observe(window);
-}
-
-// ===== WINDOW RESIZE HANDLER =====
 function handleWindowResize() {
-    const isDesktop = window.innerWidth > 1024;
     const chatbotWindow = document.getElementById('chatbotWindow');
-    
-    if (!isDesktop) {
-        // Mobile-ի վրա կենտրոնում
+    if (window.innerWidth <= 1024) {
         chatbotWindow.style.position = 'fixed';
         chatbotWindow.style.left = '50%';
         chatbotWindow.style.top = '50%';
         chatbotWindow.style.transform = 'translate(-50%, -50%)';
         chatbotWindow.style.right = 'auto';
         chatbotWindow.style.bottom = 'auto';
-        chatbotWindow.style.margin = '0';
-        
-        // Վերականգնում ենք mobile չափերը
-        chatbotWindow.style.width = window.innerWidth <= 480 ? '80vw' : '70vw';
-        chatbotWindow.style.height = '70vh';
     } else {
-        // Desktop-ի վրա վերականգնում ենք պահպանված դիրքը
         chatbotWindow.style.transform = 'none';
         loadChatbotPosition();
     }
 }
 
-// ===== INIT =====
 window.addEventListener('load', function() {
     loadChatbotSize();
     loadChatbotPosition();
     initDraggable();
-    initResizeObserver();
-    
-    // ===== ԱՎԵԼԱՑՐՈՒՑ ԱՅՍ 3 ՏՈՂԵՐԸ =====
-    const savedLang = localStorage.getItem('chatLang');
-    if (savedLang) {
-        setLanguage(savedLang);
-    } else {
-        setLanguage('hy');
-    }
-    // ===================================
-    
     if (window.innerWidth > 1024) {
         const savedPos = localStorage.getItem('chatbotPosition');
         if (!savedPos) {
-            resetChatbotPosition();
+            const window = document.getElementById('chatbotWindow');
+            window.style.left = 'auto';
+            window.style.top = 'auto';
+            window.style.right = '0';
+            window.style.bottom = '80px';
+            window.style.position = 'absolute';
         }
+    } else {
+        handleWindowResize();
     }
 });
 
-// ===== CHATBOT TRANSLATIONS =====
-function updateChatbotLanguage() {
-    const lang = '{{ lang }}';
-    const t = {
-        hy: { welcome: "Բարև, ես վիրուսային օգնականն եմ:", placeholder: "Գրիր հարցդ...", thinking: "⏳ Մտածում եմ...", error: "❌ Ցանցային սխալ" },
-        ru: { welcome: "Привет, я вирусный помощник:", placeholder: "Напишите ваш вопрос...", thinking: "⏳ Думаю...", error: "❌ Ошибка сети" },
-        en: { welcome: "Hello, I'm your virus assistant:", placeholder: "Type your question...", thinking: "⏳ Thinking...", error: "❌ Network error" }
-    };
-    const currentT = t[lang] || t.hy;
-    document.getElementById('welcomeMessage').innerText = currentT.welcome;
-    document.getElementById('userInput').placeholder = currentT.placeholder;
-}
-    
 window.addEventListener('resize', function() {
     handleWindowResize();
-    // Եթե չափը փոխվում է, նորից փորձում ենք միացնել drag-ը
-    if (window.innerWidth > 1024) {
-        initDraggable();
-    }
+    if (window.innerWidth > 1024) initDraggable();
 });
+
+const observer = new ResizeObserver(() => saveChatbotSize());
+const chatbotWindow = document.getElementById('chatbotWindow');
+if (chatbotWindow) observer.observe(chatbotWindow);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
-
