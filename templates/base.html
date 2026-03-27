@@ -111,6 +111,27 @@
 
     
         }
+        .chatbot-window {
+            background: #0a192f;
+            border: 2px solid #2cc3ff;
+            border-radius: 24px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            resize: both;              /* <--- սա է resize-ը */
+            overflow: auto;            /* resize-ի համար պարտադիր */
+            min-width: 300px;
+            min-height: 400px;
+            max-width: 800px;
+            max-height: 800px;
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 450px;
+            height: 550px;
+            z-index: 10000;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -180,6 +201,47 @@
 </footer>
 
 <script>
+    let isDragging = false;
+let offsetX, offsetY;
+
+function initDraggable() {
+    if (window.innerWidth <= 768) return;
+    const win = document.getElementById('chatbotWindow');
+    const header = document.getElementById('chatbotHeader');
+    if (!win || !header) return;
+
+    header.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
+
+    function startDrag(e) {
+        isDragging = true;
+        const rect = win.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        win.style.position = 'fixed';
+        win.style.top = rect.top + 'px';
+        win.style.left = rect.left + 'px';
+        win.style.right = 'auto';
+        win.style.bottom = 'auto';
+        e.preventDefault();
+    }
+
+    function drag(e) {
+        if (!isDragging) return;
+        let newX = e.clientX - offsetX;
+        let newY = e.clientY - offsetY;
+        newX = Math.max(0, Math.min(newX, window.innerWidth - win.offsetWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - win.offsetHeight));
+        win.style.left = newX + 'px';
+        win.style.top = newY + 'px';
+    }
+
+    function stopDrag() {
+        isDragging = false;
+        // (ըստ ցանկության՝ պահպանել դիրքը localStorage-ում)
+    }
+}
 // ===== CHATBOT =====
 function toggleChat() {
     var win = document.getElementById('chatbotWindow');
