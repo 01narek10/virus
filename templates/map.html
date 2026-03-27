@@ -1,193 +1,89 @@
-{% extends "base.html" %}
-{% block title %}
-    {% if lang == 'hy' %}Համաշխարհային քարտեզ 2026
-    {% elif lang == 'ru' %}Всемирная карта 2026
-    {% else %}World Map 2026{% endif %}
-{% endblock %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-<style>
-    #main-map { height: 700px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin: 20px 0; z-index: 1; }
-    .legend { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0; }
-    .legend-item { display: flex; align-items: center; gap: 8px; }
-    .color-dot { width: 20px; height: 20px; border-radius: 50%; }
-    .stats-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: rgba(44,195,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #2cc3ff; margin: 20px 0; }
-    .stat-card { text-align: center; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 15px; }
-    .stat-card h3 { font-size: 2.2rem; color: #2cc3ff; margin: 0; }
-    .stat-card p { margin: 5px 0 0; font-size: 1rem; opacity: 0.9; }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="card">
-    <h2>
-        {% if lang == 'hy' %}🗺️ Համաշխարհային վիրուսային բռնկումներ (2026)
-        {% elif lang == 'ru' %}🗺️ Всемирные вирусные вспышки (2026)
-        {% else %}🗺️ Global Viral Outbreaks (2026){% endif %}
-    </h2>
-    <p>
-        {% if lang == 'hy' %}Քարտեզում ներկայացված են <strong>500+ ակտիվ բռնկումներ</strong> 100+ երկրներից։ Սեղմիր մարկերների վրա՝ մանրամասներ տեսնելու համար։
-        {% elif lang == 'ru' %}На карте представлены <strong>500+ активных вспышек</strong> в 100+ странах. Нажмите на маркеры для получения подробной информации.
-        {% else %}The map shows <strong>500+ active outbreaks</strong> in 100+ countries. Click on markers for details.{% endif %}
-    </p>
-</div>
-
-<div class="legend">
-    <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> 
-        {% if lang == 'hy' %}Բարձր ռիսկ (100+ դեպք)
-        {% elif lang == 'ru' %}Высокий риск (100+ случаев)
-        {% else %}High risk (100+ cases){% endif %}
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Համաշխարհային քարտեզ - Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #0a192f; font-family: sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        .info { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 10px; z-index: 1000; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h3>🌍 Վիրուսային բռնկումներ</h3>
+        <p>Մարկերները ցույց են տալիս ակտիվ բռնկումները</p>
     </div>
-    <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> 
-        {% if lang == 'hy' %}Միջին ռիսկ (20-99 դեպք)
-        {% elif lang == 'ru' %}Средний риск (20-99 случаев)
-        {% else %}Medium risk (20-99 cases){% endif %}
-    </div>
-    <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> 
-        {% if lang == 'hy' %}Ցածր ռիսկ (1-19 դեպք)
-        {% elif lang == 'ru' %}Низкий риск (1-19 случаев)
-        {% else %}Low risk (1-19 cases){% endif %}
-    </div>
-</div>
+    <div id="map"></div>
 
-<div id="main-map"></div>
-
-<div class="stats-panel">
-    <div class="stat-card"><h3 id="total-outbreaks">0</h3><p>{% if lang == 'hy' %}Ակտիվ բռնկումներ{% elif lang == 'ru' %}Активных вспышек{% else %}Active outbreaks{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-countries">0</h3><p>{% if lang == 'hy' %}Երկրներ{% elif lang == 'ru' %}Стран{% else %}Countries{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-cases">0</h3><p>{% if lang == 'hy' %}Ընդհանուր դեպքեր{% elif lang == 'ru' %}Всего случаев{% else %}Total cases{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-deaths">0</h3><p>{% if lang == 'hy' %}Ընդհանուր մահեր{% elif lang == 'ru' %}Всего смертей{% else %}Total deaths{% endif %}</p></div>
-</div>
-
-<script>
-// ==================== OUTBREAKS DATA ====================
-var outbreaks = [
-    // Europe
-    { lat: 51.51, lon: -0.13, name: "London, UK", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 48.86, lon: 2.35, name: "Paris, France", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
-    { lat: 52.52, lon: 13.40, name: "Berlin, Germany", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 41.90, lon: 12.50, name: "Rome, Italy", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-    { lat: 40.42, lon: -3.70, name: "Madrid, Spain", virus: "COVID-19", cases: 4567, deaths: 156, risk: "medium" },
-    { lat: 55.76, lon: 37.62, name: "Moscow, Russia", virus: "COVID-19", cases: 7890, deaths: 345, risk: "high" },
-    { lat: 52.23, lon: 21.01, name: "Warsaw, Poland", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 47.50, lon: 19.04, name: "Budapest, Hungary", virus: "H3N2", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 50.08, lon: 14.42, name: "Prague, Czechia", virus: "Mpox", cases: 23, deaths: 1, risk: "low" },
-    { lat: 59.33, lon: 18.07, name: "Stockholm, Sweden", virus: "COVID-19", cases: 567, deaths: 23, risk: "low" },
-    { lat: 53.35, lon: -6.26, name: "Dublin, Ireland", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-    { lat: 60.17, lon: 24.94, name: "Helsinki, Finland", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: 52.37, lon: 4.89, name: "Amsterdam, Netherlands", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 50.85, lon: 4.35, name: "Brussels, Belgium", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: 48.20, lon: 16.37, name: "Vienna, Austria", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
-    { lat: 41.00, lon: 28.97, name: "Istanbul, Turkey", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
-    { lat: 37.98, lon: 23.73, name: "Athens, Greece", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 38.72, lon: -9.14, name: "Lisbon, Portugal", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
+    <script>
+    // Create map
+    var map = L.map('map').setView([20, 0], 2);
     
-    // North America
-    { lat: 40.71, lon: -74.01, name: "New York, USA", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
-    { lat: 34.05, lon: -118.24, name: "Los Angeles, USA", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
-    { lat: 41.88, lon: -87.63, name: "Chicago, USA", virus: "Mpox", cases: 234, deaths: 5, risk: "medium" },
-    { lat: 29.76, lon: -95.37, name: "Houston, USA", virus: "West Nile", cases: 345, deaths: 23, risk: "medium" },
-    { lat: 33.75, lon: -84.39, name: "Atlanta, USA", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-    { lat: 43.65, lon: -79.38, name: "Toronto, Canada", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 45.50, lon: -73.57, name: "Montreal, Canada", virus: "H3N2", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 49.28, lon: -123.12, name: "Vancouver, Canada", virus: "Mpox", cases: 67, deaths: 2, risk: "low" },
-    { lat: 19.43, lon: -99.13, name: "Mexico City, Mexico", virus: "COVID-19", cases: 7890, deaths: 567, risk: "high" },
-    { lat: 20.67, lon: -103.35, name: "Guadalajara, Mexico", virus: "Dengue", cases: 3456, deaths: 89, risk: "high" },
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
     
-    // South America
-    { lat: -23.55, lon: -46.63, name: "Sao Paulo, Brazil", virus: "Dengue", cases: 12500, deaths: 430, risk: "high" },
-    { lat: -22.91, lon: -43.20, name: "Rio de Janeiro, Brazil", virus: "Oropouche", cases: 3456, deaths: 23, risk: "medium" },
-    { lat: -34.60, lon: -58.38, name: "Buenos Aires, Argentina", virus: "COVID-19", cases: 5678, deaths: 234, risk: "high" },
-    { lat: -33.45, lon: -70.65, name: "Santiago, Chile", virus: "H1N1", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -12.05, lon: -77.04, name: "Lima, Peru", virus: "Dengue", cases: 4567, deaths: 123, risk: "high" },
+    // Test marker
+    var marker = L.marker([40.18, 44.51]).addTo(map);
+    marker.bindPopup("<b>Երևան, Հայաստան</b><br>Վիրուս: COVID-19<br>Դեպքեր: 2345<br>Մահեր: 67").openPopup();
     
-    // Asia
-    { lat: 35.86, lon: 104.19, name: "Beijing, China", virus: "COVID-19", cases: 4500, deaths: 89, risk: "medium" },
-    { lat: 31.23, lon: 121.47, name: "Shanghai, China", virus: "H3N2", cases: 6789, deaths: 123, risk: "medium" },
-    { lat: 22.26, lon: 114.19, name: "Hong Kong", virus: "COVID-19", cases: 7890, deaths: 156, risk: "high" },
-    { lat: 28.61, lon: 77.23, name: "New Delhi, India", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 19.08, lon: 72.88, name: "Mumbai, India", virus: "Dengue", cases: 5678, deaths: 89, risk: "high" },
-    { lat: 13.08, lon: 80.27, name: "Chennai, India", virus: "Chikungunya", cases: 1234, deaths: 12, risk: "medium" },
-    { lat: 3.14, lon: 101.69, name: "Kuala Lumpur, Malaysia", virus: "Nipah", cases: 12, deaths: 8, risk: "high" },
-    { lat: 1.35, lon: 103.82, name: "Singapore", virus: "COVID-19", cases: 890, deaths: 4, risk: "low" },
-    { lat: 13.73, lon: 100.50, name: "Bangkok, Thailand", virus: "H1N1", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 14.59, lon: 120.98, name: "Manila, Philippines", virus: "Dengue", cases: 4567, deaths: 234, risk: "high" },
-    { lat: 6.93, lon: 79.84, name: "Colombo, Sri Lanka", virus: "Dengue", cases: 3456, deaths: 67, risk: "high" },
-    { lat: 27.70, lon: 85.32, name: "Kathmandu, Nepal", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 33.88, lon: 35.50, name: "Beirut, Lebanon", virus: "Cholera", cases: 2345, deaths: 123, risk: "high" },
-    { lat: 25.07, lon: 55.31, name: "Dubai, UAE", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-    { lat: 24.63, lon: 46.71, name: "Riyadh, Saudi Arabia", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
+    // Add more markers
+    var markers = [
+        { lat: 51.51, lon: -0.13, name: "Լոնդոն, ՄԲ", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+        { lat: 48.86, lon: 2.35, name: "Փարիզ, Ֆրանսիա", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
+        { lat: 52.52, lon: 13.40, name: "Բեռլին, Գերմանիա", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
+        { lat: 41.90, lon: 12.50, name: "Հռոմ, Իտալիա", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
+        { lat: 40.42, lon: -3.70, name: "Մադրիդ, Իսպանիա", virus: "COVID-19", cases: 4567, deaths: 156, risk: "medium" },
+        { lat: 55.76, lon: 37.62, name: "Մոսկվա, Ռուսաստան", virus: "COVID-19", cases: 7890, deaths: 345, risk: "high" },
+        { lat: 40.71, lon: -74.01, name: "Նյու Յորք, ԱՄՆ", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
+        { lat: 34.05, lon: -118.24, name: "Լոս Անջելես, ԱՄՆ", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
+        { lat: -23.55, lon: -46.63, name: "Սան Պաուլո, Բրազիլիա", virus: "Դենգե", cases: 12500, deaths: 430, risk: "high" },
+        { lat: -33.87, lon: 151.21, name: "Սիդնեյ, Ավստրալիա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+        { lat: 35.86, lon: 104.19, name: "Պեկին, Չինաստան", virus: "COVID-19", cases: 4500, deaths: 89, risk: "medium" },
+        { lat: 28.61, lon: 77.23, name: "Նյու Դելի, Հնդկաստան", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+        { lat: 1.35, lon: 103.82, name: "Սինգապուր", virus: "COVID-19", cases: 890, deaths: 4, risk: "low" },
+        { lat: 25.07, lon: 55.31, name: "Դուբայ, ԱՄԷ", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
+        { lat: -4.44, lon: 15.27, name: "Կինշասա, Կոնգո", virus: "Էբոլա", cases: 312, deaths: 187, risk: "high" },
+        { lat: -26.20, lon: 28.04, name: "Յոհանեսբուրգ, ՀԱՀ", virus: "COVID-19", cases: 1250, deaths: 45, risk: "medium" },
+        { lat: 19.43, lon: -99.13, name: "Մեխիկո, Մեքսիկա", virus: "COVID-19", cases: 7890, deaths: 567, risk: "high" }
+    ];
     
-    // Africa
-    { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
-    { lat: 9.08, lon: 8.67, name: "Abuja, Nigeria", virus: "Yellow Fever", cases: 890, deaths: 134, risk: "high" },
-    { lat: -26.20, lon: 28.04, name: "Johannesburg, SA", virus: "COVID-19", cases: 1250, deaths: 45, risk: "medium" },
-    { lat: -33.92, lon: 18.42, name: "Cape Town, SA", virus: "COVID-19", cases: 2345, deaths: 78, risk: "medium" },
-    { lat: 30.06, lon: 31.25, name: "Cairo, Egypt", virus: "H5N1", cases: 78, deaths: 23, risk: "medium" },
-    { lat: -18.87, lon: 47.50, name: "Antananarivo, Madagascar", virus: "Plague", cases: 45, deaths: 12, risk: "medium" },
-    { lat: 14.76, lon: -17.36, name: "Dakar, Senegal", virus: "Zika", cases: 67, deaths: 2, risk: "low" },
-    { lat: -8.84, lon: 13.23, name: "Luanda, Angola", virus: "Yellow Fever", cases: 345, deaths: 67, risk: "high" },
-    { lat: 9.15, lon: 40.50, name: "Addis Ababa, Ethiopia", virus: "Cholera", cases: 2345, deaths: 123, risk: "high" },
-    { lat: -1.28, lon: 36.82, name: "Nairobi, Kenya", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
-    
-    // Australia & Oceania
-    { lat: -33.87, lon: 151.21, name: "Sydney, Australia", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: -37.81, lon: 144.96, name: "Melbourne, Australia", virus: "Ross River", cases: 1890, deaths: 2, risk: "low" },
-    { lat: -36.85, lon: 174.76, name: "Auckland, NZ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    
-    // Caucasus - Armenia, Georgia, Azerbaijan
-    { lat: 40.18, lon: 44.51, name: "Yerevan, Armenia", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 41.72, lon: 44.78, name: "Tbilisi, Georgia", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 40.68, lon: 46.36, name: "Ganja, Azerbaijan", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 40.58, lon: 46.32, name: "Nakhchivan, Azerbaijan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" }
-];
-
-// ==================== MAP INITIALIZATION ====================
-var map = L.map('main-map').setView([20, 0], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
-
-var markers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
-    iconCreateFunction: function(cluster) {
-        var count = cluster.getChildCount();
-        return L.divIcon({ html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>', className: 'marker-cluster', iconSize: L.point(40, 40) });
+    function getColor(risk) {
+        if (risk === 'high') return '#ff4444';
+        if (risk === 'medium') return '#ff8c44';
+        return '#4caf50';
     }
-});
-
-function getColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa'; }
-
-outbreaks.forEach(function(item) {
-    var radius = Math.sqrt(item.cases) / 6 + 4;
-    radius = Math.min(radius, 25);
-    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getColor(item.risk), fillOpacity: 0.8 });
     
-    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
+    markers.forEach(function(item) {
+        var radius = Math.sqrt(item.cases) / 6 + 4;
+        radius = Math.min(radius, 25);
+        
+        var circle = L.circleMarker([item.lat, item.lon], {
+            radius: radius,
+            color: '#fff',
+            weight: 1.5,
+            fillColor: getColor(item.risk),
+            fillOpacity: 0.8
+        }).addTo(map);
+        
+        var riskText = item.risk === 'high' ? '🔴 Բարձր' : (item.risk === 'medium' ? '🟠 Միջին' : '🟢 Ցածր');
+        
+        circle.bindPopup(`
+            <div style="min-width:200px;">
+                <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
+                <p style="margin:2px 0;"><b>Վիրուս:</b> ${item.virus}</p>
+                <p style="margin:2px 0;"><b>Դեպքեր:</b> ${item.cases.toLocaleString()}</p>
+                <p style="margin:2px 0;"><b>Մահեր:</b> ${item.deaths.toLocaleString()}</p>
+                <p style="margin:2px 0;"><b>Ռիսկ:</b> ${riskText}</p>
+            </div>
+        `);
+    });
     
-    circle.bindPopup(`
-        <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
-            <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
-        </div>
-    `);
-    markers.addLayer(circle);
-});
-
-map.addLayer(markers);
-
-var totalCases = outbreaks.reduce((sum, item) => sum + item.cases, 0);
-var totalDeaths = outbreaks.reduce((sum, item) => sum + item.deaths, 0);
-var countries = [...new Set(outbreaks.map(item => item.name.split(', ')[1]))].length;
-
-document.getElementById('total-outbreaks').innerText = outbreaks.length.toLocaleString();
-document.getElementById('total-countries').innerText = countries;
-document.getElementById('total-cases').innerText = (totalCases / 1000000).toFixed(1) + 'M';
-document.getElementById('total-deaths').innerText = (totalDeaths / 1000).toFixed(0) + 'K';
-</script>
-{% endblock %}
+    console.log("Map loaded with " + (markers.length + 1) + " markers");
+    </script>
+</body>
+</html>
