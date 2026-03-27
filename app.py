@@ -452,10 +452,6 @@ def home():
 @app.route("/map")
 def map_page():
     return render_template("map.html")
-
-@app.route("/compare")
-def compare():
-    return render_template("compare.html", viruses=virus_data)
     
 @app.route("/quiz")
 def quiz_choice():
