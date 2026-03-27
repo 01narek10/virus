@@ -339,7 +339,10 @@ def get_lang():
 @app.context_processor
 def inject_translations():
     lang = get_lang()
-    return {'t': translations.get(lang, translations['hy'])}
+    return {
+        't': translations.get(lang, translations['hy']),
+        'lang': lang  # ՍԱ ԿԱՐԵՎՈՐ Է
+    }
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
