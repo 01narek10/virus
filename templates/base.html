@@ -201,8 +201,9 @@
 </footer>
 
 <script>
-    let isDragging = false;
-let offsetX, offsetY;
+   // ===== DRAGGABLE =====
+let isDragging = false;
+let dragOffsetX = 0, dragOffsetY = 0;
 
 function initDraggable() {
     if (window.innerWidth <= 768) return;
@@ -210,15 +211,17 @@ function initDraggable() {
     const header = document.getElementById('chatbotHeader');
     if (!win || !header) return;
 
+    header.style.cursor = 'move';
     header.addEventListener('mousedown', startDrag);
-    document.addEventListener('mousemove', drag);
+    document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', stopDrag);
 
     function startDrag(e) {
+        if (e.target.closest('button')) return;
         isDragging = true;
         const rect = win.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
         win.style.position = 'fixed';
         win.style.top = rect.top + 'px';
         win.style.left = rect.left + 'px';
@@ -227,21 +230,22 @@ function initDraggable() {
         e.preventDefault();
     }
 
-    function drag(e) {
+    function onDrag(e) {
         if (!isDragging) return;
-        let newX = e.clientX - offsetX;
-        let newY = e.clientY - offsetY;
-        newX = Math.max(0, Math.min(newX, window.innerWidth - win.offsetWidth));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - win.offsetHeight));
+        let newX = e.clientX - dragOffsetX;
+        let newY = e.clientY - dragOffsetY;
+        newX = Math.min(Math.max(0, newX), window.innerWidth - win.offsetWidth);
+        newY = Math.min(Math.max(0, newY), window.innerHeight - win.offsetHeight);
         win.style.left = newX + 'px';
         win.style.top = newY + 'px';
     }
 
     function stopDrag() {
         isDragging = false;
-        // (ըստ ցանկության՝ պահպանել դիրքը localStorage-ում)
     }
 }
+
+window.addEventListener('load', initDraggable);
 // ===== CHATBOT =====
 function toggleChat() {
     var win = document.getElementById('chatbotWindow');
