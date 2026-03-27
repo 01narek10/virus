@@ -1,55 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Ընտրիր վիկտորինայի մակարդակը{% endblock %}
+{% block title %}{{ t.quiz_title }}{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 50px auto; text-align: center;">
-    <h2 style="color: #2cc3ff;">🧪 Ընտրիր մակարդակը</h2>
-    
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;">
-        <!-- Շատ հեշտ -->
-        <a href="/quiz/very_easy" style="text-decoration: none;">
-            <div style="background: #4caf50; color: white; padding: 30px; border-radius: 15px;">
-                <div style="font-size: 3rem;">😊</div>
-                <h3>Շատ հեշտ</h3>
-                <p>3 հարց</p>
-            </div>
-        </a>
-        
-        <!-- Հեշտ -->
-        <a href="/quiz/easy" style="text-decoration: none;">
-            <div style="background: #8bc34a; color: white; padding: 30px; border-radius: 15px;">
-                <div style="font-size: 3rem;">😌</div>
-                <h3>Հեշտ</h3>
-                <p>4 հարց</p>
-            </div>
-        </a>
-        
-        <!-- Միջին -->
-        <a href="/quiz/medium" style="text-decoration: none;">
-            <div style="background: #ffc107; color: black; padding: 30px; border-radius: 15px;">
-                <div style="font-size: 3rem;">🤔</div>
-                <h3>Միջին</h3>
-                <p>6 հարց</p>
-            </div>
-        </a>
-        
-        <!-- Բարդ -->
-        <a href="/quiz/hard" style="text-decoration: none;">
-            <div style="background: #ff9800; color: white; padding: 30px; border-radius: 15px;">
-                <div style="font-size: 3rem;">😤</div>
-                <h3>Բարդ</h3>
-                <p>8 հարց</p>
-            </div>
-        </a>
-        
-        <!-- Շատ բարդ -->
-        <a href="/quiz/very_hard" style="text-decoration: none;">
-            <div style="background: #f44336; color: white; padding: 30px; border-radius: 15px;">
-                <div style="font-size: 3rem;">👑</div>
-                <h3>Շատ բարդ</h3>
-                <p>10 հարց</p>
-            </div>
-        </a>
+<div class="card">
+    <h2>{{ t.quiz_title }}</h2>
+    <p>{{ t.quiz_desc }}</p>
+    <div class="quiz-levels">
+        <a href="/quiz/very_easy" class="quiz-level very-easy">{{ t.very_easy }}</a>
+        <a href="/quiz/easy" class="quiz-level easy">{{ t.easy }}</a>
+        <a href="/quiz/medium" class="quiz-level medium">{{ t.medium }}</a>
+        <a href="/quiz/hard" class="quiz-level hard">{{ t.hard }}</a>
+        <a href="/quiz/very_hard" class="quiz-level very-hard">{{ t.very_hard }}</a>
     </div>
 </div>
 {% endblock %}
