@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <style>
-    #main-map { height: 700px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin: 20px 0; z-index: 1; }
+    #main-map, #armenia-map { height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin: 20px 0; z-index: 1; }
     .map-controls { background: rgba(6,20,45,0.95); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; margin: 20px 0; border-left: 5px solid #2cc3ff; }
     .legend { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
     .legend-item { display: flex; align-items: center; gap: 8px; }
@@ -21,10 +21,13 @@
     .stat-card { text-align: center; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 15px; }
     .stat-card h3 { font-size: 2.2rem; color: #2cc3ff; margin: 0; }
     .stat-card p { margin: 5px 0 0; font-size: 1rem; opacity: 0.9; }
+    .region-btn { background: rgba(44,195,255,0.2); border: 1px solid #2cc3ff; color: white; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin: 5px; transition: all 0.3s; }
+    .region-btn:hover, .region-btn.active { background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- WORLD MAP SECTION -->
 <div class="card">
     <h2>
         {% if lang == 'hy' %}🗺️ Համաշխարհային վիրուսային բռնկումներ (2026)
@@ -462,193 +465,11 @@ var outbreaks = [
     { lat: 15.60, lon: 32.60, name: "Khartoum (Bahri), Sudan", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" }
 ];
 
-// ==================== ARMENIAN MAP DATA ====================
-var armenianOutbreaks = [
-    { lat: 40.18, lon: 44.51, name: "Yerevan (Center)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high", region: "armenia", type: "city" },
-    { lat: 40.21, lon: 44.53, name: "Yerevan (Ajapnyak)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.15, lon: 44.50, name: "Yerevan (Shengavit)", virus: "COVID-19", cases: 678, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.19, lon: 44.56, name: "Yerevan (Nor Nork)", virus: "COVID-19", cases: 567, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.17, lon: 44.52, name: "Yerevan (Malatia-Sebastia)", virus: "COVID-19", cases: 789, deaths: 14, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.13, lon: 44.47, name: "Yerevan (Nubarashen)", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.14, lon: 44.55, name: "Yerevan (Erebuni)", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.20, lon: 44.50, name: "Yerevan (Avan)", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.16, lon: 44.48, name: "Yerevan (Davtashen)", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.12, lon: 44.52, name: "Yerevan (Kanaker-Zeytun)", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.42, lon: 44.40, name: "Ashtarak", virus: "COVID-19", cases: 345, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.33, lon: 44.27, name: "Aparan", virus: "Influenza H3N2", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.45, lon: 44.48, name: "Talin", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.38, lon: 44.38, name: "Oshakan", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.34, lon: 44.38, name: "Kosh", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.42, lon: 44.23, name: "Byurakan", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.28, lon: 44.41, name: "Pemzashen", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.40, lon: 44.22, name: "Aragats", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.44, lon: 44.38, name: "Aghdzq", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.35, lon: 44.25, name: "Karbi", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.95, lon: 44.55, name: "Artashat", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.99, lon: 44.58, name: "Ararat", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.02, lon: 44.54, name: "Masis", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.91, lon: 44.73, name: "Vedi", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.88, lon: 44.58, name: "Ayntap", virus: "COVID-19", cases: 78, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.01, lon: 44.58, name: "Nor Kharberd", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.02, lon: 44.62, name: "Darbnik", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.94, lon: 44.73, name: "Vosketap", virus: "COVID-19", cases: 56, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.97, lon: 44.67, name: "Avshar", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.99, lon: 44.65, name: "Aralez", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.15, lon: 44.04, name: "Armavir", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.08, lon: 44.24, name: "Vagharshapat (Ejmiatsin)", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.09, lon: 44.32, name: "Metsamor", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.16, lon: 44.17, name: "Ptghunk", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.08, lon: 44.29, name: "Arevshat", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.12, lon: 44.18, name: "Lernamerdz", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.14, lon: 44.08, name: "Norapat", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.07, lon: 44.21, name: "Gay", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.10, lon: 44.26, name: "Arevik", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.55, lon: 45.01, name: "Gavar", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.59, lon: 45.14, name: "Chambarak", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.54, lon: 44.72, name: "Sevan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.65, lon: 45.06, name: "Martuni", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.25, lon: 45.71, name: "Vardenis", virus: "COVID-19", cases: 178, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.49, lon: 44.94, name: "Lchashen", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.58, lon: 45.00, name: "Karmirgyugh", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.52, lon: 44.97, name: "Tsaghkashen", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.47, lon: 45.05, name: "Noratus", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.87, lon: 44.45, name: "Vanadzor", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
-    { lat: 41.10, lon: 44.65, name: "Stepanavan", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.02, lon: 44.63, name: "Spitak", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.16, lon: 44.14, name: "Tumanyan", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.95, lon: 44.63, name: "Tashir", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.08, lon: 44.70, name: "Alaverdi", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.97, lon: 44.55, name: "Gyulagarak", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.07, lon: 44.65, name: "Odzun", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.12, lon: 44.68, name: "Akori", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.41, lon: 44.56, name: "Hrazdan", virus: "COVID-19", cases: 567, deaths: 9, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.29, lon: 44.60, name: "Abovyan", virus: "COVID-19", cases: 678, deaths: 11, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.24, lon: 44.58, name: "Charentsavan", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.32, lon: 44.65, name: "Byureghavan", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.33, lon: 44.57, name: "Nor Hachn", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.25, lon: 44.63, name: "Tsaghkadzor", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.41, lon: 44.67, name: "Solak", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.36, lon: 44.65, name: "Arzni", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.27, lon: 44.67, name: "Akunk", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.78, lon: 43.84, name: "Gyumri", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.62, lon: 43.94, name: "Artik", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.96, lon: 43.90, name: "Amasia", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.86, lon: 43.97, name: "Akhuryan", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.80, lon: 43.90, name: "Marmashen", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.70, lon: 43.90, name: "Mayisyan", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.51, lon: 46.34, name: "Goris", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.76, lon: 45.33, name: "Yeghegnadzor", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.28, lon: 46.36, name: "Kapan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.20, lon: 46.41, name: "Meghri", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.52, lon: 46.10, name: "Sisian", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.48, lon: 46.33, name: "Tatev", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.56, lon: 46.03, name: "Vorotan", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.76, lon: 45.33, name: "Yeghegnadzor", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.86, lon: 45.36, name: "Jermuk", virus: "COVID-19", cases: 178, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.67, lon: 45.50, name: "Vayk", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.70, lon: 45.57, name: "Zaritap", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.89, lon: 45.42, name: "Ijevan", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.82, lon: 45.14, name: "Dilijan", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.12, lon: 45.00, name: "Noyemberyan", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.95, lon: 45.18, name: "Berd", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.85, lon: 45.15, name: "Haghartsin", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.94, lon: 45.00, name: "Koghb", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.83, lon: 46.75, name: "Stepanakert", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "artsakh", type: "city" },
-    { lat: 39.86, lon: 46.93, name: "Shushi", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "artsakh", type: "city" },
-    { lat: 40.01, lon: 46.90, name: "Martakert", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.79, lon: 46.95, name: "Hadrut", virus: "COVID-19", cases: 178, deaths: 3, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.68, lon: 46.98, name: "Martuni", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "artsakh", type: "city" },
-    { lat: 40.15, lon: 46.88, name: "Askeran", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.52, lon: 46.95, name: "Kovsakan", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "artsakh", type: "village" },
-    { lat: 39.97, lon: 46.78, name: "Khojaly", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "artsakh", type: "village" },
-    { lat: 39.88, lon: 46.80, name: "Krkzhan", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "artsakh", type: "village" },
-    { lat: 41.72, lon: 44.78, name: "Tbilisi (Havlabar)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "georgia", type: "city" },
-    { lat: 41.45, lon: 44.54, name: "Bolnisi-Khachen", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.40, lon: 44.48, name: "Dmanisi", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.25, lon: 44.70, name: "Akhalkalaki", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.15, lon: 44.78, name: "Ninotsminda", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.30, lon: 44.60, name: "Tsalka", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "georgia", type: "city" },
-    { lat: 40.68, lon: 46.36, name: "Ganja", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium", region: "azerbaijan", type: "city" },
-    { lat: 40.58, lon: 46.32, name: "Nakhchivan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "azerbaijan", type: "city" },
-    { lat: 40.77, lon: 46.41, name: "Shamkhor", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.65, lon: 46.31, name: "Dashkesan", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.52, lon: 46.35, name: "Khanlar", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.70, lon: 46.42, name: "Gadabay", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.60, lon: 46.40, name: "Shahumyan", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 38.50, lon: 43.40, name: "Van (Tushpa)", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 37.91, lon: 40.24, name: "Amid (Diyarbakir)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 38.63, lon: 39.24, name: "Kharberd", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.99, lon: 38.76, name: "Akn", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.50, lon: 42.30, name: "Tatvan", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.95, lon: 41.50, name: "Mush", virus: "COVID-19", cases: 456, deaths: 9, risk: "low", region: "turkey", type: "historical" },
-    { lat: 39.90, lon: 41.27, name: "Karin (Erzurum)", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 40.78, lon: 42.85, name: "Kars", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 40.35, lon: 43.05, name: "Ani", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "turkey", type: "historical" },
-    { lat: 40.60, lon: 43.10, name: "Ardahan", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "turkey", type: "historical" },
-    { lat: 40.70, lon: 42.60, name: "Oltu", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "turkey", type: "historical" },
-    { lat: 39.75, lon: 44.00, name: "Maku", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 39.55, lon: 44.10, name: "Bayazet", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.25, lon: 46.28, name: "Tabriz", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "iran", type: "city" },
-    { lat: 38.42, lon: 47.06, name: "Ahar", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "iran", type: "city" },
-    { lat: 38.55, lon: 46.85, name: "Marand", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "iran", type: "city" },
-    { lat: 38.38, lon: 47.68, name: "Sarab", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "iran", type: "city" },
-    { lat: 38.65, lon: 46.75, name: "Jolfa", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "iran", type: "city" },
-    { lat: 38.52, lon: 46.65, name: "Salmas", virus: "COVID-19", cases: 178, deaths: 3, risk: "low", region: "iran", type: "city" },
-    { lat: 37.58, lon: 47.70, name: "Miyaneh", virus: "COVID-19", cases: 456, deaths: 9, risk: "low", region: "iran", type: "city" },
-    { lat: 38.48, lon: 46.48, name: "Urmia", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "iran", type: "city" },
-    { lat: 38.43, lon: 47.18, name: "Qaradagh", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "iran", type: "village" },
-    { lat: 38.62, lon: 46.52, name: "Sisian", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "iran", type: "village" },
-    { lat: 38.70, lon: 46.60, name: "Mered", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "iran", type: "village" },
-    { lat: 38.10, lon: 46.30, name: "Shendabad", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "iran", type: "village" },
-    { lat: 40.18, lon: 44.54, name: "Yerevan (Arabkir)", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.19, lon: 44.49, name: "Yerevan (Kentron)", virus: "COVID-19", cases: 678, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.36, lon: 44.32, name: "Nerkin Bazmaberd", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.39, lon: 44.35, name: "Verin Bazmaberd", virus: "COVID-19", cases: 18, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.41, lon: 44.28, name: "Mastara", virus: "COVID-19", cases: 34, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.44, lon: 44.42, name: "Shenavan", virus: "COVID-19", cases: 28, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.92, lon: 44.70, name: "Vosketap", virus: "COVID-19", cases: 45, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.89, lon: 44.68, name: "Goravan", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.96, lon: 44.62, name: "Baghramyan", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.00, lon: 44.70, name: "Mkhchyan", virus: "COVID-19", cases: 67, deaths: 2, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.11, lon: 44.20, name: "Aknalich", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.05, lon: 44.18, name: "Hovtamej", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.03, lon: 44.15, name: "Tandzut", virus: "COVID-19", cases: 28, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.60, lon: 44.95, name: "Lchap", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.53, lon: 44.85, name: "Dzoragyugh", virus: "COVID-19", cases: 45, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.48, lon: 45.12, name: "Lichk", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.05, lon: 44.58, name: "Dsegh", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.00, lon: 44.68, name: "Haghpat", virus: "COVID-19", cases: 28, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.02, lon: 44.55, name: "Mets Parni", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.45, lon: 44.62, name: "Garni", virus: "COVID-19", cases: 78, deaths: 2, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.38, lon: 44.70, name: "Geghadir", virus: "COVID-19", cases: 45, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.28, lon: 44.70, name: "Zoravan", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.75, lon: 43.88, name: "Maralik", virus: "COVID-19", cases: 89, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.84, lon: 43.82, name: "Azatan", virus: "COVID-19", cases: 45, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.78, lon: 43.95, name: "Lernakert", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.40, lon: 46.40, name: "Kajaran", virus: "COVID-19", cases: 123, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.44, lon: 46.38, name: "Agarak", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.80, lon: 45.45, name: "Malishka", virus: "COVID-19", cases: 45, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.72, lon: 45.52, name: "Yeghegis", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.86, lon: 45.28, name: "Chinchin", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.92, lon: 45.25, name: "Haghartsin", virus: "COVID-19", cases: 28, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.95, lon: 46.88, name: "Askeran", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "artsakh", type: "city" },
-    { lat: 40.18, lon: 46.78, name: "Mardakert", virus: "COVID-19", cases: 89, deaths: 2, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.90, lon: 46.75, name: "Shushi (Surp Ghazanchetsots)", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "artsakh", type: "historical" },
-    { lat: 38.35, lon: 42.70, name: "Aghtamar (Van)", virus: "COVID-19", cases: 12, deaths: 0, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.10, lon: 38.80, name: "Sasun", virus: "COVID-19", cases: 23, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 37.50, lon: 41.00, name: "Midyat (Tur Abdin)", virus: "COVID-19", cases: 34, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.70, lon: 43.20, name: "Hayots Dzor", virus: "COVID-19", cases: 18, deaths: 0, risk: "low", region: "turkey", type: "historical" },
-    { lat: 37.70, lon: 44.20, name: "Marand", virus: "COVID-19", cases: 89, deaths: 2, risk: "low", region: "iran", type: "city" },
-    { lat: 37.60, lon: 45.00, name: "Khoy", virus: "COVID-19", cases: 123, deaths: 3, risk: "low", region: "iran", type: "city" },
-    { lat: 38.90, lon: 44.50, name: "Salmas", virus: "COVID-19", cases: 156, deaths: 4, risk: "low", region: "iran", type: "city" },
-    { lat: 38.20, lon: 44.80, name: "Dilman", virus: "COVID-19", cases: 78, deaths: 2, risk: "low", region: "iran", type: "city" }
-];
+// ==================== WORLD MAP INITIALIZATION ====================
+var worldMap = L.map('main-map').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(worldMap);
 
-// ==================== MAP INITIALIZATION ====================
-var map = L.map('main-map').setView([20, 0], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
-
-var markers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
+var worldMarkers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
     iconCreateFunction: function(cluster) {
         var count = cluster.getChildCount();
         return L.divIcon({ html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>', className: 'marker-cluster', iconSize: L.point(40, 40) });
@@ -673,10 +494,10 @@ outbreaks.forEach(function(item) {
             <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
         </div>
     `);
-    markers.addLayer(circle);
+    worldMarkers.addLayer(circle);
 });
 
-map.addLayer(markers);
+worldMap.addLayer(worldMarkers);
 
 var totalCases = outbreaks.reduce((sum, item) => sum + item.cases, 0);
 var totalDeaths = outbreaks.reduce((sum, item) => sum + item.deaths, 0);
@@ -688,15 +509,52 @@ document.getElementById('total-cases').innerText = (totalCases / 1000000).toFixe
 document.getElementById('total-deaths').innerText = (totalDeaths / 1000).toFixed(0) + 'K';
 
 // ==================== ARMENIAN MAP SECTION ====================
-document.getElementById('armenia-map').innerHTML = '';
-var armeniaMapDiv = document.createElement('div');
-armeniaMapDiv.id = 'armenia-map';
-armeniaMapDiv.style.height = '650px';
-armeniaMapDiv.style.width = '100%';
-armeniaMapDiv.style.borderRadius = '24px';
-armeniaMapDiv.style.border = '2px solid #2cc3ff';
-armeniaMapDiv.style.boxShadow = '0 20px 40px rgba(0,0,0,0.5)';
-document.querySelector('.card:last-of-type').after(armeniaMapDiv);
+var armenianOutbreaks = [
+    { lat: 40.18, lon: 44.51, name: "Yerevan", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.21, lon: 44.53, name: "Ajapnyak", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.15, lon: 44.50, name: "Shengavit", virus: "COVID-19", cases: 678, deaths: 12, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.19, lon: 44.56, name: "Nor Nork", virus: "COVID-19", cases: 567, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.17, lon: 44.52, name: "Malatia-Sebastia", virus: "COVID-19", cases: 789, deaths: 14, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.13, lon: 44.47, name: "Nubarashen", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.14, lon: 44.55, name: "Erebuni", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.20, lon: 44.50, name: "Avan", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.16, lon: 44.48, name: "Davtashen", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.12, lon: 44.52, name: "Kanaker-Zeytun", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.42, lon: 44.40, name: "Ashtarak", virus: "COVID-19", cases: 345, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.33, lon: 44.27, name: "Aparan", virus: "Influenza H3N2", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.45, lon: 44.48, name: "Talin", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.95, lon: 44.55, name: "Artashat", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.99, lon: 44.58, name: "Ararat", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.02, lon: 44.54, name: "Masis", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.15, lon: 44.04, name: "Armavir", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.08, lon: 44.24, name: "Vagharshapat", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.55, lon: 45.01, name: "Gavar", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.54, lon: 44.72, name: "Sevan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.87, lon: 44.45, name: "Vanadzor", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
+    { lat: 41.08, lon: 44.70, name: "Alaverdi", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.41, lon: 44.56, name: "Hrazdan", virus: "COVID-19", cases: 567, deaths: 9, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.29, lon: 44.60, name: "Abovyan", virus: "COVID-19", cases: 678, deaths: 11, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.78, lon: 43.84, name: "Gyumri", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "armenia", type: "city" },
+    { lat: 39.51, lon: 46.34, name: "Goris", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.28, lon: 46.36, name: "Kapan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.76, lon: 45.33, name: "Yeghegnadzor", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.89, lon: 45.42, name: "Ijevan", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.82, lon: 45.14, name: "Dilijan", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.83, lon: 46.75, name: "Stepanakert", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "artsakh", type: "city" },
+    { lat: 39.86, lon: 46.93, name: "Shushi", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "artsakh", type: "city" },
+    { lat: 40.01, lon: 46.90, name: "Martakert", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "artsakh", type: "city" },
+    { lat: 41.72, lon: 44.78, name: "Tbilisi (Havlabar)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "georgia", type: "city" },
+    { lat: 41.25, lon: 44.70, name: "Akhalkalaki", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "georgia", type: "city" },
+    { lat: 41.15, lon: 44.78, name: "Ninotsminda", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "georgia", type: "city" },
+    { lat: 40.68, lon: 46.36, name: "Ganja", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium", region: "azerbaijan", type: "city" },
+    { lat: 40.58, lon: 46.32, name: "Nakhchivan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "azerbaijan", type: "city" },
+    { lat: 38.50, lon: 43.40, name: "Van", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 37.91, lon: 40.24, name: "Diyarbakir", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 39.90, lon: 41.27, name: "Erzurum", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 40.78, lon: 42.85, name: "Kars", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 38.25, lon: 46.28, name: "Tabriz", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "iran", type: "city" },
+    { lat: 38.48, lon: 46.48, name: "Urmia", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "iran", type: "city" }
+];
 
 var armeniaMap = L.map('armenia-map').setView([40.18, 44.51], 7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(armeniaMap);
@@ -736,6 +594,12 @@ armenianOutbreaks.forEach(function(item) {
 });
 
 armeniaMap.addLayer(armeniaMarkers);
+
+// Stats panel update
+document.getElementById('total-places').innerText = armenianOutbreaks.length + '+';
+document.getElementById('total-cities').innerText = armenianOutbreaks.filter(i => i.type === 'city').length;
+document.getElementById('total-villages').innerText = armenianOutbreaks.filter(i => i.type === 'village').length;
+document.getElementById('total-historical').innerText = armenianOutbreaks.filter(i => i.type === 'historical').length;
 </script>
 
 <!-- ARMENIAN MAP SECTION -->
@@ -752,10 +616,12 @@ armeniaMap.addLayer(armeniaMarkers);
     </p>
 </div>
 
+<div id="armenia-map" style="height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 20px;"></div>
+
 <div class="map-controls">
     <div style="text-align: center; margin-bottom: 15px;">
         <h3 style="color: #2cc3ff;">{% if lang == 'hy' %}Տարածաշրջաններ{% elif lang == 'ru' %}Регионы{% else %}Regions{% endif %}</h3>
-        <button class="region-btn active" onclick="filterRegion('all')">{% if lang == 'hy' %}Բոլորը{% elif lang == 'ru' %}Все{% else %}All{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('all')">{% if lang == 'hy' %}Բոլորը{% elif lang == 'ru' %}Все{% else %}All{% endif %}</button>
         <button class="region-btn" onclick="filterRegion('armenia')">{% if lang == 'hy' %}Հայաստան{% elif lang == 'ru' %}Армения{% else %}Armenia{% endif %}</button>
         <button class="region-btn" onclick="filterRegion('artsakh')">{% if lang == 'hy' %}Արցախ{% elif lang == 'ru' %}Арцах{% else %}Artsakh{% endif %}</button>
         <button class="region-btn" onclick="filterRegion('georgia')">{% if lang == 'hy' %}Վրաստան{% elif lang == 'ru' %}Грузия{% else %}Georgia{% endif %}</button>
@@ -772,8 +638,6 @@ armeniaMap.addLayer(armeniaMarkers);
     </div>
 </div>
 
-<div id="armenia-map-container" style="height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5);"></div>
-
 <script>
 window.filterRegion = function(region) {
     document.querySelectorAll('.region-btn').forEach(btn => btn.classList.remove('active'));
@@ -782,8 +646,7 @@ window.filterRegion = function(region) {
     var filtered = region === 'all' ? armenianOutbreaks : armenianOutbreaks.filter(item => item.region === region);
     
     armeniaMap.eachLayer(function(layer) {
-        if (layer instanceof L.MarkerClusterGroup) return;
-        armeniaMap.removeLayer(layer);
+        if (layer._icon) armeniaMap.removeLayer(layer);
     });
     
     var newMarkers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
@@ -811,20 +674,9 @@ window.filterRegion = function(region) {
     armeniaMap.addLayer(newMarkers);
     
     document.getElementById('total-places').innerText = filtered.length + '+';
-    document.getElementById('total-cities').innerText = filtered.filter(item => item.type === 'city').length;
-    document.getElementById('total-villages').innerText = filtered.filter(item => item.type === 'village').length;
-    document.getElementById('total-historical').innerText = filtered.filter(item => item.type === 'historical').length;
+    document.getElementById('total-cities').innerText = filtered.filter(i => i.type === 'city').length;
+    document.getElementById('total-villages').innerText = filtered.filter(i => i.type === 'village').length;
+    document.getElementById('total-historical').innerText = filtered.filter(i => i.type === 'historical').length;
 };
-
-// Stats panel for Armenian map
-var statsPanel = document.createElement('div');
-statsPanel.className = 'stats-panel';
-statsPanel.innerHTML = `
-    <div class="stat-card"><h3 id="total-places">${armenianOutbreaks.length}+</h3><p>${lang === 'hy' ? 'Բնակավայրեր' : (lang === 'ru' ? 'Населенных пунктов' : 'Settlements')}</p></div>
-    <div class="stat-card"><h3 id="total-cities">${armenianOutbreaks.filter(i => i.type === 'city').length}</h3><p>${lang === 'hy' ? 'Քաղաքներ' : (lang === 'ru' ? 'Городов' : 'Cities')}</p></div>
-    <div class="stat-card"><h3 id="total-villages">${armenianOutbreaks.filter(i => i.type === 'village').length}</h3><p>${lang === 'hy' ? 'Գյուղեր' : (lang === 'ru' ? 'Деревень' : 'Villages')}</p></div>
-    <div class="stat-card"><h3 id="total-historical">${armenianOutbreaks.filter(i => i.type === 'historical').length}</h3><p>${lang === 'hy' ? 'Պատմական վայրեր' : (lang === 'ru' ? 'Исторических мест' : 'Historical sites')}</p></div>
-`;
-document.querySelector('#armenia-map-container').after(statsPanel);
 </script>
 {% endblock %}
