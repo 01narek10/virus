@@ -3601,3 +3601,60 @@ footer::before {
     box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
     transition: none;  /* drag-ի ժամանակ անցումներ պետք չեն */
 }
+
+.quiz-levels {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+.quiz-level {
+    display: inline-block;
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    text-align: center;
+    min-width: 150px;
+}
+.quiz-level.very-easy { background: #28a745; color: white; box-shadow: 0 5px 0 #1e7e34; }
+.quiz-level.easy { background: #17a2b8; color: white; box-shadow: 0 5px 0 #0f6674; }
+.quiz-level.medium { background: #ffc107; color: #0a192f; box-shadow: 0 5px 0 #b27a00; }
+.quiz-level.hard { background: #fd7e14; color: white; box-shadow: 0 5px 0 #c45c00; }
+.quiz-level.very-hard { background: #dc3545; color: white; box-shadow: 0 5px 0 #a71d2a; }
+.quiz-level:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+}
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(44,195,255,0.3);
+}
+.leaderboard-table th {
+    background: rgba(44,195,255,0.2);
+    color: #2cc3ff;
+}
+.leaderboard-table tr:hover {
+    background: rgba(44,195,255,0.1);
+}
+
+.compare-selectors select,
+.comparison-grid div,
+.criteria,
+.value {
+    color: white;
+}
+.comparison-grid .value {
+    color: white !important;
+}
