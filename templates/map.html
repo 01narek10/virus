@@ -95,42 +95,22 @@
 {% endblock %}
 
 {% block content %}
-<!-- ՎԵՐՆԱԳԻՐ -->
 <div class="card">
-    <h2>🗺️ Համաշխարհային վիրուսային բռնկումներ (2026)</h2>
-    <p>Քարտեզում ներկայացված են <strong>1,247 ակտիվ բռնկումներ</strong> 156 երկրներից։ Սեղմիր մարկերների վրա՝ մանրամասներ տեսնելու համար։</p>
+    <h2>{{ t.map_title }}</h2>
+    <p>{{ t.map_desc|safe }}</p>
 </div>
 
-<!-- ՔԱՐՏԵԶ -->
-<div class="map-controls">
-    <div class="legend">
-        <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> Բարձր ռիսկ (100+ դեպք)</div>
-        <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> Միջին ռիսկ (20-99 դեպք)</div>
-        <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> Ցածր ռիսկ (1-19 դեպք)</div>
-        <div class="legend-item"><span class="color-dot" style="background: #aaa;"></span> Տվյալներ չկան</div>
-    </div>
+<div class="legend">
+    <div><span class="color-dot high"></span> {{ t.high_risk }}</div>
+    <div><span class="color-dot medium"></span> {{ t.medium_risk }}</div>
+    <div><span class="color-dot low"></span> {{ t.low_risk }}</div>
 </div>
 
-<div id="main-map"></div>
-
-<!-- ՎԻՃԱԿԱԳՐՈՒԹՅՈՒՆ -->
 <div class="stats-panel">
-    <div class="stat-card">
-        <h3 id="total-outbreaks">1,247</h3>
-        <p>Ակտիվ բռնկումներ</p>
-    </div>
-    <div class="stat-card">
-        <h3 id="total-countries">156</h3>
-        <p>Երկրներ</p>
-    </div>
-    <div class="stat-card">
-        <h3 id="total-cases">2.4M</h3>
-        <p>Ընդհանուր դեպքեր</p>
-    </div>
-    <div class="stat-card">
-        <h3 id="total-deaths">124K</h3>
-        <p>Ընդհանուր մահեր</p>
-    </div>
+    <div class="stat-card"><h3 id="total-outbreaks">0</h3><p>{{ t.active_outbreaks }}</p></div>
+    <div class="stat-card"><h3 id="total-countries">0</h3><p>{{ t.countries }}</p></div>
+    <div class="stat-card"><h3 id="total-cases">0</h3><p>{{ t.total_cases }}</p></div>
+    <div class="stat-card"><h3 id="total-deaths">0</h3><p>{{ t.total_deaths }}</p></div>
 </div>
 
 <script>
