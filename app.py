@@ -4,7 +4,19 @@ from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-# ===== TRANSLATIONS DICTIONARY =====
+# ==================== 1. ՍՏԵՂԾԵԼ APP ====================
+app = Flask(__name__)
+app.secret_key = "virus-secret-2026"
+
+# ==================== 2. DATABASE ====================
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'sqlite:///scores.db').replace('postgres://', 'postgresql://')
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
+# ==================== 3. GROQ ====================
+groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+
+# ==================== 4. TRANSLATIONS DICTIONARY ====================
 translations = {
     'hy': {
         'home': '🏠 Գլխավոր',
@@ -314,7 +326,7 @@ translations = {
     }
 }
 
-# ===== LANGUAGE SUPPORT =====
+# ==================== 5. LANGUAGE SUPPORT ====================
 def get_lang():
     lang = request.args.get('lang')
     if lang in ['hy', 'ru', 'en']:
@@ -335,18 +347,7 @@ def set_language(lang):
         session['lang'] = lang
     return redirect(request.referrer or url_for('home'))
 
-app = Flask(__name__)
-app.secret_key = "virus-secret-2026"
-
-# ===== DATABASE =====
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'sqlite:///scores.db').replace('postgres://', 'postgresql://')
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
-
-# ===== GROQ =====
-groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-
-# ===== SCORE MODEL =====
+# ==================== 6. SCORE MODEL ====================
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -370,7 +371,7 @@ class Score(db.Model):
             'date': self.date
         }
 
-# ===== ROUTES =====
+# ==================== 7. ROUTES ====================
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -455,9 +456,11 @@ def chat():
 def page_not_found(e):
     return render_template("404.html"), 404
 
+# ==================== 8. CREATE TABLES ====================
 with app.app_context():
     db.create_all()
 
+# ==================== 9. RUN ====================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
