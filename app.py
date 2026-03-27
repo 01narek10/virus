@@ -127,7 +127,20 @@ translations = {
         'active_outbreaks': 'Ակտիվ բռնկումներ',
         'countries': 'Երկրներ',
         'total_cases': 'Ընդհանուր դեպքեր',
-        'total_deaths': 'Ընդհանուր մահեր'
+        'total_deaths': 'Ընդհանուր մահեր',
+        'simulator_title': '🧬 Վիրուսային սիմուլյատոր',
+        'simulator_desc': 'Դիտեք, թե ինչպես է վիրուսը տարածվում բջիջների միջև:',
+        'infection_rate': '🦠 Վարակման արագություն',
+        'mortality_rate': '💀 Մահացություն (%)',
+        'vaccinated': '💉 Պատվաստվածներ (%)',
+        'initial_infected': '🦠 Սկզբնական վարակվածներ',
+        'healthy': '🟢 Առողջ',
+        'infected': '🔴 Վարակված',
+        'recovered': '🟡 Ապաքինված',
+        'dead': '⚫ Մահացած',
+        'start': '▶ Սկսել',
+        'stop': '⏸️ Կանգնեցնել',
+        'reset': '🔄 Վերականգնել'
     },
     'ru': {
         'home': '🏠 Главная',
