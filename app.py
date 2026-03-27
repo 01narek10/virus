@@ -449,6 +449,11 @@ class Score(db.Model):
 def home():
     return render_template("index.html")
 
+# ===== COMPARE ROUTE =====
+@app.route("/compare")
+def compare():
+    return render_template("compare.html", viruses=virus_data)
+    
 @app.route("/map")
 def map_page():
     return render_template("map.html")
