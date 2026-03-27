@@ -32,9 +32,9 @@
         {% else %}🗺️ Global Viral Outbreaks (2026){% endif %}
     </h2>
     <p>
-        {% if lang == 'hy' %}Քարտեզում ներկայացված են <strong>1,247 ակտիվ բռնկումներ</strong> 156 երկրներից։ Սեղմիր մարկերների վրա՝ մանրամասներ տեսնելու համար։
-        {% elif lang == 'ru' %}На карте представлены <strong>1,247 активных вспышек</strong> в 156 странах. Нажмите на маркеры для получения подробной информации.
-        {% else %}The map shows <strong>1,247 active outbreaks</strong> in 156 countries. Click on markers for details.{% endif %}
+        {% if lang == 'hy' %}Քարտեզում ներկայացված են <strong>1,000+ ակտիվ բռնկումներ</strong> 150+ երկրներից։ Սեղմիր մարկերների վրա՝ մանրամասներ տեսնելու համար։
+        {% elif lang == 'ru' %}На карте представлены <strong>1,000+ активных вспышек</strong> в 150+ странах. Нажмите на маркеры для получения подробной информации.
+        {% else %}The map shows <strong>1,000+ active outbreaks</strong> in 150+ countries. Click on markers for details.{% endif %}
     </p>
 </div>
 
@@ -66,13 +66,14 @@
 <div id="main-map"></div>
 
 <div class="stats-panel">
-    <div class="stat-card"><h3 id="total-outbreaks">1,247</h3><p>{% if lang == 'hy' %}Ակտիվ բռնկումներ{% elif lang == 'ru' %}Активных вспышек{% else %}Active outbreaks{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-countries">156</h3><p>{% if lang == 'hy' %}Երկրներ{% elif lang == 'ru' %}Стран{% else %}Countries{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-cases">2.4M</h3><p>{% if lang == 'hy' %}Ընդհանուր դեպքեր{% elif lang == 'ru' %}Всего случаев{% else %}Total cases{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-deaths">124K</h3><p>{% if lang == 'hy' %}Ընդհանուր մահեր{% elif lang == 'ru' %}Всего смертей{% else %}Total deaths{% endif %}</p></div>
+    <div class="stat-card"><h3 id="total-outbreaks">0</h3><p>{% if lang == 'hy' %}Ակտիվ բռնկումներ{% elif lang == 'ru' %}Активных вспышек{% else %}Active outbreaks{% endif %}</p></div>
+    <div class="stat-card"><h3 id="total-countries">0</h3><p>{% if lang == 'hy' %}Երկրներ{% elif lang == 'ru' %}Стран{% else %}Countries{% endif %}</p></div>
+    <div class="stat-card"><h3 id="total-cases">0</h3><p>{% if lang == 'hy' %}Ընդհանուր դեպքեր{% elif lang == 'ru' %}Всего случаев{% else %}Total cases{% endif %}</p></div>
+    <div class="stat-card"><h3 id="total-deaths">0</h3><p>{% if lang == 'hy' %}Ընդհանուր մահեր{% elif lang == 'ru' %}Всего смертей{% else %}Total deaths{% endif %}</p></div>
 </div>
 
 <script>
+// ==================== OUTBREAKS DATA ====================
 var outbreaks = [
     { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
     { lat: -4.33, lon: 15.32, name: "Kinshasa (Limete), DRC", virus: "Ebola", cases: 45, deaths: 23, risk: "medium" },
@@ -461,85 +462,7 @@ var outbreaks = [
     { lat: 15.60, lon: 32.60, name: "Khartoum (Bahri), Sudan", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" }
 ];
 
-
-// ==================== MAP INITIALIZATION ====================
-var map = L.map('main-map').setView([20, 0], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
-
-var markers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
-    iconCreateFunction: function(cluster) {
-        var count = cluster.getChildCount();
-        return L.divIcon({ html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>', className: 'marker-cluster', iconSize: L.point(40, 40) });
-    }
-});
-
-function getColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa'; }
-
-outbreaks.forEach(function(item) {
-    var radius = Math.sqrt(item.cases) / 6 + 4;
-    radius = Math.min(radius, 25);
-    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getColor(item.risk), fillOpacity: 0.8 });
-    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
-    circle.bindPopup(`<div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;"><h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4><p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p><p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p><p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p><p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p></div>`);
-    markers.addLayer(circle);
-});
-
-map.addLayer(markers);
-
-var totalCases = outbreaks.reduce((sum, item) => sum + item.cases, 0);
-var totalDeaths = outbreaks.reduce((sum, item) => sum + item.deaths, 0);
-var countries = [...new Set(outbreaks.map(item => item.name.split(', ')[1]))].length;
-
-document.getElementById('total-outbreaks').innerText = outbreaks.length.toLocaleString();
-document.getElementById('total-countries').innerText = countries;
-document.getElementById('total-cases').innerText = (totalCases / 1000000).toFixed(1) + 'M';
-document.getElementById('total-deaths').innerText = (totalDeaths / 1000).toFixed(0) + 'K';
-</script>
-
-<!-- ==================== ARMENIAN MAP SECTION ==================== -->
-<div class="card" style="margin-top: 50px;">
-    <h2>
-        {% if lang == 'hy' %}🇦🇲 Հայաստանի և Հայկական լեռնաշխարհի քարտեզ (2026)
-        {% elif lang == 'ru' %}🇦🇲 Карта Армении и Армянского нагорья (2026)
-        {% else %}🇦🇲 Map of Armenia and Armenian Highlands (2026){% endif %}
-    </h2>
-    <p>
-        {% if lang == 'hy' %}Քարտեզում ներկայացված են <strong>350+ բնակավայրեր</strong> Հայաստանից, Արցախից, Վրաստանից, Ադրբեջանից, Իրանից և Թուրքիայի հայկական պատմական տարածքներից։
-        {% elif lang == 'ru' %}На карте представлены <strong>350+ населенных пунктов</strong> из Армении, Арцаха, Грузии, Азербайджана, Ирана и исторических армянских территорий Турции.
-        {% else %}The map shows <strong>350+ settlements</strong> from Armenia, Artsakh, Georgia, Azerbaijan, Iran, and historical Armenian territories of Turkey.{% endif %}
-    </p>
-</div>
-
-<div class="map-controls">
-    <div style="text-align: center; margin-bottom: 15px;">
-        <h3 style="color: #2cc3ff;">{% if lang == 'hy' %}Տարածաշրջաններ{% elif lang == 'ru' %}Регионы{% else %}Regions{% endif %}</h3>
-        <button class="region-btn active" onclick="filterRegion('all')">{% if lang == 'hy' %}Բոլորը{% elif lang == 'ru' %}Все{% else %}All{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('armenia')">{% if lang == 'hy' %}Հայաստան{% elif lang == 'ru' %}Армения{% else %}Armenia{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('artsakh')">{% if lang == 'hy' %}Արցախ{% elif lang == 'ru' %}Арцах{% else %}Artsakh{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('georgia')">{% if lang == 'hy' %}Վրաստան{% elif lang == 'ru' %}Грузия{% else %}Georgia{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('azerbaijan')">{% if lang == 'hy' %}Ադրբեջան{% elif lang == 'ru' %}Азербайджан{% else %}Azerbaijan{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('turkey')">{% if lang == 'hy' %}Թուրքիա{% elif lang == 'ru' %}Турция{% else %}Turkey{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('iran')">{% if lang == 'hy' %}Իրան{% elif lang == 'ru' %}Иран{% else %}Iran{% endif %}</button>
-        <button class="region-btn" onclick="filterRegion('historical')">{% if lang == 'hy' %}Պատմական{% elif lang == 'ru' %}Исторические{% else %}Historical{% endif %}</button>
-    </div>
-    <div class="legend">
-        <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> {% if lang == 'hy' %}Բարձր ռիսկ (100+ դեպք){% elif lang == 'ru' %}Высокий риск (100+ случаев){% else %}High risk (100+ cases){% endif %}</div>
-        <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> {% if lang == 'hy' %}Միջին ռիսկ (20-99 դեպք){% elif lang == 'ru' %}Средний риск (20-99 случаев){% else %}Medium risk (20-99 cases){% endif %}</div>
-        <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> {% if lang == 'hy' %}Ցածր ռիսկ (1-19 դեպք){% elif lang == 'ru' %}Низкий риск (1-19 случаев){% else %}Low risk (1-19 cases){% endif %}</div>
-        <div class="legend-item"><span class="color-dot" style="background: #aaa;"></span> {% if lang == 'hy' %}Տվյալներ չկան / Պատմական{% elif lang == 'ru' %}Нет данных / Исторические{% else %}No data / Historical{% endif %}</div>
-    </div>
-</div>
-
-<div id="armenia-map" style="height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5);"></div>
-
-<div class="stats-panel">
-    <div class="stat-card"><h3 id="total-places">350+</h3><p>{% if lang == 'hy' %}Բնակավայրեր{% elif lang == 'ru' %}Населенных пунктов{% else %}Settlements{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-cities">124</h3><p>{% if lang == 'hy' %}Քաղաքներ{% elif lang == 'ru' %}Городов{% else %}Cities{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-villages">226</h3><p>{% if lang == 'hy' %}Գյուղեր{% elif lang == 'ru' %}Деревень{% else %}Villages{% endif %}</p></div>
-    <div class="stat-card"><h3 id="total-historical">45</h3><p>{% if lang == 'hy' %}Պատմական վայրեր{% elif lang == 'ru' %}Исторических мест{% else %}Historical sites{% endif %}</p></div>
-</div>
-
-<script>
+// ==================== ARMENIAN MAP DATA ====================
 var armenianOutbreaks = [
     { lat: 40.18, lon: 44.51, name: "Yerevan (Center)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high", region: "armenia", type: "city" },
     { lat: 40.21, lon: 44.53, name: "Yerevan (Ajapnyak)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
@@ -721,6 +644,59 @@ var armenianOutbreaks = [
     { lat: 38.20, lon: 44.80, name: "Dilman", virus: "COVID-19", cases: 78, deaths: 2, risk: "low", region: "iran", type: "city" }
 ];
 
+// ==================== MAP INITIALIZATION ====================
+var map = L.map('main-map').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
+
+var markers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
+    iconCreateFunction: function(cluster) {
+        var count = cluster.getChildCount();
+        return L.divIcon({ html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>', className: 'marker-cluster', iconSize: L.point(40, 40) });
+    }
+});
+
+function getColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa'; }
+
+outbreaks.forEach(function(item) {
+    var radius = Math.sqrt(item.cases) / 6 + 4;
+    radius = Math.min(radius, 25);
+    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getColor(item.risk), fillOpacity: 0.8 });
+    
+    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
+    
+    circle.bindPopup(`
+        <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
+            <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
+        </div>
+    `);
+    markers.addLayer(circle);
+});
+
+map.addLayer(markers);
+
+var totalCases = outbreaks.reduce((sum, item) => sum + item.cases, 0);
+var totalDeaths = outbreaks.reduce((sum, item) => sum + item.deaths, 0);
+var countries = [...new Set(outbreaks.map(item => item.name.split(', ')[1]))].length;
+
+document.getElementById('total-outbreaks').innerText = outbreaks.length.toLocaleString();
+document.getElementById('total-countries').innerText = countries;
+document.getElementById('total-cases').innerText = (totalCases / 1000000).toFixed(1) + 'M';
+document.getElementById('total-deaths').innerText = (totalDeaths / 1000).toFixed(0) + 'K';
+
+// ==================== ARMENIAN MAP SECTION ====================
+document.getElementById('armenia-map').innerHTML = '';
+var armeniaMapDiv = document.createElement('div');
+armeniaMapDiv.id = 'armenia-map';
+armeniaMapDiv.style.height = '650px';
+armeniaMapDiv.style.width = '100%';
+armeniaMapDiv.style.borderRadius = '24px';
+armeniaMapDiv.style.border = '2px solid #2cc3ff';
+armeniaMapDiv.style.boxShadow = '0 20px 40px rgba(0,0,0,0.5)';
+document.querySelector('.card:last-of-type').after(armeniaMapDiv);
 
 var armeniaMap = L.map('armenia-map').setView([40.18, 44.51], 7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(armeniaMap);
@@ -743,7 +719,9 @@ armenianOutbreaks.forEach(function(item) {
     var radius = Math.sqrt(item.cases) / 6 + 4;
     radius = Math.min(radius, 20);
     var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getArmeniaColor(item.risk), fillOpacity: 0.8 });
+    
     var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
+    
     circle.bindPopup(`
         <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
             <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
@@ -758,18 +736,65 @@ armenianOutbreaks.forEach(function(item) {
 });
 
 armeniaMap.addLayer(armeniaMarkers);
+</script>
 
+<!-- ARMENIAN MAP SECTION -->
+<div class="card" style="margin-top: 50px;">
+    <h2>
+        {% if lang == 'hy' %}🇦🇲 Հայաստանի և Հայկական լեռնաշխարհի քարտեզ (2026)
+        {% elif lang == 'ru' %}🇦🇲 Карта Армении и Армянского нагорья (2026)
+        {% else %}🇦🇲 Map of Armenia and Armenian Highlands (2026){% endif %}
+    </h2>
+    <p>
+        {% if lang == 'hy' %}Քարտեզում ներկայացված են <strong>50+ բնակավայրեր</strong> Հայաստանից, Արցախից, Վրաստանից, Ադրբեջանից, Իրանից և Թուրքիայի հայկական պատմական տարածքներից։
+        {% elif lang == 'ru' %}На карте представлены <strong>50+ населенных пунктов</strong> из Армении, Арцаха, Грузии, Азербайджана, Ирана и исторических армянских территорий Турции.
+        {% else %}The map shows <strong>50+ settlements</strong> from Armenia, Artsakh, Georgia, Azerbaijan, Iran, and historical Armenian territories of Turkey.{% endif %}
+    </p>
+</div>
+
+<div class="map-controls">
+    <div style="text-align: center; margin-bottom: 15px;">
+        <h3 style="color: #2cc3ff;">{% if lang == 'hy' %}Տարածաշրջաններ{% elif lang == 'ru' %}Регионы{% else %}Regions{% endif %}</h3>
+        <button class="region-btn active" onclick="filterRegion('all')">{% if lang == 'hy' %}Բոլորը{% elif lang == 'ru' %}Все{% else %}All{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('armenia')">{% if lang == 'hy' %}Հայաստան{% elif lang == 'ru' %}Армения{% else %}Armenia{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('artsakh')">{% if lang == 'hy' %}Արցախ{% elif lang == 'ru' %}Арцах{% else %}Artsakh{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('georgia')">{% if lang == 'hy' %}Վրաստան{% elif lang == 'ru' %}Грузия{% else %}Georgia{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('azerbaijan')">{% if lang == 'hy' %}Ադրբեջան{% elif lang == 'ru' %}Азербайджан{% else %}Azerbaijan{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('turkey')">{% if lang == 'hy' %}Թուրքիա{% elif lang == 'ru' %}Турция{% else %}Turkey{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('iran')">{% if lang == 'hy' %}Իրան{% elif lang == 'ru' %}Иран{% else %}Iran{% endif %}</button>
+        <button class="region-btn" onclick="filterRegion('historical')">{% if lang == 'hy' %}Պատմական{% elif lang == 'ru' %}Исторические{% else %}Historical{% endif %}</button>
+    </div>
+    <div class="legend">
+        <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> {% if lang == 'hy' %}Բարձր ռիսկ (100+ դեպք){% elif lang == 'ru' %}Высокий риск (100+ случаев){% else %}High risk (100+ cases){% endif %}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> {% if lang == 'hy' %}Միջին ռիսկ (20-99 դեպք){% elif lang == 'ru' %}Средний риск (20-99 случаев){% else %}Medium risk (20-99 cases){% endif %}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> {% if lang == 'hy' %}Ցածր ռիսկ (1-19 դեպք){% elif lang == 'ru' %}Низкий риск (1-19 случаев){% else %}Low risk (1-19 cases){% endif %}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #aaa;"></span> {% if lang == 'hy' %}Տվյալներ չկան / Պատմական{% elif lang == 'ru' %}Нет данных / Исторические{% else %}No data / Historical{% endif %}</div>
+    </div>
+</div>
+
+<div id="armenia-map-container" style="height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5);"></div>
+
+<script>
 window.filterRegion = function(region) {
     document.querySelectorAll('.region-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
-    armeniaMap.removeLayer(armeniaMarkers);
-    var newMarkers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
+    
     var filtered = region === 'all' ? armenianOutbreaks : armenianOutbreaks.filter(item => item.region === region);
+    
+    armeniaMap.eachLayer(function(layer) {
+        if (layer instanceof L.MarkerClusterGroup) return;
+        armeniaMap.removeLayer(layer);
+    });
+    
+    var newMarkers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
+    
     filtered.forEach(function(item) {
         var radius = Math.sqrt(item.cases) / 6 + 4;
         radius = Math.min(radius, 20);
         var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getArmeniaColor(item.risk), fillOpacity: 0.8 });
+        
         var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
+        
         circle.bindPopup(`
             <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
                 <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
@@ -782,12 +807,24 @@ window.filterRegion = function(region) {
         `);
         newMarkers.addLayer(circle);
     });
+    
     armeniaMap.addLayer(newMarkers);
-    armeniaMarkers = newMarkers;
+    
     document.getElementById('total-places').innerText = filtered.length + '+';
     document.getElementById('total-cities').innerText = filtered.filter(item => item.type === 'city').length;
     document.getElementById('total-villages').innerText = filtered.filter(item => item.type === 'village').length;
     document.getElementById('total-historical').innerText = filtered.filter(item => item.type === 'historical').length;
 };
+
+// Stats panel for Armenian map
+var statsPanel = document.createElement('div');
+statsPanel.className = 'stats-panel';
+statsPanel.innerHTML = `
+    <div class="stat-card"><h3 id="total-places">${armenianOutbreaks.length}+</h3><p>${lang === 'hy' ? 'Բնակավայրեր' : (lang === 'ru' ? 'Населенных пунктов' : 'Settlements')}</p></div>
+    <div class="stat-card"><h3 id="total-cities">${armenianOutbreaks.filter(i => i.type === 'city').length}</h3><p>${lang === 'hy' ? 'Քաղաքներ' : (lang === 'ru' ? 'Городов' : 'Cities')}</p></div>
+    <div class="stat-card"><h3 id="total-villages">${armenianOutbreaks.filter(i => i.type === 'village').length}</h3><p>${lang === 'hy' ? 'Գյուղեր' : (lang === 'ru' ? 'Деревень' : 'Villages')}</p></div>
+    <div class="stat-card"><h3 id="total-historical">${armenianOutbreaks.filter(i => i.type === 'historical').length}</h3><p>${lang === 'hy' ? 'Պատմական վայրեր' : (lang === 'ru' ? 'Исторических мест' : 'Historical sites')}</p></div>
+`;
+document.querySelector('#armenia-map-container').after(statsPanel);
 </script>
 {% endblock %}
