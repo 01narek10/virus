@@ -396,6 +396,20 @@ virus_data = {
     }
 }
 
+questions_db = {
+    'very_easy': [
+        {"question": "Վիրուսները տեսանելի են անզեն աչքով?", "options": ["Այո", "Ոչ"], "correct": 1, "explanation": "Վիրուսները շատ փոքր են:"},
+        {"question": "Գրիպը վիրուսային հիվանդությո՞ւն է", "options": ["Այո", "Ոչ"], "correct": 0, "explanation": "Գրիպը առաջանում է ինֆլուենցա վիրուսից:"},
+        {"question": "Պատվաստումը պաշտպանում է վիրուսներից?", "options": ["Այո", "Ոչ"], "correct": 0, "explanation": "Պատվաստումը օգնում է իմունային համակարգին:"}
+    ],
+    'easy': [
+        {"question": "Ո՞րն է ամենատարածված վիրուսային հիվանդությունը", "options": ["Գրիպ", "Էբոլա", "COVID-19", "Կարմրուկ"], "correct": 0, "explanation": "Գրիպը ամենատարածվածն է:"},
+        # ... ավելացրու քո հարցերը
+    ],
+    'medium': [...],
+    'hard': [...],
+    'very_hard': [...]
+}
 # ==================== 5. LANGUAGE SUPPORT ====================
 def get_lang():
     lang = request.args.get('lang')
@@ -526,6 +540,27 @@ def chat():
         return jsonify({'reply': response.choices[0].message.content})
     except Exception as e:
         return jsonify({'reply': f'❌ Error: {str(e)}'}), 500
+
+@app.route("/quiz/<level>")
+def quiz_level(level):
+    if level not in questions_db:
+        return redirect("/quiz")
+    questions = questions_db[level]
+    level_names = {
+        'very_easy': 'Շատ հեշտ', 'easy': 'Հեշտ', 'medium': 'Միջին',
+        'hard': 'Բարդ', 'very_hard': 'Շատ բարդ'
+    }
+    level_classes = {
+        'very_easy': 'very-easy', 'easy': 'easy', 'medium': 'medium',
+        'hard': 'hard', 'very_hard': 'very-hard'
+    }
+    return render_template("quiz.html",
+        level=level,
+        level_name=level_names[level],
+        level_class=level_classes[level],
+        questions=questions,
+        total=len(questions)
+    )
 
 @app.errorhandler(404)
 def page_not_found(e):
