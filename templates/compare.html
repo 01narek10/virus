@@ -7,18 +7,18 @@
     <p>{{ t.compare_desc }}</p>
     
     <div class="compare-selectors" style="display: flex; gap: 30px; justify-content: center; margin: 30px 0; flex-wrap: wrap;">
-        <div class="selector-group" style="flex: 1; min-width: 250px; max-width: 350px;">
-            <label for="virus1" style="display: block; margin-bottom: 10px; color: #2cc3ff;">{{ t.first_virus }}</label>
-            <select id="virus1" class="compare-select" onchange="updateComparison()" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
+        <div style="flex: 1; min-width: 250px; max-width: 350px;">
+            <label style="display: block; margin-bottom: 10px; color: #2cc3ff;">{{ t.first_virus }}</label>
+            <select id="virus1" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
                 <option value="">-- {{ t.select }} --</option>
                 {% for key, virus in viruses.items() %}
                 <option value="{{ key }}">{{ virus.name }}</option>
                 {% endfor %}
             </select>
         </div>
-        <div class="selector-group" style="flex: 1; min-width: 250px; max-width: 350px;">
-            <label for="virus2" style="display: block; margin-bottom: 10px; color: #2cc3ff;">{{ t.second_virus }}</label>
-            <select id="virus2" class="compare-select" onchange="updateComparison()" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
+        <div style="flex: 1; min-width: 250px; max-width: 350px;">
+            <label style="display: block; margin-bottom: 10px; color: #2cc3ff;">{{ t.second_virus }}</label>
+            <select id="virus2" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
                 <option value="">-- {{ t.select }} --</option>
                 {% for key, virus in viruses.items() %}
                 <option value="{{ key }}">{{ virus.name }}</option>
@@ -34,8 +34,8 @@
             <div style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 15px; font-weight: 700; text-align: center;" id="virus2-name"></div>
             
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.image }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);"><img id="virus1-img" style="max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid #2cc3ff; display: block; margin: 0 auto;"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);"><img id="virus2-img" style="max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid #2cc3ff; display: block; margin: 0 auto;"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); text-align: center;"><img id="virus1-img" style="max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid #2cc3ff;"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); text-align: center;"><img id="virus2-img" style="max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid #2cc3ff;"></div>
             
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.full_name }}</div>
             <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-full_name"></div>
@@ -76,40 +76,39 @@
 var viruses = {{ viruses | tojson }};
 
 function updateComparison() {
-    var virus1 = document.getElementById('virus1').value;
-    var virus2 = document.getElementById('virus2').value;
+    var v1 = document.getElementById('virus1').value;
+    var v2 = document.getElementById('virus2').value;
     var table = document.getElementById('comparison-table');
     var error = document.getElementById('same-error');
     
-    if (virus1 && virus2) {
-        if (virus1 === virus2) {
+    if (v1 && v2) {
+        if (v1 === v2) {
             table.style.display = 'none';
             error.style.display = 'block';
             return;
         }
         error.style.display = 'none';
+        var data1 = viruses[v1];
+        var data2 = viruses[v2];
         
-        var v1 = viruses[virus1];
-        var v2 = viruses[virus2];
-        
-        document.getElementById('virus1-name').innerText = v1.name;
-        document.getElementById('virus2-name').innerText = v2.name;
-        document.getElementById('virus1-img').src = v1.image;
-        document.getElementById('virus2-img').src = v2.image;
-        document.getElementById('virus1-full_name').innerText = v1.full_name;
-        document.getElementById('virus2-full_name').innerText = v2.full_name;
-        document.getElementById('virus1-type').innerText = v1.type;
-        document.getElementById('virus2-type').innerText = v2.type;
-        document.getElementById('virus1-discovery').innerText = v1.discovery;
-        document.getElementById('virus2-discovery').innerText = v2.discovery;
-        document.getElementById('virus1-transmission').innerText = v1.transmission;
-        document.getElementById('virus2-transmission').innerText = v2.transmission;
-        document.getElementById('virus1-mortality').innerText = v1.mortality;
-        document.getElementById('virus2-mortality').innerText = v2.mortality;
-        document.getElementById('virus1-vaccine').innerText = v1.vaccine;
-        document.getElementById('virus2-vaccine').innerText = v2.vaccine;
-        document.getElementById('virus1-symptoms').innerText = v1.symptoms;
-        document.getElementById('virus2-symptoms').innerText = v2.symptoms;
+        document.getElementById('virus1-name').innerText = data1.name;
+        document.getElementById('virus2-name').innerText = data2.name;
+        document.getElementById('virus1-img').src = data1.image;
+        document.getElementById('virus2-img').src = data2.image;
+        document.getElementById('virus1-full_name').innerText = data1.full_name;
+        document.getElementById('virus2-full_name').innerText = data2.full_name;
+        document.getElementById('virus1-type').innerText = data1.type;
+        document.getElementById('virus2-type').innerText = data2.type;
+        document.getElementById('virus1-discovery').innerText = data1.discovery;
+        document.getElementById('virus2-discovery').innerText = data2.discovery;
+        document.getElementById('virus1-transmission').innerText = data1.transmission;
+        document.getElementById('virus2-transmission').innerText = data2.transmission;
+        document.getElementById('virus1-mortality').innerText = data1.mortality;
+        document.getElementById('virus2-mortality').innerText = data2.mortality;
+        document.getElementById('virus1-vaccine').innerText = data1.vaccine;
+        document.getElementById('virus2-vaccine').innerText = data2.vaccine;
+        document.getElementById('virus1-symptoms').innerText = data1.symptoms;
+        document.getElementById('virus2-symptoms').innerText = data2.symptoms;
         
         table.style.display = 'block';
     } else {
@@ -117,5 +116,8 @@ function updateComparison() {
         error.style.display = 'none';
     }
 }
+
+document.getElementById('virus1').onchange = updateComparison;
+document.getElementById('virus2').onchange = updateComparison;
 </script>
 {% endblock %}
