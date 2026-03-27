@@ -466,9 +466,6 @@ def show_leaderboard():
     scores = Score.query.order_by(Score.percent.desc(), Score.score.desc()).limit(50).all()
     return render_template("leaderboard.html", leaderboard=[s.to_dict() for s in scores])
 
-@app.route("/compare")
-def compare():
-    return render_template("compare.html")
 
 @app.route("/simulator")
 def simulator():
