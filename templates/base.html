@@ -301,192 +301,70 @@
 </footer>
 
 <script>
-// ===== CHATBOT FUNCTIONS =====
+// ===== CHATBOT =====
 function toggleChat() {
-    const window = document.getElementById('chatbotWindow');
-    window.classList.toggle('show');
+    var win = document.getElementById('chatbotWindow');
+    if (win.style.display === 'flex') {
+        win.style.display = 'none';
+    } else {
+        win.style.display = 'flex';
+    }
 }
 
 function addMessage(text, sender) {
-    const messagesDiv = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    var container = document.getElementById('chatMessages');
+    var div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.innerHTML = '<div class="message-content">' + text + '</div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
 }
 
 function addThinking() {
-    const messagesDiv = document.getElementById('chatMessages');
-    const thinkingDiv = document.createElement('div');
-    thinkingDiv.className = 'message bot thinking';
-    thinkingDiv.id = 'thinking-' + Date.now();
-    const lang = '{{ lang }}';
-    const thinkingText = lang === 'hy' ? '⏳ Մտածում եմ...' : (lang === 'ru' ? '⏳ Думаю...' : '⏳ Thinking...');
-    thinkingDiv.innerHTML = `<div class="message-content">${thinkingText}</div>`;
-    messagesDiv.appendChild(thinkingDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    return thinkingDiv.id;
+    var container = document.getElementById('chatMessages');
+    var div = document.createElement('div');
+    div.className = 'message bot thinking';
+    div.id = 'thinking-' + Date.now();
+    var lang = '{{ lang }}';
+    var thinkingText = lang === 'hy' ? '⏳ Մտածում եմ...' : (lang === 'ru' ? '⏳ Думаю...' : '⏳ Thinking...');
+    div.innerHTML = '<div class="message-content">' + thinkingText + '</div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div.id;
 }
 
 function removeThinking(id) {
-    const el = document.getElementById(id);
+    var el = document.getElementById(id);
     if (el) el.remove();
 }
 
 function sendMessage() {
-    const input = document.getElementById('userInput');
-    const message = input.value.trim();
+    var input = document.getElementById('userInput');
+    var message = input.value.trim();
     if (!message) return;
-
+    
     addMessage(message, 'user');
     input.value = '';
-
-    const thinkingId = addThinking();
-    const lang = '{{ lang }}';
-
+    
+    var thinkingId = addThinking();
+    var lang = '{{ lang }}';
+    
     fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: message, language: lang })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
         removeThinking(thinkingId);
         addMessage(data.reply, 'bot');
     })
-    .catch(error => {
+    .catch(function(error) {
         removeThinking(thinkingId);
-        const errorText = lang === 'hy' ? '❌ Ցանցային սխալ' : (lang === 'ru' ? '❌ Ошибка сети' : '❌ Network error');
+        var errorText = lang === 'hy' ? '❌ Ցանցային սխալ' : (lang === 'ru' ? '❌ Ошибка сети' : '❌ Network error');
         addMessage(errorText, 'bot');
     });
 }
-
-// ===== DRAGGABLE =====
-let isDragging = false;
-let offsetX, offsetY;
-
-function initDraggable() {
-    const chatbotWindow = document.getElementById('chatbotWindow');
-    const header = document.getElementById('chatbotHeader');
-    if (!chatbotWindow || !header) return;
-    if (window.innerWidth <= 1024) return;
-
-    header.addEventListener('mousedown', startDrag);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDrag);
-
-    function startDrag(e) {
-        isDragging = true;
-        const rect = chatbotWindow.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        chatbotWindow.style.position = 'fixed';
-        chatbotWindow.style.margin = '0';
-        header.style.cursor = 'grabbing';
-        e.preventDefault();
-    }
-
-    function drag(e) {
-        if (!isDragging) return;
-        let newX = e.clientX - offsetX;
-        let newY = e.clientY - offsetY;
-        const maxX = window.innerWidth - chatbotWindow.offsetWidth;
-        const maxY = window.innerHeight - chatbotWindow.offsetHeight;
-        newX = Math.max(0, Math.min(newX, maxX));
-        newY = Math.max(0, Math.min(newY, maxY));
-        chatbotWindow.style.left = newX + 'px';
-        chatbotWindow.style.top = newY + 'px';
-        chatbotWindow.style.right = 'auto';
-        chatbotWindow.style.bottom = 'auto';
-        e.preventDefault();
-    }
-
-    function stopDrag() {
-        if (!isDragging) return;
-        isDragging = false;
-        header.style.cursor = 'move';
-        saveChatbotPosition();
-    }
-}
-
-function saveChatbotPosition() {
-    const window = document.getElementById('chatbotWindow');
-    const position = { left: window.style.left, top: window.style.top };
-    localStorage.setItem('chatbotPosition', JSON.stringify(position));
-}
-
-function loadChatbotPosition() {
-    const saved = localStorage.getItem('chatbotPosition');
-    if (saved && window.innerWidth > 1024) {
-        const pos = JSON.parse(saved);
-        const window = document.getElementById('chatbotWindow');
-        window.style.left = pos.left;
-        window.style.top = pos.top;
-        window.style.right = 'auto';
-        window.style.bottom = 'auto';
-        window.style.transform = 'none';
-    }
-}
-
-function saveChatbotSize() {
-    const window = document.getElementById('chatbotWindow');
-    const size = { width: window.offsetWidth, height: window.offsetHeight };
-    localStorage.setItem('chatbotSize', JSON.stringify(size));
-}
-
-function loadChatbotSize() {
-    const saved = localStorage.getItem('chatbotSize');
-    if (saved) {
-        const size = JSON.parse(saved);
-        const window = document.getElementById('chatbotWindow');
-        window.style.width = size.width + 'px';
-        window.style.height = size.height + 'px';
-    }
-}
-
-function handleWindowResize() {
-    const chatbotWindow = document.getElementById('chatbotWindow');
-    if (window.innerWidth <= 1024) {
-        chatbotWindow.style.position = 'fixed';
-        chatbotWindow.style.left = '50%';
-        chatbotWindow.style.top = '50%';
-        chatbotWindow.style.transform = 'translate(-50%, -50%)';
-        chatbotWindow.style.right = 'auto';
-        chatbotWindow.style.bottom = 'auto';
-    } else {
-        chatbotWindow.style.transform = 'none';
-        loadChatbotPosition();
-    }
-}
-
-window.addEventListener('load', function() {
-    loadChatbotSize();
-    loadChatbotPosition();
-    initDraggable();
-    if (window.innerWidth > 1024) {
-        const savedPos = localStorage.getItem('chatbotPosition');
-        if (!savedPos) {
-            const window = document.getElementById('chatbotWindow');
-            window.style.left = 'auto';
-            window.style.top = 'auto';
-            window.style.right = '0';
-            window.style.bottom = '80px';
-            window.style.position = 'absolute';
-        }
-    } else {
-        handleWindowResize();
-    }
-});
-
-window.addEventListener('resize', function() {
-    handleWindowResize();
-    if (window.innerWidth > 1024) initDraggable();
-});
-
-const observer = new ResizeObserver(() => saveChatbotSize());
-const chatbotWindow = document.getElementById('chatbotWindow');
-if (chatbotWindow) observer.observe(chatbotWindow);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
