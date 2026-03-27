@@ -326,6 +326,76 @@ translations = {
     }
 }
 
+# ===== VIRUS DATA FOR COMPARE =====
+virus_data = {
+    'covid19': {
+        'name': 'COVID-19',
+        'full_name': 'SARS-CoV-2',
+        'type': 'ՌՆԹ վիրուս',
+        'discovery': '2019',
+        'transmission': 'Օդակաթիլային',
+        'mortality': '2-3%',
+        'vaccine': '✅ Կա',
+        'symptoms': 'Ջերմություն, հազ, շնչառության դժվարություն',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png'
+    },
+    'ebola': {
+        'name': 'Էբոլա',
+        'full_name': 'Ebola virus',
+        'type': 'ՌՆԹ վիրուս',
+        'discovery': '1976',
+        'transmission': 'Արյան միջոցով',
+        'mortality': '50-90%',
+        'vaccine': '✅ Կա',
+        'symptoms': 'Արյունահոսություն, ջերմություն, փսխում',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg'
+    },
+    'hiv': {
+        'name': 'ՄԻԱՎ',
+        'full_name': 'Human Immunodeficiency Virus',
+        'type': 'ՌՆԹ վիրուս',
+        'discovery': '1983',
+        'transmission': 'Արյուն, սեռական',
+        'mortality': 'Բարձր առանց բուժման',
+        'vaccine': '❌ Չկա',
+        'symptoms': 'Իմունային անբավարարություն',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg'
+    },
+    'flu': {
+        'name': 'Գրիպ',
+        'full_name': 'Influenza virus',
+        'type': 'ՌՆԹ վիրուս',
+        'discovery': '1933',
+        'transmission': 'Օդակաթիլային',
+        'mortality': '0.1%',
+        'vaccine': '✅ Կա',
+        'symptoms': 'Ջերմություն, հազ, մկանացավ',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg'
+    },
+    'rotavirus': {
+        'name': 'Ռոտավիրուս',
+        'full_name': 'Rotavirus',
+        'type': 'ՌՆԹ վիրուս',
+        'discovery': '1973',
+        'transmission': 'Ֆեկալ-օրալ',
+        'mortality': '0.1%',
+        'vaccine': '✅ Կա',
+        'symptoms': 'Լուծ, փսխում, ջերմություն',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg'
+    },
+    'adenovirus': {
+        'name': 'Ադենովիրուս',
+        'full_name': 'Adenovirus',
+        'type': 'ԴՆԹ վիրուս',
+        'discovery': '1953',
+        'transmission': 'Օդակաթիլային',
+        'mortality': '<1%',
+        'vaccine': '✅ Կա',
+        'symptoms': 'Մրսածություն, կոկորդի ցավ',
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg'
+    }
+}
+
 # ==================== 5. LANGUAGE SUPPORT ====================
 def get_lang():
     lang = request.args.get('lang')
@@ -383,6 +453,10 @@ def home():
 def map_page():
     return render_template("map.html")
 
+@app.route("/compare")
+def compare():
+    return render_template("compare.html", viruses=virus_data)
+    
 @app.route("/quiz")
 def quiz_choice():
     return render_template("quiz_choice.html")
