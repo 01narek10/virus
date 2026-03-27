@@ -144,7 +144,14 @@
     color: #0a192f;
     font-weight: bold;
 }
-        .language-selector {
+        
+.language-selector .lang-btn.active {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: #0a192f;
+    font-weight: bold;
+}
+        
+ .language-selector {
     position: fixed;
     top: 20px;
     right: 20px;
@@ -210,10 +217,11 @@
 
 <!-- ===== LANGUAGE SELECTOR ===== -->
 <div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; gap: 5px; background: rgba(10,25,47,0.9); padding: 8px 12px; border-radius: 40px; backdrop-filter: blur(10px); border: 1px solid #2cc3ff;">
-    <a href="/set_language/hy" class="lang-btn" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇦🇲 Հայ</a>
-    <a href="/set_language/ru" class="lang-btn" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇷🇺 Рус</a>
-    <a href="/set_language/en" class="lang-btn" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇬🇧 En</a>
+    <a href="/set_language/hy" class="lang-btn {% if lang == 'hy' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇦🇲 Հայ</a>
+    <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇷🇺 Рус</a>
+    <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}" style="background: transparent; border: none; color: white; padding: 5px 12px; border-radius: 30px; text-decoration: none;">🇬🇧 En</a>
 </div>
+
     
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
@@ -222,36 +230,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/">
-                    {% if lang == 'hy' %}🏠 Գլխավոր
-                    {% elif lang == 'ru' %}🏠 Главная
-                    {% else %}🏠 Home{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/map">
-                    {% if lang == 'hy' %}🗺️ Քարտեզ
-                    {% elif lang == 'ru' %}🗺️ Карта
-                    {% else %}🗺️ Map{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/quiz">
-                    {% if lang == 'hy' %}🧪 Վիկտորինա
-                    {% elif lang == 'ru' %}🧪 Викторина
-                    {% else %}🧪 Quiz{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/leaderboard">
-                    {% if lang == 'hy' %}🏆 Ցուցակ
-                    {% elif lang == 'ru' %}🏆 Таблица
-                    {% else %}🏆 Leaderboard{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/simulator">
-                    {% if lang == 'hy' %}🧬 Սիմուլյատոր
-                    {% elif lang == 'ru' %}🧬 Симулятор
-                    {% else %}🧬 Simulator{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/compare">
-                    {% if lang == 'hy' %}🔍 Համեմատել
-                    {% elif lang == 'ru' %}🔍 Сравнить
-                    {% else %}🔍 Compare{% endif %}
-                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/">{{ t.home }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="/map">{{ t.map }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="/quiz">{{ t.quiz }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="/leaderboard">{{ t.leaderboard }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="/simulator">{{ t.simulator }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="/compare">{{ t.compare }}</a></li>
             </ul>
         </div>
     </div>
@@ -272,38 +256,26 @@
     </main>
 
 
-<!-- ===== CHATBOT ===== -->
-<div class="chatbot-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 10000; display: flex; flex-direction: column; align-items: flex-end;">
-    <div class="chatbot-button" onclick="toggleChat()">💬</div>
-    <div class="chatbot-window" id="chatbotWindow">
-        <div class="chatbot-header" id="chatbotHeader">
-            <span id="chatbotTitle">🦠 Վիրուսային օգնական</span>
-            <button onclick="toggleChat()">&times;</button>
-        </div>
-        <div class="chatbot-messages" id="chatMessages">
-            <div class="message bot"><div class="message-content" id="welcomeMessage">Բարև, ես վիրուսային օգնականն եմ:</div></div>
-        </div>
-        <div class="chatbot-input">
-            <input type="text" id="userInput" placeholder="Գրիր հարցդ..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()">➤</button>
-        </div>
+<div class="chatbot-header" id="chatbotHeader">
+    <span id="chatbotTitle">{{ t.chatbot_title }}</span>
+    <button onclick="toggleChat()">&times;</button>
+</div>
+<div class="chatbot-messages" id="chatMessages">
+    <div class="message bot">
+        <div class="message-content" id="welcomeMessage">{{ t.chatbot_welcome }}</div>
     </div>
 </div>
+<div class="chatbot-input">
+    <input type="text" id="userInput" placeholder="{{ t.chatbot_placeholder }}" onkeypress="if(event.key === 'Enter') sendMessage()">
+    <button onclick="sendMessage()">➤</button>
+</div>
     
-        <footer>
-            <div class="footer-content">
-                <p>
-                    {% if lang == 'hy' %}© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են
-                    {% elif lang == 'ru' %}© 2026 Платформа изучения вирусов | Все права защищены
-                    {% else %}© 2026 Virus Study Platform | All rights reserved{% endif %}
-                </p>
-                <p>
-                    {% if lang == 'hy' %}Տվյալները թարմացվել են՝ 2026 մարտի 7
-                    {% elif lang == 'ru' %}Данные обновлены: 7 марта 2026
-                    {% else %}Data updated: March 7, 2026{% endif %}
-                </p>
-            </div>
-        </footer>
+<footer>
+    <div class="footer-content">
+        <p>{{ t.footer }}</p>
+        <p>{{ t.footer_update }}</p>
+    </div>
+</footer>
 
 
 
@@ -649,6 +621,19 @@ window.addEventListener('load', function() {
     }
 });
 
+// ===== CHATBOT TRANSLATIONS =====
+function updateChatbotLanguage() {
+    const lang = '{{ lang }}';
+    const t = {
+        hy: { welcome: "Բարև, ես վիրուսային օգնականն եմ:", placeholder: "Գրիր հարցդ...", thinking: "⏳ Մտածում եմ...", error: "❌ Ցանցային սխալ" },
+        ru: { welcome: "Привет, я вирусный помощник:", placeholder: "Напишите ваш вопрос...", thinking: "⏳ Думаю...", error: "❌ Ошибка сети" },
+        en: { welcome: "Hello, I'm your virus assistant:", placeholder: "Type your question...", thinking: "⏳ Thinking...", error: "❌ Network error" }
+    };
+    const currentT = t[lang] || t.hy;
+    document.getElementById('welcomeMessage').innerText = currentT.welcome;
+    document.getElementById('userInput').placeholder = currentT.placeholder;
+}
+    
 window.addEventListener('resize', function() {
     handleWindowResize();
     // Եթե չափը փոխվում է, նորից փորձում ենք միացնել drag-ը
