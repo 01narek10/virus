@@ -2,117 +2,16 @@
 {% block title %}Համաշխարհային քարտեզ 2026{% endblock %}
 
 {% block extra_head %}
-<!-- Leaflet գրադարաններ -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- MarkerCluster գրադարան -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <style>
-    #main-map {
-        height: 700px;
-        width: 100%;
-        border-radius: 24px;
-        border: 2px solid #2cc3ff;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        margin: 20px 0;
-        z-index: 1;
-    }
-    
-    .map-controls {
-        background: rgba(6,20,45,0.95);
-        backdrop-filter: blur(10px);
-        padding: 20px;
-        border-radius: 20px;
-        margin: 20px 0;
-        border-left: 5px solid #2cc3ff;
-    }
-    
-    .legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-    }
-    
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .color-dot {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-    }
-    
-    .stats-panel {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        background: rgba(44,195,255,0.1);
-        padding: 25px;
-        border-radius: 20px;
-        border: 1px solid #2cc3ff;
-        margin: 20px 0;
-    }
-    
-    .stat-card {
-        text-align: center;
-        padding: 15px;
-        background: rgba(0,0,0,0.3);
-        border-radius: 15px;
-    }
-    
-    .stat-card h3 {
-        font-size: 2.2rem;
-        color: #2cc3ff;
-        margin: 0;
-    }
-    
-    .stat-card p {
-        margin: 5px 0 0;
-        font-size: 1rem;
-        opacity: 0.9;
-    }
-    
-    .search-box {
-        margin-bottom: 20px;
-    }
-    
-    .search-box input {
-        width: 100%;
-        padding: 15px 20px;
-        border-radius: 50px;
-        border: 2px solid #2cc3ff;
-        background: rgba(6,20,45,0.8);
-        color: white;
-        font-size: 1.1rem;
-    }
+#main-map, #armenia-map { height: 500px; width: 100%; border-radius: 20px; margin: 20px 0; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2>{{ t.map_title }}</h2>
-    <p>{{ t.map_desc|safe }}</p>
-</div>
-
-<div class="legend">
-    <div><span class="color-dot high"></span> {{ t.high_risk }}</div>
-    <div><span class="color-dot medium"></span> {{ t.medium_risk }}</div>
-    <div><span class="color-dot low"></span> {{ t.low_risk }}</div>
-</div>
-
-<div class="stats-panel">
-    <div class="stat-card"><h3 id="total-outbreaks">0</h3><p>{{ t.active_outbreaks }}</p></div>
-    <div class="stat-card"><h3 id="total-countries">0</h3><p>{{ t.countries }}</p></div>
-    <div class="stat-card"><h3 id="total-cases">0</h3><p>{{ t.total_cases }}</p></div>
-    <div class="stat-card"><h3 id="total-deaths">0</h3><p>{{ t.total_deaths }}</p></div>
-</div>
-
+<div id="main-map"></div>
+<div id="armenia-map"></div>
 <script>
 // ==================== 1000+ ԲՌՆԿՈՒՄՆԵՐ ====================
 var outbreaks = [
