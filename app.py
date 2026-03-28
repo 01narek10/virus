@@ -215,9 +215,9 @@ translations = {
         'leaderboard': 'Ցուցակ',
         'no_scores': 'Դեռևս արդյունքներ չկան',
         'date': 'Ամսաթիվ',
-        'score': 'Միավոր'
+        'score': 'Միավոր',
         # Simulator
-        'simulator_title': '🧬 Վիրուսային սիմուլյատոր'
+        'simulator_title': '🧬 Վիրուսային սիմուլյատոր',
         'simulator_desc': 'Դիտեք, թե ինչպես է վիրուսը տարածվում բջիջների միջև:',
         'infection_rate': '🦠 Վարակման արագություն',
         'mortality_rate': '💀 Մահացություն (%)',
