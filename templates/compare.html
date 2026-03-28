@@ -5,11 +5,11 @@
 <div class="card">
     <h2>{{ t.compare_title }}</h2>
     <p>{{ t.compare_desc }}</p>
-    
+
     <div class="compare-selectors" style="display: flex; gap: 30px; justify-content: center; margin: 30px 0; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 250px; max-width: 350px;">
             <label style="display: block; margin-bottom: 10px; color: #2cc3ff;">{{ t.first_virus }}</label>
-            <select id="virus1" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
+            <select id="virus1" class="compare-select" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
                 <option value="">-- {{ t.select }} --</option>
                 {% for key, virus in viruses.items() %}
                 <option value="{{ key }}">{{ virus.name }}</option>
@@ -18,7 +18,7 @@
         </div>
         <div style="flex: 1; min-width: 250px; max-width: 350px;">
             <label style="display: block; margin-bottom: 10px; color: #2cc3ff;">{{ t.second_virus }}</label>
-            <select id="virus2" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
+            <select id="virus2" class="compare-select" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
                 <option value="">-- {{ t.select }} --</option>
                 {% for key, virus in viruses.items() %}
                 <option value="{{ key }}">{{ virus.name }}</option>
@@ -26,47 +26,47 @@
             </select>
         </div>
     </div>
-    
-    <div id="comparison-table" style="display: none;">
-        <div style="display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 1px; background: rgba(44,195,255,0.2); border-radius: 20px; overflow: hidden; border: 1px solid #2cc3ff;">
+
+    <div id="comparison-table" style="display: none; margin-top: 20px;">
+        <div class="comparison-grid" style="display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 1px; background: rgba(44,195,255,0.2); border-radius: 20px; overflow: hidden; border: 1px solid #2cc3ff;">
             <div style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 15px; font-weight: 700; text-align: center;">{{ t.criteria }}</div>
             <div style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 15px; font-weight: 700; text-align: center;" id="virus1-name"></div>
             <div style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 15px; font-weight: 700; text-align: center;" id="virus2-name"></div>
-            
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.image }}</div>
             <div style="padding: 15px; background: rgba(6,20,45,0.9); text-align: center;"><img id="virus1-img" style="max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid #2cc3ff;"></div>
             <div style="padding: 15px; background: rgba(6,20,45,0.9); text-align: center;"><img id="virus2-img" style="max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid #2cc3ff;"></div>
-            
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.full_name }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-full_name"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-full_name"></div>
-            
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-full_name"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-full_name"></div>
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.type }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-type"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-type"></div>
-            
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-type"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-type"></div>
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.discovery }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-discovery"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-discovery"></div>
-            
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-discovery"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-discovery"></div>
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.transmission }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-transmission"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-transmission"></div>
-            
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-transmission"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-transmission"></div>
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.mortality }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-mortality"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-mortality"></div>
-            
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-mortality"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-mortality"></div>
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.vaccine }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-vaccine"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-vaccine"></div>
-            
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-vaccine"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-vaccine"></div>
+
             <div style="padding: 15px; background: rgba(6,20,45,0.9); font-weight: 600; color: #2cc3ff;">{{ t.symptoms }}</div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus1-symptoms"></div>
-            <div style="padding: 15px; background: rgba(6,20,45,0.9);" id="virus2-symptoms"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus1-symptoms"></div>
+            <div style="padding: 15px; background: rgba(6,20,45,0.9); color: white;" id="virus2-symptoms"></div>
         </div>
     </div>
-    
+
     <div id="same-error" style="display: none; color: #ff4444; text-align: center; margin-top: 20px; padding: 10px; background: rgba(255,68,68,0.1); border-radius: 10px;">
         ⚠️ {{ t.same_error }}
     </div>
@@ -80,7 +80,7 @@ function updateComparison() {
     var v2 = document.getElementById('virus2').value;
     var table = document.getElementById('comparison-table');
     var error = document.getElementById('same-error');
-    
+
     if (v1 && v2) {
         if (v1 === v2) {
             table.style.display = 'none';
@@ -90,7 +90,7 @@ function updateComparison() {
         error.style.display = 'none';
         var data1 = viruses[v1];
         var data2 = viruses[v2];
-        
+
         document.getElementById('virus1-name').innerText = data1.name;
         document.getElementById('virus2-name').innerText = data2.name;
         document.getElementById('virus1-img').src = data1.image;
@@ -109,7 +109,7 @@ function updateComparison() {
         document.getElementById('virus2-vaccine').innerText = data2.vaccine;
         document.getElementById('virus1-symptoms').innerText = data1.symptoms;
         document.getElementById('virus2-symptoms').innerText = data2.symptoms;
-        
+
         table.style.display = 'block';
     } else {
         table.style.display = 'none';
