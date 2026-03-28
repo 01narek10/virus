@@ -4,38 +4,114 @@
 {% block content %}
 <div class="card">
     <h2 style="text-align: center;">{{ t.quiz_title }} — {{ level_name }}</h2>
-    <form id="quizForm">
-        {% for q in questions %}
-        <div class="quiz-question" style="margin-bottom: 30px; background: rgba(6,20,45,0.6); padding: 20px; border-radius: 20px; border-left: 5px solid #2cc3ff;">
-            <p style="font-size: 1.2rem; margin-bottom: 15px;"><strong>{{ loop.index }}. {{ q.question }}</strong></p>
-            {% for opt in q.options %}
-            <label style="display: block; margin: 12px 0; cursor: pointer; padding: 8px 12px; border-radius: 12px; transition: background 0.2s; background: rgba(44,195,255,0.05);">
-                <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}" style="margin-right: 12px; transform: scale(1.1); vertical-align: middle;">
-                <span style="font-size: 1rem;">{{ opt }}</span>
-            </label>
-            {% endfor %}
+    <div id="quiz-container" style="background: rgba(6,20,45,0.6); border-radius: 20px; padding: 25px; margin: 20px 0;">
+        <div id="question-number" style="color: #2cc3ff; margin-bottom: 15px; font-weight: bold;"></div>
+        <div id="question-text" style="font-size: 1.3rem; margin-bottom: 30px;"></div>
+        <div id="options-container"></div>
+        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+            <button id="prev-btn" class="quiz-nav-btn" style="background: rgba(44,195,255,0.2); color: white; padding: 10px 25px; border: 1px solid #2cc3ff; border-radius: 40px; cursor: pointer; transition: 0.3s;">{{ t.prev|default('◀ Նախորդ') }}</button>
+            <button id="next-btn" class="quiz-nav-btn" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; padding: 10px 25px; border: none; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.3s;">{{ t.next|default('Հաջորդ ▶') }}</button>
         </div>
-        {% endfor %}
-        
-        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
-            <button type="button" onclick="submitQuiz()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; padding: 12px 35px; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.3s;">{{ t.submit }}</button>
-            <button type="button" onclick="resetQuiz()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 35px; border: 1px solid #2cc3ff; border-radius: 50px; font-size: 1rem; cursor: pointer; transition: all 0.3s;">{{ t.reset }}</button>
-        </div>
-    </form>
-    <div id="quiz-result" style="margin-top: 30px; text-align: center; font-size: 1.2rem;"></div>
+        <div id="quiz-result" style="margin-top: 20px; text-align: center; font-size: 1.1rem;"></div>
+    </div>
 </div>
 
 <script>
-function submitQuiz() {
-    const form = document.getElementById('quizForm');
-    let score = 0;
-    const total = {{ total }};
+// ===== QUIZ DATA =====
+const questions = [
     {% for q in questions %}
-    const selected = form.querySelector('input[name="q{{ loop.index0 }}"]:checked');
-    if (selected && parseInt(selected.value) === {{ q.correct }}) {
-        score++;
-    }
+    {
+        text: "{{ q.question|safe }}",
+        options: [
+            {% for opt in q.options %}
+            "{{ opt|safe }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        correct: {{ q.correct }}
+    }{% if not loop.last %},{% endif %}
     {% endfor %}
+];
+const total = {{ total }};
+let current = 0;
+let answers = new Array(total).fill(null);
+
+// ===== DOM ELEMENTS =====
+const questionNumberDiv = document.getElementById('question-number');
+const questionTextDiv = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const resultDiv = document.getElementById('quiz-result');
+
+// ===== LOAD CURRENT QUESTION =====
+function loadQuestion() {
+    const q = questions[current];
+    questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
+    questionTextDiv.innerText = q.text;
+    
+    let optionsHtml = '';
+    q.options.forEach((opt, idx) => {
+        const checked = answers[current] === idx ? 'checked' : '';
+        optionsHtml += `
+            <label style="display: block; margin: 15px 0; cursor: pointer; padding: 12px 15px; border-radius: 15px; background: rgba(44,195,255,0.05); transition: 0.2s;">
+                <input type="radio" name="option" value="${idx}" ${checked} style="margin-right: 12px; transform: scale(1.1);">
+                <span style="font-size: 1rem;">${opt}</span>
+            </label>
+        `;
+    });
+    optionsContainer.innerHTML = optionsHtml;
+    
+    // Attach event listeners to radio buttons
+    document.querySelectorAll('input[name="option"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            answers[current] = parseInt(e.target.value);
+        });
+    });
+    
+    // Update button states
+    prevBtn.style.opacity = current === 0 ? '0.5' : '1';
+    prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
+    
+    if (current === total - 1) {
+        nextBtn.innerText = '{{ t.finish|default("✔ Ավարտել") }}';
+    } else {
+        nextBtn.innerText = '{{ t.next|default("Հաջորդ ▶") }}';
+    }
+}
+
+// ===== NEXT BUTTON =====
+function nextQuestion() {
+    // Save current answer if selected
+    const selected = document.querySelector('input[name="option"]:checked');
+    if (selected) {
+        answers[current] = parseInt(selected.value);
+    }
+    
+    if (current === total - 1) {
+        // Finish quiz
+        finishQuiz();
+    } else {
+        current++;
+        loadQuestion();
+    }
+}
+
+// ===== PREVIOUS BUTTON =====
+function prevQuestion() {
+    if (current > 0) {
+        current--;
+        loadQuestion();
+    }
+}
+
+// ===== FINISH QUIZ =====
+function finishQuiz() {
+    let score = 0;
+    for (let i = 0; i < total; i++) {
+        if (answers[i] !== null && answers[i] === questions[i].correct) {
+            score++;
+        }
+    }
     const percent = Math.round((score / total) * 100);
     const name = prompt("{{ t.your_name }}", "Guest");
     if (name && name.trim()) {
@@ -52,15 +128,22 @@ function submitQuiz() {
         }).then(() => {
             window.location.href = '/leaderboard';
         }).catch(() => {
-            document.getElementById('quiz-result').innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+            resultDiv.innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+            nextBtn.disabled = true;
+            prevBtn.disabled = true;
         });
     } else {
-        document.getElementById('quiz-result').innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+        resultDiv.innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+        nextBtn.disabled = true;
+        prevBtn.disabled = true;
     }
 }
-function resetQuiz() {
-    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-    document.getElementById('quiz-result').innerHTML = '';
-}
+
+// ===== EVENT LISTENERS =====
+prevBtn.addEventListener('click', prevQuestion);
+nextBtn.addEventListener('click', nextQuestion);
+
+// ===== INIT =====
+loadQuestion();
 </script>
 {% endblock %}
