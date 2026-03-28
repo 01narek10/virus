@@ -3,77 +3,161 @@
 <head>
     <meta name="google-site-verification" content="Zj0hJ-4cJB2uGESTPj3qNoUEzFcaVQ1s0pW1AUOwbhI" />
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.5, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>{% block title %}Վիրուսների հանրագիտարան 2026{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     {% block extra_head %}{% endblock %}
     <style>
-/* CHATBOT */
-.chatbot-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.2rem;
-    color: white;
-    cursor: pointer;
-    z-index: 10001;
-    box-shadow: 0 4px 20px rgba(44,195,255,0.5);
-    transition: transform 0.3s;
-}
-
-.chatbot-button:hover {
-    transform: scale(1.1);
-}
-
-.chatbot-window {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    width: 450px;
-    height: 550px;
-    background: #0a192f;
-    border: 2px solid #2cc3ff;
-    border-radius: 24px;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 10000;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-}
-
-.chatbot-window.show {
-    display: flex;
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-    .chatbot-window {
-        width: 90vw;
-        height: 70vh;
-        top: 50%;
-        left: 50%;
-        bottom: auto;
-        right: auto;
-        transform: translate(-50%, -50%);
-    }
-    .chatbot-button {
-        bottom: 15px;
-        right: 15px;
-        width: 60px;
-        height: 60px;
-        font-size: 1.8rem;
-    }
-}
-
-        /* Language Selector */
+        /* CHATBOT */
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: white;
+            cursor: pointer;
+            z-index: 10001;
+            box-shadow: 0 4px 20px rgba(44,195,255,0.5);
+            transition: transform 0.3s;
+        }
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+        .chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 450px;
+            height: 550px;
+            background: #0a192f;
+            border: 2px solid #2cc3ff;
+            border-radius: 24px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10000;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            resize: both;
+            overflow: auto;
+            min-width: 300px;
+            min-height: 400px;
+            max-width: 800px;
+            max-height: 800px;
+        }
+        .chatbot-window.show {
+            display: flex;
+        }
+        @media (max-width: 768px) {
+            .chatbot-window {
+                width: 90vw;
+                height: 70vh;
+                top: 50%;
+                left: 50%;
+                bottom: auto;
+                right: auto;
+                transform: translate(-50%, -50%);
+            }
+            .chatbot-button {
+                bottom: 15px;
+                right: 15px;
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+        }
+        .chatbot-header {
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            color: #0a192f;
+            padding: 12px 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+        .chatbot-header button {
+            background: rgba(0,0,0,0.2);
+            border: none;
+            color: #0a192f;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #0a192f;
+        }
+        .message {
+            display: flex;
+        }
+        .message.bot {
+            justify-content: flex-start;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message-content {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: white;
+        }
+        .message.bot .message-content {
+            background: #1e3a6b;
+            border: 1px solid #2cc3ff;
+            border-bottom-left-radius: 5px;
+        }
+        .message.user .message-content {
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            color: #0a192f;
+            border-bottom-right-radius: 5px;
+        }
+        .chatbot-input {
+            display: flex;
+            padding: 12px;
+            background: #0a192f;
+            border-top: 1px solid #2cc3ff;
+            gap: 8px;
+        }
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #2cc3ff;
+            border-radius: 40px;
+            background: #1e2f4a;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .chatbot-input button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+            border: none;
+            color: #0a192f;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        /* Language selector */
         .language-selector {
             position: fixed;
             top: 20px;
@@ -87,7 +171,6 @@
             backdrop-filter: blur(10px);
             border: 1px solid #2cc3ff;
         }
-
         .lang-btn {
             background: transparent;
             border: none;
@@ -99,38 +182,39 @@
             text-decoration: none;
             transition: all 0.3s;
         }
-
         .lang-btn:hover {
             background: rgba(44, 195, 255, 0.2);
         }
-
         .lang-btn.active {
             background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
             color: #0a192f;
             font-weight: bold;
-
-    
         }
-        .chatbot-window {
+        /* Other basic styles */
+        body {
             background: #0a192f;
-            border: 2px solid #2cc3ff;
-            border-radius: 24px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            resize: both;              /* <--- սա է resize-ը */
-            overflow: auto;            /* resize-ի համար պարտադիր */
-            min-width: 300px;
-            min-height: 400px;
-            max-width: 800px;
-            max-height: 800px;
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            width: 450px;
-            height: 550px;
-            z-index: 10000;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            color: white;
+            font-family: sans-serif;
+        }
+        .navbar {
+            background: rgba(10,25,47,0.95);
+            backdrop-filter: blur(10px);
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .card {
+            background: rgba(6,20,45,0.8);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid #2cc3ff;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #aaa;
         }
     </style>
 </head>
@@ -144,27 +228,54 @@
 <div class="moving-grid"></div>
 <div class="spotlight"></div>
 
+<!-- LANGUAGE SELECTOR -->
 <div class="language-selector">
     <a href="/set_language/hy" class="lang-btn {% if lang == 'hy' %}active{% endif %}">🇦🇲 Հայ</a>
     <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}">🇷🇺 Рус</a>
     <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
 
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
-    ...
-    <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/">
-            {% if lang == 'hy' %}🏠 Գլխավոր
-            {% elif lang == 'ru' %}🏠 Главная
-            {% else %}🏠 Home{% endif %}
-        </a></li>
-        <li class="nav-item"><a class="nav-link" href="/map">
-            {% if lang == 'hy' %}🗺️ Քարտեզ
-            {% elif lang == 'ru' %}🗺️ Карта
-            {% else %}🗺️ Map{% endif %}
-        </a></li>
-        ...
-    </ul>
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">
+                    {% if lang == 'hy' %}🏠 Գլխավոր
+                    {% elif lang == 'ru' %}🏠 Главная
+                    {% else %}🏠 Home{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/map">
+                    {% if lang == 'hy' %}🗺️ Քարտեզ
+                    {% elif lang == 'ru' %}🗺️ Карта
+                    {% else %}🗺️ Map{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/quiz">
+                    {% if lang == 'hy' %}🧪 Վիկտորինա
+                    {% elif lang == 'ru' %}🧪 Викторина
+                    {% else %}🧪 Quiz{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/leaderboard">
+                    {% if lang == 'hy' %}🏆 Ցուցակ
+                    {% elif lang == 'ru' %}🏆 Таблица
+                    {% else %}🏆 Leaderboard{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/simulator">
+                    {% if lang == 'hy' %}🧬 Սիմուլյատոր
+                    {% elif lang == 'ru' %}🧬 Симулятор
+                    {% else %}🧬 Simulator{% endif %}
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/compare">
+                    {% if lang == 'hy' %}🔍 Համեմատել
+                    {% elif lang == 'ru' %}🔍 Сравнить
+                    {% else %}🔍 Compare{% endif %}
+                </a></li>
+            </ul>
+        </div>
+    </div>
 </nav>
 
 <main class="container">
@@ -198,7 +309,7 @@
 </footer>
 
 <script>
-   // ===== DRAGGABLE =====
+// ===== DRAGGABLE =====
 let isDragging = false;
 let dragOffsetX = 0, dragOffsetY = 0;
 
@@ -243,6 +354,7 @@ function initDraggable() {
 }
 
 window.addEventListener('load', initDraggable);
+
 // ===== CHATBOT =====
 function toggleChat() {
     var win = document.getElementById('chatbotWindow');
@@ -280,15 +392,6 @@ function removeThinking(id) {
     if (el) el.remove();
 }
 
-function initDraggable() {
-    if (window.innerWidth > 768) {
-        var win = document.getElementById('chatbotWindow');
-        var header = document.getElementById('chatbotHeader');
-        if (!win || !header) return;
-        // ... drag logic
-    }
-}
-    
 function sendMessage() {
     var input = document.getElementById('userInput');
     var message = input.value.trim();
