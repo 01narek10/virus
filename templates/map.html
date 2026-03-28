@@ -48,6 +48,8 @@
 </div>
 
 <script>
+var lang = '{{ lang }}';
+if (lang === '{{ lang }}') lang = 'hy';  // fallback, եթե Jinja2-ը չի փոխարինել
 // ==================== OUTBREAKS DATA ====================
 var outbreaks = [
     { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
