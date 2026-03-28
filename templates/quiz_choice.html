@@ -5,13 +5,13 @@
 <div class="card">
     <h2>{{ t.quiz_title }}</h2>
     <p>{{ t.quiz_desc }}</p>
-
-<div class="quiz-levels">
-    <a href="/quiz/very_easy" class="quiz-level very_easy">{{ t.very_easy }}</a>
-    <a href="/quiz/easy" class="quiz-level easy">{{ t.easy }}</a>
-    <a href="/quiz/medium" class="quiz-level medium">{{ t.medium }}</a>
-    <a href="/quiz/hard" class="quiz-level hard">{{ t.hard }}</a>
-    <a href="/quiz/very_hard" class="quiz-level very_hard">{{ t.very_hard }}</a>
-</div>
+    
+    <div class="quiz-levels" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin: 40px 0;">
+        <a href="/quiz/very_easy" class="quiz-level very-easy" style="background: #28a745; color: white; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 0 #1e7e34; transition: all 0.3s;">{{ t.very_easy }}</a>
+        <a href="/quiz/easy" class="quiz-level easy" style="background: #17a2b8; color: white; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 0 #0f6674;">{{ t.easy }}</a>
+        <a href="/quiz/medium" class="quiz-level medium" style="background: #ffc107; color: #0a192f; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 0 #b27a00;">{{ t.medium }}</a>
+        <a href="/quiz/hard" class="quiz-level hard" style="background: #fd7e14; color: white; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 0 #c45c00;">{{ t.hard }}</a>
+        <a href="/quiz/very_hard" class="quiz-level very-hard" style="background: #dc3545; color: white; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: bold; box-shadow: 0 5px 0 #a71d2a;">{{ t.very_hard }}</a>
+    </div>
 </div>
 {% endblock %}
