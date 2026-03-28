@@ -1,44 +1,80 @@
 {% extends "base.html" %}
-{% block title %}Վիրուսային սիմուլյատոր{% endblock %}
+{% block title %}{{ t.simulator_title }}{% endblock %}
 
 {% block content %}
 <div class="card">
-  <h2>{{ t.simulator_title }}</h2>
-<p>{{ t.simulator_desc }}</p>
+    <h2>{{ t.simulator_title }}</h2>
+    <p>{{ t.simulator_desc }}</p>
 
-<label>{{ t.infection_rate }}</label>
-<label>{{ t.mortality_rate }}</label>
-<label>{{ t.vaccinated }}</label>
-<label>{{ t.initial_infected }}</label>
+    <div class="simulator-container" style="padding: 20px; background: rgba(6,20,45,0.8); border-radius: 20px; margin-top: 20px;">
+        <div class="simulator-controls" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="color: #2cc3ff; font-weight: 600;">{{ t.infection_rate }}</label>
+                <input type="range" id="speed" min="0.1" max="0.9" step="0.1" value="0.3" style="width: 100%; height: 8px; background: linear-gradient(90deg, #2cc3ff, #ff2c6d); border-radius: 10px; -webkit-appearance: none;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="color: #2cc3ff; font-weight: 600;">{{ t.mortality_rate }}</label>
+                <input type="range" id="mortality" min="0" max="30" step="1" value="10" style="width: 100%; height: 8px; background: linear-gradient(90deg, #2cc3ff, #ff2c6d); border-radius: 10px; -webkit-appearance: none;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="color: #2cc3ff; font-weight: 600;">{{ t.vaccinated }}</label>
+                <input type="range" id="vaccinated" min="0" max="100" step="5" value="20" style="width: 100%; height: 8px; background: linear-gradient(90deg, #2cc3ff, #ff2c6d); border-radius: 10px; -webkit-appearance: none;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="color: #2cc3ff; font-weight: 600;">{{ t.initial_infected }}</label>
+                <input type="number" id="initial" min="1" max="20" value="3" style="background: rgba(255,255,255,0.1); border: 2px solid #2cc3ff; border-radius: 10px; padding: 8px; color: white;">
+            </div>
+        </div>
 
-<div class="stat-item"><span>{{ t.healthy }}</span><span id="healthyCount">0</span></div>
-<div class="stat-item"><span>{{ t.infected }}</span><span id="infectedCount">0</span></div>
-<div class="stat-item"><span>{{ t.recovered }}</span><span id="recoveredCount">0</span></div>
-<div class="stat-item"><span>{{ t.dead }}</span><span id="deadCount">0</span></div>
+        <canvas id="simulatorCanvas" width="400" height="400" style="display: block; margin: 20px auto; background: #0a192f; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></canvas>
 
-<button onclick="startSimulation()">{{ t.start }}</button>
-<button onclick="stopSimulation()">{{ t.stop }}</button>
-<button onclick="resetSimulation()">{{ t.reset }}</button>
+        <div class="simulator-stats" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 20px;">
+            <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <div style="width: 20px; height: 20px; background: #2ecc71; border-radius: 5px; box-shadow: 0 0 15px #2ecc71;"></div>
+                <span>{{ t.healthy }}</span>
+                <span id="healthyCount" style="font-size: 1.5rem; font-weight: 700; color: white;">0</span>
+            </div>
+            <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <div style="width: 20px; height: 20px; background: #e74c3c; border-radius: 5px; box-shadow: 0 0 15px #e74c3c;"></div>
+                <span>{{ t.infected }}</span>
+                <span id="infectedCount" style="font-size: 1.5rem; font-weight: 700; color: white;">0</span>
+            </div>
+            <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <div style="width: 20px; height: 20px; background: #f1c40f; border-radius: 5px; box-shadow: 0 0 15px #f1c40f;"></div>
+                <span>{{ t.recovered }}</span>
+                <span id="recoveredCount" style="font-size: 1.5rem; font-weight: 700; color: white;">0</span>
+            </div>
+            <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <div style="width: 20px; height: 20px; background: #2c3e50; border-radius: 5px; box-shadow: 0 0 15px #2c3e50;"></div>
+                <span>{{ t.dead }}</span>
+                <span id="deadCount" style="font-size: 1.5rem; font-weight: 700; color: white;">0</span>
+            </div>
+        </div>
+
+        <div class="simulator-buttons" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button onclick="startSimulation()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">▶ {{ t.start }}</button>
+            <button onclick="stopSimulation()" class="btn-warning" style="background: linear-gradient(135deg, #ffc107, #b27a00); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">⏸️ {{ t.stop }}</button>
+            <button onclick="resetSimulation()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">🔄 {{ t.reset }}</button>
+        </div>
+    </div>
 </div>
 
 <script>
-// ==================== ՍԻՄՈՒԼՅԱՏՈՐԻ ԿԱՐԳԱՎՈՐՈՒՄՆԵՐ ====================
+// ==================== SIMULATOR CONFIGURATION ====================
 const canvas = document.getElementById('simulatorCanvas');
 const ctx = canvas.getContext('2d');
 const cellSize = 20;
 const cols = 20;
 const rows = 20;
-
 let grid = [];
 let simulationInterval = null;
 let isRunning = false;
 
-// Գույներ (միայն 4 գույն)
 const COLORS = {
-    HEALTHY: '#2ecc71',    // Վառ կանաչ
-    INFECTED: '#e74c3c',    // Վառ կարմիր
-    RECOVERED: '#f1c40f',   // Ոսկեդեղին
-    DEAD: '#2c3e50'         // Մուգ կապտամոխրագույն
+    HEALTHY: '#2ecc71',
+    INFECTED: '#e74c3c',
+    RECOVERED: '#f1c40f',
+    DEAD: '#2c3e50'
 };
 
 const STATES = {
@@ -48,7 +84,7 @@ const STATES = {
     DEAD: 3
 };
 
-// ==================== ՍԿԶՆԱՐԿՈՒՄ ====================
+// ==================== INITIALIZATION ====================
 function initGrid() {
     grid = [];
     for (let i = 0; i < rows; i++) {
@@ -57,58 +93,42 @@ function initGrid() {
             grid[i][j] = STATES.HEALTHY;
         }
     }
-    
-    // Սկզբնական վարակվածներ
+
     const initialInfected = parseInt(document.getElementById('initial').value) || 3;
     for (let n = 0; n < initialInfected; n++) {
         const i = Math.floor(Math.random() * rows);
         const j = Math.floor(Math.random() * cols);
         grid[i][j] = STATES.INFECTED;
     }
-    
-        // Պատվաստվածներ (առողջ, բայց իմունիտետով)
-        const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) || 20;
-        const totalCells = rows * cols;
-        const vaccinatedCount = Math.floor(totalCells * vaccinatedPercent / 100);
-        
-        let vaccinated = 0;
-        while (vaccinated < vaccinatedCount) {
-            const i = Math.floor(Math.random() * rows);
-            const j = Math.floor(Math.random() * cols);
-            if (grid[i][j] === STATES.HEALTHY) {
-                grid[i][j] = STATES.HEALTHY;  // թողնում ենք առողջ, բայց
-                // պետք է հետո չվարակվեն - սա ավելի բարդ է
-                vaccinated++;
-            }
+
+    const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) || 20;
+    const totalCells = rows * cols;
+    const vaccinatedCount = Math.floor(totalCells * vaccinatedPercent / 100);
+    let vaccinated = 0;
+    while (vaccinated < vaccinatedCount) {
+        const i = Math.floor(Math.random() * rows);
+        const j = Math.floor(Math.random() * cols);
+        if (grid[i][j] === STATES.HEALTHY) {
+            grid[i][j] = STATES.RECOVERED;
+            vaccinated++;
         }
-    
+    }
     drawGrid();
     updateStats();
 }
 
 function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             let color;
             switch(grid[i][j]) {
-                case STATES.HEALTHY:
-                    color = COLORS.HEALTHY;
-                    break;
-                case STATES.INFECTED:
-                    color = COLORS.INFECTED;
-                    break;
-                case STATES.RECOVERED:
-                    color = COLORS.RECOVERED;
-                    break;
-                case STATES.DEAD:
-                    color = COLORS.DEAD;
-                    break;
-                default:
-                    color = '#fff';
+                case STATES.HEALTHY: color = COLORS.HEALTHY; break;
+                case STATES.INFECTED: color = COLORS.INFECTED; break;
+                case STATES.RECOVERED: color = COLORS.RECOVERED; break;
+                case STATES.DEAD: color = COLORS.DEAD; break;
+                default: color = '#fff';
             }
-            
             ctx.fillStyle = color;
             ctx.fillRect(j * cellSize, i * cellSize, cellSize-1, cellSize-1);
         }
@@ -117,7 +137,6 @@ function drawGrid() {
 
 function updateStats() {
     let healthy = 0, infected = 0, recovered = 0, dead = 0;
-    
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             switch(grid[i][j]) {
@@ -128,7 +147,6 @@ function updateStats() {
             }
         }
     }
-    
     document.getElementById('healthyCount').innerText = healthy;
     document.getElementById('infectedCount').innerText = infected;
     document.getElementById('recoveredCount').innerText = recovered;
@@ -139,24 +157,19 @@ function updateSimulation() {
     const newGrid = JSON.parse(JSON.stringify(grid));
     const infectionRate = parseFloat(document.getElementById('speed').value);
     const mortalityRate = parseFloat(document.getElementById('mortality').value) / 100;
-    
+
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             if (grid[i][j] === STATES.INFECTED) {
-                // Հաշվել մահացությունը
                 if (Math.random() < mortalityRate) {
                     newGrid[i][j] = STATES.DEAD;
                     continue;
                 }
-                
-                // Փորձել վարակել հարևաններին
                 for (let di = -1; di <= 1; di++) {
                     for (let dj = -1; dj <= 1; dj++) {
                         if (di === 0 && dj === 0) continue;
-                        
                         const ni = i + di;
                         const nj = j + dj;
-                        
                         if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
                             if (grid[ni][nj] === STATES.HEALTHY && Math.random() < infectionRate) {
                                 newGrid[ni][nj] = STATES.INFECTED;
@@ -164,21 +177,18 @@ function updateSimulation() {
                         }
                     }
                 }
-                
-                // Վարակվածը կարող է ապաքինվել
                 if (Math.random() < 0.1) {
                     newGrid[i][j] = STATES.RECOVERED;
                 }
             }
         }
     }
-    
     grid = newGrid;
     drawGrid();
     updateStats();
 }
 
-// ==================== ԿԱՌԱՎԱՐՄԱՆ ՖՈՒՆԿՑԻԱՆԵՐ ====================
+// ==================== CONTROL FUNCTIONS ====================
 window.startSimulation = function() {
     if (isRunning) return;
     isRunning = true;
@@ -198,145 +208,7 @@ window.resetSimulation = function() {
     initGrid();
 };
 
-// ==================== ՍԿՍԵԼ ====================
+// ==================== START ====================
 initGrid();
 </script>
-
-<style>
-.simulator-container {
-    padding: 20px;
-    background: rgba(6,20,45,0.8);
-    border-radius: 20px;
-    margin-top: 20px;
-}
-
-.simulator-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.control-group label {
-    color: #2cc3ff;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.control-group input[type="range"] {
-    width: 100%;
-    height: 8px;
-    background: linear-gradient(90deg, #2cc3ff, #ff2c6d);
-    border-radius: 10px;
-    -webkit-appearance: none;
-}
-
-.control-group input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 0 15px #2cc3ff;
-    cursor: pointer;
-}
-
-.control-group input[type="number"] {
-    background: rgba(255,255,255,0.1);
-    border: 2px solid #2cc3ff;
-    border-radius: 10px;
-    padding: 8px;
-    color: white;
-    font-size: 1rem;
-}
-
-#simulatorCanvas {
-    display: block;
-    margin: 20px auto;
-    background: #0a192f;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.simulator-stats {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin: 20px 0;
-    padding: 20px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 20px;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    min-width: 80px;
-}
-
-.stat-color {
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-.stat-color.healthy { background: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
-.stat-color.infected { background: #e74c3c; box-shadow: 0 0 15px #e74c3c; }
-.stat-color.recovered { background: #f1c40f; box-shadow: 0 0 15px #f1c40f; }
-.stat-color.dead { background: #2c3e50; box-shadow: 0 0 15px #2c3e50; }
-
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-}
-
-.simulator-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.btn-primary, .btn-warning, .btn-secondary {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 1rem;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
-    color: #0b1d3a;
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #ffc107, #b27a00);
-    color: #0b1d3a;
-}
-
-.btn-secondary {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    border: 1px solid #2cc3ff;
-}
-
-.btn-primary:hover, .btn-warning:hover, .btn-secondary:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 10px 20px rgba(44,195,255,0.4);
-}
-</style>
 {% endblock %}
