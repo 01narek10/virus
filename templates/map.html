@@ -48,6 +48,40 @@
 </div>
 
 <script>
+// ===== TRANSLATIONS FOR POPUPS =====
+var translations = {
+    // Viruses
+    virus: {
+        'Ebola': { hy: 'Էբոլա', ru: 'Эбола', en: 'Ebola' },
+        'Mpox': { hy: 'Mpox', ru: 'Оспа обезьян', en: 'Mpox' },
+        'Cholera': { hy: 'Խոլերա', ru: 'Холера', en: 'Cholera' },
+        'Yellow Fever': { hy: 'Դեղին տենդ', ru: 'Жёлтая лихорадка', en: 'Yellow Fever' },
+        'Lassa': { hy: 'Լասա', ru: 'Ласса', en: 'Lassa' },
+        'COVID-19': { hy: 'COVID-19', ru: 'COVID-19', en: 'COVID-19' },
+        'Zika': { hy: 'Զիկա', ru: 'Зика', en: 'Zika' },
+        'Dengue': { hy: 'Դենգե', ru: 'Денге', en: 'Dengue' },
+        'H5N1': { hy: 'H5N1', ru: 'H5N1', en: 'H5N1' },
+        'Plague': { hy: 'Ժանտախտ', ru: 'Чума', en: 'Plague' },
+        'Malaria': { hy: 'Մալարիա', ru: 'Малярия', en: 'Malaria' },
+        'Nipah': { hy: 'Nipah', ru: 'Нипах', en: 'Nipah' },
+        'Rabies': { hy: 'Կատաղություն', ru: 'Бешенство', en: 'Rabies' },
+        'Chikungunya': { hy: 'Չիկունգունյա', ru: 'Чикунгунья', en: 'Chikungunya' },
+        'H1N1': { hy: 'H1N1', ru: 'H1N1', en: 'H1N1' },
+        'H3N2': { hy: 'H3N2', ru: 'H3N2', en: 'H3N2' },
+        'H7N9': { hy: 'H7N9', ru: 'H7N9', en: 'H7N9' },
+        'West Nile': { hy: 'Արևմտյան Նեղոս', ru: 'Западный Нил', en: 'West Nile' },
+        'Oropouche': { hy: 'Օրոպուչ', ru: 'Оропуш', en: 'Oropouche' },
+        'Ross River': { hy: 'Ռոս գետ', ru: 'Росс-Ривер', en: 'Ross River' },
+        'Japanese encephalitis': { hy: 'Ճապոնական էնցեֆալիտ', ru: 'Японский энцефалит', en: 'Japanese encephalitis' }
+    },
+    // Risk levels (already translated in template, but we'll use them here too)
+    risk: {
+        high: { hy: '🔴 Բարձր', ru: '🔴 Высокий', en: '🔴 High' },
+        medium: { hy: '🟠 Միջին', ru: '🟠 Средний', en: '🟠 Medium' },
+        low: { hy: '🟢 Ցածր', ru: '🟢 Низкий', en: '🟢 Low' }
+    }
+};
+
 var lang = '{{ lang }}';
 if (lang === '{{ lang }}') lang = 'hy';  // fallback, եթե Jinja2-ը չի փոխարինել
 // ==================== OUTBREAKS DATA ====================
@@ -292,17 +326,32 @@ function getColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium'
 outbreaks.forEach(function(item) {
     var radius = Math.sqrt(item.cases) / 6 + 4;
     radius = Math.min(radius, 25);
-    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getColor(item.risk), fillOpacity: 0.8 });
+    var circle = L.circleMarker([item.lat, item.lon], {
+        radius: radius,
+        color: '#fff',
+        weight: 1.5,
+        fillColor: getColor(item.risk),
+        fillOpacity: 0.8
+    });
     
-    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
+    // Translate virus name
+    var virusName = translateVirus(item.virus);
+    // Translate risk text (or use pre-defined from template)
+    var riskText = translateRisk(item.risk);
+    
+    // Labels based on current language
+    var virusLabel = lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus');
+    var casesLabel = lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases');
+    var deathsLabel = lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths');
+    var riskLabel = lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk');
     
     circle.bindPopup(`
         <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
             <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
+            <p style="margin:2px 0;"><b>${virusLabel}:</b> ${virusName}</p>
+            <p style="margin:2px 0;"><b>${casesLabel}:</b> ${item.cases.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${deathsLabel}:</b> ${item.deaths.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${riskLabel}:</b> ${riskText}</p>
         </div>
     `);
     worldMarkers.addLayer(circle);
@@ -481,5 +530,16 @@ window.filterRegion = function(region) {
     document.getElementById('total-villages').innerText = filtered.filter(i => i.type === 'village').length;
     document.getElementById('total-historical').innerText = filtered.filter(i => i.type === 'historical').length;
 };
+
+    function translateVirus(virusEn) {
+    if (translations.virus[virusEn] && translations.virus[virusEn][lang]) {
+        return translations.virus[virusEn][lang];
+    }
+    return virusEn; // fallback to English
+}
+
+function translateRisk(riskEn) {
+    return translations.risk[riskEn] ? translations.risk[riskEn][lang] : riskEn;
+}
 </script>
 {% endblock %}
