@@ -254,7 +254,13 @@ translations = {
         # Leaderboard
         'no_scores': 'Դեռևս արդյունքներ չկան',
         'date': 'Ամսաթիվ',
-        'score': 'Միավոր'
+        'score': 'Միավոր',
+        'question': 'Հարց',
+        #quiz
+        'prev': '◀ Նախորդ',
+        'next': 'Հաջորդ ▶',
+        'finish': '✔ Ավարտել',
+        'result': 'Արդյունք'
     },
     'ru': {
         'home': '🏠 Главная',
@@ -358,7 +364,12 @@ translations = {
         'chatbot_error': '❌ Ошибка сети',
         'no_scores': 'Пока нет результатов',
         'date': 'Дата',
-        'score': 'Баллы'
+        'score': 'Баллы',
+        # quiz
+        'prev': '◀ Предыдущий',
+        'next': 'Следующий ▶',
+        'finish': '✔ Закончить',
+        'result': 'Результаты'
     },
     'en': {
         'home': '🏠 Home',
@@ -462,7 +473,12 @@ translations = {
         'chatbot_error': '❌ Network error',
         'no_scores': 'No scores yet',
         'date': 'Date',
-        'score': 'Score'
+        'score': 'Score',
+         # quiz
+        'prev': '◀ Previous',
+        'next': 'Next ▶',
+        'finish': '✔ Finish',
+        'result': 'Result'
     }
 }
 
