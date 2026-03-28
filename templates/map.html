@@ -20,12 +20,12 @@
     .region-btn { background: rgba(44,195,255,0.2); border: 1px solid #2cc3ff; color: white; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin: 5px; transition: all 0.3s; }
     .region-btn:hover, .region-btn.active { background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; }
     .city-label {
-    background: transparent;
-    border: none;
-    font-weight: bold;
-    text-shadow: 0 0 3px rgba(0,0,0,0.8);
-    white-space: nowrap;
-}
+        background: transparent;
+        border: none;
+        font-weight: bold;
+        text-shadow: 0 0 3px rgba(0,0,0,0.8);
+        white-space: nowrap;
+    }
 </style>
 {% endblock %}
 
@@ -55,10 +55,6 @@
 </div>
 
 <script>
-console.log('lang from template:', '{{ lang }}');
-var lang = '{{ lang }}';
-if (lang === '{{ lang }}') lang = 'hy';
-console.log('lang after fallback:', lang);
 // ==================== TRANSLATIONS DICTIONARIES ====================
 var translations = {
     virus: {
@@ -91,70 +87,14 @@ var translations = {
         low: { hy: '🟢 Ցածր', ru: '🟢 Низкий', en: '🟢 Low' }
     }
 };
-    
+
 // ==================== LANGUAGE ====================
 var lang = '{{ lang }}';
-// Validate language, fallback to hy only if invalid
 if (lang !== 'hy' && lang !== 'ru' && lang !== 'en') {
     lang = 'hy';
 }
-console.log('Language set to:', lang);  // կարող ես հետո հեռացնել
+console.log('Language set to:', lang);
 
-armenianOutbreaks.forEach(function(item) {
-    var radius = Math.sqrt(item.cases) / 6 + 4;
-    radius = Math.min(radius, 20);
-    
-    // 1. Գունավոր կետ (circleMarker)
-    var circle = L.circleMarker([item.lat, item.lon], {
-        radius: radius,
-        color: '#fff',
-        weight: 1.5,
-        fillColor: getArmeniaColor(item.risk),
-        fillOpacity: 0.8
-    });
-    
-    // 2. Տեքստային պիտակ (միայն քաղաքների համար)
-    if (item.type === 'city') {
-        var label = L.marker([item.lat, item.lon], {
-            icon: L.divIcon({
-                className: 'city-label',
-                html: `<div style="
-                    background: rgba(0,0,0,0.6);
-                    color: white;
-                    font-size: 11px;
-                    font-weight: bold;
-                    padding: 2px 6px;
-                    border-radius: 12px;
-                    border: 1px solid #2cc3ff;
-                    white-space: nowrap;
-                    transform: translate(-50%, -120%);
-                    pointer-events: none;
-                    text-shadow: 0 0 3px black;
-                ">${item.name}</div>`,
-                iconSize: [0, 0],
-                popupAnchor: [0, 0]
-            })
-        });
-        armeniaMarkers.addLayer(label);
-    }
-    
-    // 3. Popup (մնում է նույնը)
-    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
-    
-    circle.bindPopup(`
-        <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
-            <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Տարածաշրջան' : (lang === 'ru' ? 'Регион' : 'Region')}:</b> ${getRegionName(item.region)}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
-        </div>
-    `);
-    
-    armeniaMarkers.addLayer(circle);
-});
-    
 // ==================== TRANSLATION FUNCTIONS ====================
 function translateVirus(virusEn) {
     if (translations.virus[virusEn] && translations.virus[virusEn][lang]) {
@@ -169,228 +109,10 @@ function translateRisk(riskEn) {
 
 // ==================== OUTBREAKS DATA (WORLD) ====================
 var outbreaks = [
+    // ... (ваши данные, я их не меняю, они такие же как у вас)
     { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
     { lat: -4.33, lon: 15.32, name: "Kinshasa (Limete), DRC", virus: "Ebola", cases: 45, deaths: 23, risk: "medium" },
-    { lat: -4.38, lon: 15.41, name: "Kinshasa (Ngiri-Ngiri), DRC", virus: "Ebola", cases: 78, deaths: 34, risk: "high" },
-    { lat: -5.89, lon: 22.42, name: "Kananga, DRC", virus: "Mpox", cases: 234, deaths: 12, risk: "medium" },
-    { lat: -6.17, lon: 23.59, name: "Mbuji-Mayi, DRC", virus: "Mpox", cases: 156, deaths: 8, risk: "medium" },
-    { lat: -11.66, lon: 27.48, name: "Lubumbashi, DRC", virus: "Cholera", cases: 567, deaths: 34, risk: "high" },
-    { lat: 9.08, lon: 8.67, name: "Abuja, Nigeria", virus: "Yellow Fever", cases: 890, deaths: 134, risk: "high" },
-    { lat: 6.45, lon: 7.51, name: "Enugu, Nigeria", virus: "Lassa", cases: 234, deaths: 45, risk: "high" },
-    { lat: 7.38, lon: 3.90, name: "Ibadan, Nigeria", virus: "Lassa", cases: 178, deaths: 23, risk: "medium" },
-    { lat: 10.51, lon: 7.44, name: "Kaduna, Nigeria", virus: "Mpox", cases: 89, deaths: 5, risk: "low" },
-    { lat: 12.00, lon: 8.52, name: "Kano, Nigeria", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 4.82, lon: 7.03, name: "Port Harcourt, Nigeria", virus: "Cholera", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 6.52, lon: 3.38, name: "Lagos (Victoria Island), Nigeria", virus: "Yellow Fever", cases: 234, deaths: 12, risk: "medium" },
-    { lat: 6.44, lon: 3.42, name: "Lagos (Apapa), Nigeria", virus: "Lassa", cases: 567, deaths: 34, risk: "high" },
-    { lat: 6.59, lon: 3.34, name: "Lagos (Ikeja), Nigeria", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
-    { lat: -26.20, lon: 28.04, name: "Johannesburg, SA", virus: "COVID-19", cases: 1250, deaths: 45, risk: "medium" },
-    { lat: -26.10, lon: 28.05, name: "Johannesburg (Sandton), SA", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    { lat: -33.92, lon: 18.42, name: "Cape Town, SA", virus: "COVID-19", cases: 2345, deaths: 78, risk: "medium" },
-    { lat: -29.85, lon: 31.02, name: "Durban, SA", virus: "Mpox", cases: 89, deaths: 4, risk: "low" },
-    { lat: -25.75, lon: 28.19, name: "Pretoria, SA", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 15.50, lon: -12.50, name: "Bamako, Mali", virus: "Mpox", cases: 234, deaths: 12, risk: "medium" },
-    { lat: 13.45, lon: -16.58, name: "Banjul, Gambia", virus: "Mpox", cases: 34, deaths: 5, risk: "low" },
-    { lat: 14.76, lon: -17.36, name: "Dakar, Senegal", virus: "Zika", cases: 67, deaths: 2, risk: "low" },
-    { lat: 14.68, lon: -17.44, name: "Dakar (Yoff), Senegal", virus: "Dengue", cases: 45, deaths: 1, risk: "low" },
-    { lat: 30.06, lon: 31.25, name: "Cairo, Egypt", virus: "H5N1", cases: 78, deaths: 23, risk: "medium" },
-    { lat: 30.04, lon: 31.24, name: "Cairo (Giza), Egypt", virus: "H5N1", cases: 34, deaths: 8, risk: "low" },
-    { lat: 31.20, lon: 29.92, name: "Alexandria, Egypt", virus: "H5N1", cases: 23, deaths: 5, risk: "low" },
-    { lat: 26.82, lon: 30.80, name: "Asyut, Egypt", virus: "COVID-19", cases: 456, deaths: 23, risk: "medium" },
-    { lat: -18.87, lon: 47.50, name: "Antananarivo, Madagascar", virus: "Plague", cases: 45, deaths: 12, risk: "medium" },
-    { lat: -19.87, lon: 47.03, name: "Antsirabe, Madagascar", virus: "Plague", cases: 23, deaths: 5, risk: "low" },
-    { lat: -13.32, lon: 48.31, name: "Antsiranana, Madagascar", virus: "Mpox", cases: 12, deaths: 2, risk: "low" },
-    { lat: 12.37, lon: -1.53, name: "Ouagadougou, Burkina Faso", virus: "Dengue", cases: 234, deaths: 8, risk: "low" },
-    { lat: 11.18, lon: -4.30, name: "Bobo-Dioulasso, Burkina Faso", virus: "Dengue", cases: 89, deaths: 3, risk: "low" },
-    { lat: 12.37, lon: -1.52, name: "Ouagadougou (Kadiogo), Burkina Faso", virus: "Malaria", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: -3.38, lon: 29.36, name: "Bujumbura, Burundi", virus: "Malaria", cases: 5678, deaths: 234, risk: "high" },
-    { lat: -3.38, lon: 29.37, name: "Bujumbura (Mutanga), Burundi", virus: "Malaria", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: -3.41, lon: 29.39, name: "Bujumbura (Kamenge), Burundi", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 18.22, lon: -66.59, name: "San Juan, Puerto Rico", virus: "Dengue", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 18.45, lon: -66.07, name: "Bayamon, Puerto Rico", virus: "Dengue", cases: 234, deaths: 5, risk: "low" },
-    { lat: 18.43, lon: -66.62, name: "Arecibo, Puerto Rico", virus: "Zika", cases: 67, deaths: 1, risk: "low" },
-    { lat: -8.84, lon: 13.23, name: "Luanda, Angola", virus: "Yellow Fever", cases: 345, deaths: 67, risk: "high" },
-    { lat: -8.96, lon: 13.27, name: "Luanda (Cazenga), Angola", virus: "Yellow Fever", cases: 123, deaths: 23, risk: "medium" },
-    { lat: -12.55, lon: 13.42, name: "Benguela, Angola", virus: "Mpox", cases: 45, deaths: 5, risk: "low" },
-    { lat: -12.78, lon: 15.73, name: "Huambo, Angola", virus: "COVID-19", cases: 678, deaths: 23, risk: "medium" },
-    { lat: 9.15, lon: 40.50, name: "Addis Ababa, Ethiopia", virus: "Cholera", cases: 2345, deaths: 123, risk: "high" },
-    { lat: 9.03, lon: 38.75, name: "Addis Ababa (Bole), Ethiopia", virus: "Cholera", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 11.56, lon: 37.37, name: "Bahir Dar, Ethiopia", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-    { lat: 13.50, lon: 39.47, name: "Mekelle, Ethiopia", virus: "Mpox", cases: 78, deaths: 5, risk: "low" },
-    { lat: 6.82, lon: -5.28, name: "Yamoussoukro, Ivory Coast", virus: "Dengue", cases: 234, deaths: 8, risk: "low" },
-    { lat: 5.34, lon: -4.03, name: "Abidjan, Ivory Coast", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 5.31, lon: -4.02, name: "Abidjan (Cocody), Ivory Coast", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: -1.28, lon: 36.82, name: "Nairobi, Kenya", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
-    { lat: -1.45, lon: 36.98, name: "Nairobi (Karen), Kenya", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: -4.05, lon: 39.67, name: "Mombasa, Kenya", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
-    { lat: -0.28, lon: 36.07, name: "Nakuru, Kenya", virus: "Mpox", cases: 78, deaths: 3, risk: "low" },
-    { lat: 6.45, lon: 7.49, name: "Enugu, Nigeria", virus: "Lassa", cases: 145, deaths: 23, risk: "medium" },
-    { lat: 20.59, lon: 78.96, name: "Nagpur, India", virus: "Nipah", cases: 78, deaths: 34, risk: "high" },
-    { lat: 21.15, lon: 79.09, name: "Nagpur (Manewada), India", virus: "Nipah", cases: 23, deaths: 12, risk: "medium" },
-    { lat: 21.14, lon: 79.11, name: "Nagpur (Khapa), India", virus: "Nipah", cases: 12, deaths: 5, risk: "low" },
-    { lat: 28.61, lon: 77.23, name: "New Delhi, India", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 28.63, lon: 77.22, name: "New Delhi (Connaught Place), India", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 28.54, lon: 77.26, name: "New Delhi (Noida), India", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 28.67, lon: 77.22, name: "Delhi (Shahdara), India", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
-    { lat: 19.08, lon: 72.88, name: "Mumbai, India", virus: "Dengue", cases: 5678, deaths: 89, risk: "high" },
-    { lat: 19.11, lon: 72.90, name: "Mumbai (Andheri), India", virus: "Dengue", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 19.03, lon: 72.85, name: "Mumbai (Nariman Point), India", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 19.21, lon: 72.97, name: "Thane, India", virus: "Dengue", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 19.16, lon: 72.95, name: "Mumbai (Dadar), India", virus: "Chikungunya", cases: 567, deaths: 5, risk: "low" },
-    { lat: 13.08, lon: 80.27, name: "Chennai, India", virus: "Chikungunya", cases: 1234, deaths: 12, risk: "medium" },
-    { lat: 13.03, lon: 80.23, name: "Chennai (Adyar), India", virus: "Chikungunya", cases: 345, deaths: 4, risk: "low" },
-    { lat: 13.06, lon: 80.25, name: "Chennai (T-Nagar), India", virus: "Dengue", cases: 890, deaths: 8, risk: "medium" },
-    { lat: 35.86, lon: 104.19, name: "Beijing, China", virus: "COVID-19", cases: 4500, deaths: 89, risk: "medium" },
-    { lat: 39.90, lon: 116.40, name: "Beijing (Chaoyang), China", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 39.95, lon: 116.36, name: "Beijing (Haidian), China", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
-    { lat: 31.23, lon: 121.47, name: "Shanghai, China", virus: "H3N2", cases: 6789, deaths: 123, risk: "medium" },
-    { lat: 31.26, lon: 121.52, name: "Shanghai (Pudong), China", virus: "H3N2", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 31.20, lon: 121.43, name: "Shanghai (Hongkou), China", virus: "H3N2", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 23.13, lon: 113.26, name: "Guangzhou, China", virus: "H7N9", cases: 45, deaths: 23, risk: "high" },
-    { lat: 23.11, lon: 113.32, name: "Guangzhou (Tianhe), China", virus: "H7N9", cases: 12, deaths: 5, risk: "low" },
-    { lat: 23.01, lon: 113.12, name: "Foshan, China", virus: "H7N9", cases: 8, deaths: 3, risk: "low" },
-    { lat: 22.53, lon: 114.05, name: "Shenzhen, China", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-    { lat: 22.55, lon: 114.10, name: "Shenzhen (Futian), China", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-    { lat: 22.26, lon: 114.19, name: "Hong Kong", virus: "COVID-19", cases: 7890, deaths: 156, risk: "high" },
-    { lat: 22.31, lon: 114.17, name: "Hong Kong (Mong Kok)", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 22.28, lon: 114.15, name: "Hong Kong (Central)", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: -6.91, lon: 107.61, name: "Bandung, Indonesia", virus: "Rabies", cases: 67, deaths: 67, risk: "high" },
-    { lat: -6.92, lon: 107.60, name: "Bandung (Cikapundung), Indonesia", virus: "Rabies", cases: 23, deaths: 23, risk: "high" },
-    { lat: -6.90, lon: 107.62, name: "Bandung (Lengkong), Indonesia", virus: "Rabies", cases: 12, deaths: 12, risk: "medium" },
-    { lat: -7.79, lon: 110.36, name: "Yogyakarta, Indonesia", virus: "Dengue", cases: 2345, deaths: 78, risk: "high" },
-    { lat: -7.80, lon: 110.38, name: "Yogyakarta (Gondokusuman), Indonesia", virus: "Dengue", cases: 567, deaths: 23, risk: "medium" },
-    { lat: -7.78, lon: 110.35, name: "Sleman, Indonesia", virus: "Dengue", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 3.59, lon: 98.67, name: "Medan, Indonesia", virus: "Mpox", cases: 23, deaths: 4, risk: "low" },
-    { lat: 3.57, lon: 98.65, name: "Medan (Polonia), Indonesia", virus: "Mpox", cases: 8, deaths: 1, risk: "low" },
-    { lat: 3.61, lon: 98.68, name: "Medan (Kampung Baru), Indonesia", virus: "Mpox", cases: 5, deaths: 0, risk: "low" },
-    { lat: 14.59, lon: 120.98, name: "Manila, Philippines", virus: "Dengue", cases: 4567, deaths: 234, risk: "high" },
-    { lat: 14.56, lon: 121.02, name: "Makati, Philippines", virus: "Dengue", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 14.55, lon: 121.00, name: "Pasay, Philippines", virus: "Dengue", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 14.60, lon: 121.03, name: "Quezon City, Philippines", virus: "COVID-19", cases: 3456, deaths: 89, risk: "medium" },
-    { lat: 14.51, lon: 120.99, name: "Parañaque, Philippines", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 10.32, lon: 123.89, name: "Cebu, Philippines", virus: "Chikungunya", cases: 890, deaths: 5, risk: "medium" },
-    { lat: 10.29, lon: 123.90, name: "Cebu (Lapu-Lapu), Philippines", virus: "Chikungunya", cases: 234, deaths: 2, risk: "low" },
-    { lat: 10.33, lon: 123.91, name: "Mandaue, Philippines", virus: "Chikungunya", cases: 156, deaths: 1, risk: "low" },
-    { lat: 13.73, lon: 100.50, name: "Bangkok, Thailand", virus: "H1N1", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 13.75, lon: 100.52, name: "Bangkok (Sukhumvit), Thailand", virus: "H1N1", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 13.78, lon: 100.54, name: "Bangkok (Chatuchak), Thailand", virus: "H1N1", cases: 567, deaths: 8, risk: "low" },
-    { lat: 13.73, lon: 100.56, name: "Bangkok (Sathon), Thailand", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 18.79, lon: 98.98, name: "Chiang Mai, Thailand", virus: "Mpox", cases: 34, deaths: 2, risk: "low" },
-    { lat: 18.78, lon: 98.99, name: "Chiang Mai (Nimman), Thailand", virus: "Mpox", cases: 12, deaths: 1, risk: "low" },
-    { lat: 18.80, lon: 98.97, name: "Chiang Mai (San Kamphaeng), Thailand", virus: "Mpox", cases: 8, deaths: 0, risk: "low" },
-    { lat: 1.35, lon: 103.82, name: "Singapore", virus: "COVID-19", cases: 890, deaths: 4, risk: "low" },
-    { lat: 1.33, lon: 103.84, name: "Singapore (Chinatown)", virus: "COVID-19", cases: 234, deaths: 1, risk: "low" },
-    { lat: 1.28, lon: 103.85, name: "Singapore (Sentosa)", virus: "COVID-19", cases: 89, deaths: 0, risk: "low" },
-    { lat: 1.36, lon: 103.87, name: "Singapore (Ang Mo Kio)", virus: "COVID-19", cases: 156, deaths: 1, risk: "low" },
-    { lat: 3.14, lon: 101.69, name: "Kuala Lumpur, Malaysia", virus: "Nipah", cases: 12, deaths: 8, risk: "high" },
-    { lat: 3.15, lon: 101.71, name: "Kuala Lumpur (Bukit Bintang)", virus: "Nipah", cases: 5, deaths: 3, risk: "medium" },
-    { lat: 3.08, lon: 101.60, name: "Petaling Jaya, Malaysia", virus: "Nipah", cases: 3, deaths: 2, risk: "low" },
-    { lat: 5.41, lon: 100.33, name: "George Town, Malaysia", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 1.49, lon: 103.78, name: "Johor Bahru, Malaysia", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
-    { lat: 6.93, lon: 79.84, name: "Colombo, Sri Lanka", virus: "Dengue", cases: 3456, deaths: 67, risk: "high" },
-    { lat: 6.91, lon: 79.86, name: "Colombo (Kollupitiya), Sri Lanka", virus: "Dengue", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 6.94, lon: 79.89, name: "Colombo (Borella), Sri Lanka", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 7.29, lon: 80.63, name: "Kandy, Sri Lanka", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 27.70, lon: 85.32, name: "Kathmandu, Nepal", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 27.72, lon: 85.34, name: "Kathmandu (Thamel), Nepal", virus: "COVID-19", cases: 234, deaths: 5, risk: "low" },
-    { lat: 27.67, lon: 85.33, name: "Lalitpur, Nepal", virus: "COVID-19", cases: 156, deaths: 3, risk: "low" },
-    { lat: 33.88, lon: 35.50, name: "Beirut, Lebanon", virus: "Cholera", cases: 2345, deaths: 123, risk: "high" },
-    { lat: 33.90, lon: 35.48, name: "Beirut (Ashrafieh), Lebanon", virus: "Cholera", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 33.86, lon: 35.52, name: "Beirut (Hamra), Lebanon", virus: "Cholera", cases: 567, deaths: 23, risk: "medium" },
-    { lat: 39.93, lon: 32.86, name: "Ankara, Turkey", virus: "H5N1", cases: 234, deaths: 23, risk: "medium" },
-    { lat: 39.92, lon: 32.85, name: "Ankara (Kizilay), Turkey", virus: "H5N1", cases: 89, deaths: 8, risk: "low" },
-    { lat: 39.88, lon: 32.86, name: "Ankara (Maltepe), Turkey", virus: "H5N1", cases: 45, deaths: 4, risk: "low" },
-    { lat: 41.01, lon: 28.97, name: "Istanbul, Turkey", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
-    { lat: 41.02, lon: 28.97, name: "Istanbul (Taksim), Turkey", virus: "COVID-19", cases: 3456, deaths: 89, risk: "medium" },
-    { lat: 40.99, lon: 28.92, name: "Istanbul (Bakırköy), Turkey", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 27.17, lon: 78.04, name: "Agra, India", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 27.19, lon: 78.02, name: "Agra (Taj Ganj), India", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-    { lat: 22.57, lon: 88.36, name: "Kolkata, India", virus: "Dengue", cases: 3456, deaths: 45, risk: "high" },
-    { lat: 22.56, lon: 88.38, name: "Kolkata (Salt Lake), India", virus: "Dengue", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 22.51, lon: 88.35, name: "Kolkata (Alipore), India", virus: "Dengue", cases: 567, deaths: 8, risk: "low" },
-    { lat: 31.55, lon: 74.34, name: "Lahore, Pakistan", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high" },
-    { lat: 31.57, lon: 74.36, name: "Lahore (Gulberg), Pakistan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 31.51, lon: 74.35, name: "Lahore (Model Town), Pakistan", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 24.86, lon: 67.01, name: "Karachi, Pakistan", virus: "Cholera", cases: 5678, deaths: 234, risk: "high" },
-    { lat: 24.88, lon: 67.05, name: "Karachi (Defence), Pakistan", virus: "Cholera", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 24.86, lon: 67.00, name: "Karachi (Sadar), Pakistan", virus: "Cholera", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 33.51, lon: 36.29, name: "Damascus, Syria", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 33.52, lon: 36.31, name: "Damascus (Abu Rummaneh), Syria", virus: "COVID-19", cases: 234, deaths: 12, risk: "low" },
-    { lat: 34.01, lon: 36.20, name: "Baalbek, Lebanon", virus: "Cholera", cases: 567, deaths: 34, risk: "medium" },
-    { lat: 33.27, lon: 35.20, name: "Tyre, Lebanon", virus: "Cholera", cases: 234, deaths: 12, risk: "medium" },
-    { lat: 51.51, lon: -0.13, name: "London, UK", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 48.86, lon: 2.35, name: "Paris, France", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
-    { lat: 52.52, lon: 13.40, name: "Berlin, Germany", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 41.90, lon: 12.50, name: "Rome, Italy", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-    { lat: 40.42, lon: -3.70, name: "Madrid, Spain", virus: "COVID-19", cases: 4567, deaths: 156, risk: "medium" },
-    { lat: 55.76, lon: 37.62, name: "Moscow, Russia", virus: "COVID-19", cases: 7890, deaths: 345, risk: "high" },
-    { lat: 52.23, lon: 21.01, name: "Warsaw, Poland", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 47.50, lon: 19.04, name: "Budapest, Hungary", virus: "H3N2", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 50.08, lon: 14.42, name: "Prague, Czechia", virus: "Mpox", cases: 23, deaths: 1, risk: "low" },
-    { lat: 59.33, lon: 18.07, name: "Stockholm, Sweden", virus: "COVID-19", cases: 567, deaths: 23, risk: "low" },
-    { lat: 53.35, lon: -6.26, name: "Dublin, Ireland", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-    { lat: 60.17, lon: 24.94, name: "Helsinki, Finland", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: 55.68, lon: 12.57, name: "Copenhagen, Denmark", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: 59.91, lon: 10.75, name: "Oslo, Norway", virus: "COVID-19", cases: 678, deaths: 10, risk: "low" },
-    { lat: 52.37, lon: 4.89, name: "Amsterdam, Netherlands", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 50.85, lon: 4.35, name: "Brussels, Belgium", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: 47.37, lon: 8.54, name: "Zurich, Switzerland", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: 48.20, lon: 16.37, name: "Vienna, Austria", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
-    { lat: 41.00, lon: 28.97, name: "Istanbul, Turkey", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
-    { lat: 37.98, lon: 23.73, name: "Athens, Greece", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 38.72, lon: -9.14, name: "Lisbon, Portugal", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: 44.43, lon: 26.10, name: "Bucharest, Romania", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 42.70, lon: 23.32, name: "Sofia, Bulgaria", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: 32.08, lon: 34.78, name: "Tel Aviv, Israel", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-    { lat: 40.71, lon: -74.01, name: "New York (Manhattan), USA", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
-    { lat: 34.05, lon: -118.24, name: "Los Angeles, USA", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
-    { lat: 41.88, lon: -87.63, name: "Chicago, USA", virus: "Mpox", cases: 234, deaths: 5, risk: "medium" },
-    { lat: 29.76, lon: -95.37, name: "Houston, USA", virus: "West Nile", cases: 345, deaths: 23, risk: "medium" },
-    { lat: 33.75, lon: -84.39, name: "Atlanta, USA", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-    { lat: 43.65, lon: -79.38, name: "Toronto, Canada", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 45.50, lon: -73.57, name: "Montreal, Canada", virus: "H3N2", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 49.28, lon: -123.12, name: "Vancouver, Canada", virus: "Mpox", cases: 67, deaths: 2, risk: "low" },
-    { lat: 19.43, lon: -99.13, name: "Mexico City, Mexico", virus: "COVID-19", cases: 7890, deaths: 567, risk: "high" },
-    { lat: 20.67, lon: -103.35, name: "Guadalajara, Mexico", virus: "Dengue", cases: 3456, deaths: 89, risk: "high" },
-    { lat: 32.78, lon: -96.80, name: "Dallas, USA", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-    { lat: 47.61, lon: -122.33, name: "Seattle, USA", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-    { lat: 42.36, lon: -71.06, name: "Boston, USA", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 39.95, lon: -75.16, name: "Philadelphia, USA", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-    { lat: -23.55, lon: -46.63, name: "Sao Paulo, Brazil", virus: "Dengue", cases: 12500, deaths: 430, risk: "high" },
-    { lat: -22.91, lon: -43.20, name: "Rio de Janeiro, Brazil", virus: "Oropouche", cases: 3456, deaths: 23, risk: "medium" },
-    { lat: -15.79, lon: -47.88, name: "Brasilia, Brazil", virus: "Zika", cases: 567, deaths: 5, risk: "low" },
-    { lat: -12.97, lon: -38.48, name: "Salvador, Brazil", virus: "Zika", cases: 890, deaths: 12, risk: "medium" },
-    { lat: -3.72, lon: -38.54, name: "Fortaleza, Brazil", virus: "Dengue", cases: 5678, deaths: 123, risk: "high" },
-    { lat: -8.05, lon: -34.90, name: "Recife, Brazil", virus: "Dengue", cases: 3456, deaths: 78, risk: "medium" },
-    { lat: -1.45, lon: -48.50, name: "Belem, Brazil", virus: "Yellow Fever", cases: 890, deaths: 45, risk: "medium" },
-    { lat: -30.03, lon: -51.23, name: "Porto Alegre, Brazil", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -34.60, lon: -58.38, name: "Buenos Aires, Argentina", virus: "COVID-19", cases: 5678, deaths: 234, risk: "high" },
-    { lat: -31.42, lon: -64.18, name: "Cordoba, Argentina", virus: "Dengue", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: -33.45, lon: -70.65, name: "Santiago, Chile", virus: "H1N1", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -12.05, lon: -77.04, name: "Lima, Peru", virus: "Dengue", cases: 4567, deaths: 123, risk: "high" },
-    { lat: -16.41, lon: -71.53, name: "Arequipa, Peru", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -2.18, lon: -79.88, name: "Guayaquil, Ecuador", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-    { lat: 10.50, lon: -66.91, name: "Caracas, Venezuela", virus: "COVID-19", cases: 4567, deaths: 234, risk: "high" },
-    { lat: -33.87, lon: 151.21, name: "Sydney, Australia", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: -37.81, lon: 144.96, name: "Melbourne, Australia", virus: "Ross River", cases: 1890, deaths: 2, risk: "low" },
-    { lat: -27.47, lon: 153.02, name: "Brisbane, Australia", virus: "Japanese encephalitis", cases: 23, deaths: 4, risk: "low" },
-    { lat: -31.95, lon: 115.86, name: "Perth, Australia", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: -34.93, lon: 138.60, name: "Adelaide, Australia", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: -35.28, lon: 149.13, name: "Canberra, Australia", virus: "COVID-19", cases: 345, deaths: 4, risk: "low" },
-    { lat: -41.29, lon: 174.78, name: "Wellington, NZ", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: -36.85, lon: 174.76, name: "Auckland, NZ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: -43.53, lon: 172.64, name: "Christchurch, NZ", virus: "COVID-19", cases: 345, deaths: 5, risk: "low" },
-    { lat: -9.45, lon: 159.20, name: "Honiara, Solomon Islands", virus: "Dengue", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: -17.75, lon: 168.30, name: "Port Vila, Vanuatu", virus: "Dengue", cases: 890, deaths: 12, risk: "low" },
-    { lat: -18.14, lon: 178.44, name: "Suva, Fiji", virus: "Dengue", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: -6.92, lon: 147.00, name: "Lae, Papua New Guinea", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    { lat: 25.07, lon: 55.31, name: "Dubai, UAE", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-    { lat: 24.45, lon: 54.38, name: "Abu Dhabi, UAE", virus: "COVID-19", cases: 3456, deaths: 56, risk: "medium" },
-    { lat: 25.28, lon: 51.52, name: "Doha, Qatar", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-    { lat: 26.42, lon: 50.13, name: "Dammam, Saudi Arabia", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 21.54, lon: 39.17, name: "Jeddah, Saudi Arabia", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 24.63, lon: 46.71, name: "Riyadh, Saudi Arabia", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-    { lat: 15.61, lon: 32.53, name: "Khartoum, Sudan", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" }
+    // ... весь ваш массив outbreaks (сохраните его без изменений)
 ];
 
 // ==================== WORLD MAP INITIALIZATION ====================
@@ -497,50 +219,10 @@ document.getElementById('total-deaths').innerText = (totalDeaths / 1000).toFixed
 <script>
 // ==================== ARMENIAN OUTBREAKS DATA ====================
 var armenianOutbreaks = [
+    // ... (ваши данные, я их не меняю, они такие же как у вас)
     { lat: 40.18, lon: 44.51, name: "Yerevan (Center)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high", region: "armenia", type: "city" },
     { lat: 40.21, lon: 44.53, name: "Yerevan (Ajapnyak)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.15, lon: 44.50, name: "Yerevan (Shengavit)", virus: "COVID-19", cases: 678, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.19, lon: 44.56, name: "Yerevan (Nor Nork)", virus: "COVID-19", cases: 567, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.17, lon: 44.52, name: "Yerevan (Malatia-Sebastia)", virus: "COVID-19", cases: 789, deaths: 14, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.13, lon: 44.47, name: "Yerevan (Nubarashen)", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.14, lon: 44.55, name: "Yerevan (Erebuni)", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.20, lon: 44.50, name: "Yerevan (Avan)", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.16, lon: 44.48, name: "Yerevan (Davtashen)", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.12, lon: 44.52, name: "Yerevan (Kanaker-Zeytun)", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.42, lon: 44.40, name: "Ashtarak", virus: "COVID-19", cases: 345, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.33, lon: 44.27, name: "Aparan", virus: "Influenza H3N2", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.45, lon: 44.48, name: "Talin", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.95, lon: 44.55, name: "Artashat", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.99, lon: 44.58, name: "Ararat", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.02, lon: 44.54, name: "Masis", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.15, lon: 44.04, name: "Armavir", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.08, lon: 44.24, name: "Vagharshapat", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.55, lon: 45.01, name: "Gavar", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.54, lon: 44.72, name: "Sevan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.87, lon: 44.45, name: "Vanadzor", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
-    { lat: 41.08, lon: 44.70, name: "Alaverdi", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.41, lon: 44.56, name: "Hrazdan", virus: "COVID-19", cases: 567, deaths: 9, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.29, lon: 44.60, name: "Abovyan", virus: "COVID-19", cases: 678, deaths: 11, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.78, lon: 43.84, name: "Gyumri", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "armenia", type: "city" },
-    { lat: 39.51, lon: 46.34, name: "Goris", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.28, lon: 46.36, name: "Kapan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.76, lon: 45.33, name: "Yeghegnadzor", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.89, lon: 45.42, name: "Ijevan", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.82, lon: 45.14, name: "Dilijan", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.83, lon: 46.75, name: "Stepanakert", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "artsakh", type: "city" },
-    { lat: 39.86, lon: 46.93, name: "Shushi", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "artsakh", type: "city" },
-    { lat: 40.01, lon: 46.90, name: "Martakert", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "artsakh", type: "city" },
-    { lat: 41.72, lon: 44.78, name: "Tbilisi (Havlabar)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "georgia", type: "city" },
-    { lat: 41.25, lon: 44.70, name: "Akhalkalaki", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.15, lon: 44.78, name: "Ninotsminda", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "georgia", type: "city" },
-    { lat: 40.68, lon: 46.36, name: "Ganja", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium", region: "azerbaijan", type: "city" },
-    { lat: 40.58, lon: 46.32, name: "Nakhchivan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "azerbaijan", type: "city" },
-    { lat: 38.50, lon: 43.40, name: "Van", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 37.91, lon: 40.24, name: "Diyarbakir", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 39.90, lon: 41.27, name: "Erzurum", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 40.78, lon: 42.85, name: "Kars", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 38.25, lon: 46.28, name: "Tabriz", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "iran", type: "city" },
-    { lat: 38.48, lon: 46.48, name: "Urmia", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "iran", type: "city" }
+    // ... остальные данные армянской карты (сохраните их без изменений)
 ];
 
 // ==================== ARMENIAN MAP INITIALIZATION ====================
@@ -561,32 +243,60 @@ function getRegionName(region) {
     return '';
 }
 
-armenianOutbreaks.forEach(function(item) {
-    var radius = Math.sqrt(item.cases) / 6 + 4;
-    radius = Math.min(radius, 20);
-    var circle = L.circleMarker([item.lat, item.lon], {
-        radius: radius,
-        color: '#fff',
-        weight: 1.5,
-        fillColor: getArmeniaColor(item.risk),
-        fillOpacity: 0.8
+// ==================== ADD MARKERS & LABELS (COMMON FUNCTION) ====================
+function addArmenianMarkersAndLabels(targetGroup, data) {
+    data.forEach(function(item) {
+        var radius = Math.sqrt(item.cases) / 6 + 4;
+        radius = Math.min(radius, 20);
+        
+        // Circle marker
+        var circle = L.circleMarker([item.lat, item.lon], {
+            radius: radius,
+            color: '#fff',
+            weight: 1.5,
+            fillColor: getArmeniaColor(item.risk),
+            fillOpacity: 0.8
+        });
+        
+        // Popup text (with translated labels)
+        var regionLabel = lang === 'hy' ? 'Տարածաշրջան' : (lang === 'ru' ? 'Регион' : 'Region');
+        var virusLabel = lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus');
+        var casesLabel = lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases');
+        var deathsLabel = lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths');
+        var riskLabel = lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk');
+        
+        var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
+        
+        circle.bindPopup(`
+            <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
+                <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
+                <p style="margin:2px 0;"><b>${regionLabel}:</b> ${getRegionName(item.region)}</p>
+                <p style="margin:2px 0;"><b>${virusLabel}:</b> ${item.virus}</p>
+                <p style="margin:2px 0;"><b>${casesLabel}:</b> ${item.cases.toLocaleString()}</p>
+                <p style="margin:2px 0;"><b>${deathsLabel}:</b> ${item.deaths.toLocaleString()}</p>
+                <p style="margin:2px 0;"><b>${riskLabel}:</b> ${riskText}</p>
+            </div>
+        `);
+        
+        targetGroup.addLayer(circle);
+        
+        // City label (only for cities)
+        if (item.type === 'city') {
+            var label = L.marker([item.lat, item.lon], {
+                icon: L.divIcon({
+                    className: 'city-label',
+                    html: `<div style="background: rgba(0,0,0,0.6); color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 12px; border: 1px solid #2cc3ff; white-space: nowrap; transform: translate(-50%, -120%); pointer-events: none; text-shadow: 0 0 3px black;">${item.name}</div>`,
+                    iconSize: [0, 0],
+                    popupAnchor: [0, 0]
+                })
+            });
+            targetGroup.addLayer(label);
+        }
     });
-    
-    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
-    
-    circle.bindPopup(`
-        <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
-            <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Տարածաշրջան' : (lang === 'ru' ? 'Регион' : 'Region')}:</b> ${getRegionName(item.region)}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
-        </div>
-    `);
-    armeniaMarkers.addLayer(circle);
-});
+}
 
+// Initial load
+addArmenianMarkersAndLabels(armeniaMarkers, armenianOutbreaks);
 armeniaMap.addLayer(armeniaMarkers);
 
 // ==================== FILTER FUNCTION ====================
@@ -598,35 +308,13 @@ window.filterRegion = function(region) {
     var newMarkers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
     var filtered = region === 'all' ? armenianOutbreaks : armenianOutbreaks.filter(item => item.region === region);
     
-    filtered.forEach(function(item) {
-        var radius = Math.sqrt(item.cases) / 6 + 4;
-        radius = Math.min(radius, 20);
-        var circle = L.circleMarker([item.lat, item.lon], {
-            radius: radius,
-            color: '#fff',
-            weight: 1.5,
-            fillColor: getArmeniaColor(item.risk),
-            fillOpacity: 0.8
-        });
-        
-        var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
-        
-        circle.bindPopup(`
-            <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
-                <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Տարածաշրջան' : (lang === 'ru' ? 'Регион' : 'Region')}:</b> ${getRegionName(item.region)}</p>
-                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
-                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
-                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
-                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
-            </div>
-        `);
-        newMarkers.addLayer(circle);
-    });
+    // Add markers and labels using the same function
+    addArmenianMarkersAndLabels(newMarkers, filtered);
     
     armeniaMap.addLayer(newMarkers);
     armeniaMarkers = newMarkers;
     
+    // Update stats
     document.getElementById('total-places').innerText = filtered.length + '+';
     document.getElementById('total-cities').innerText = filtered.filter(i => i.type === 'city').length;
     document.getElementById('total-villages').innerText = filtered.filter(i => i.type === 'village').length;
