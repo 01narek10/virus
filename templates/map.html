@@ -84,10 +84,14 @@ var translations = {
         low: { hy: '🟢 Ցածր', ru: '🟢 Низкий', en: '🟢 Low' }
     }
 };
-
+    
 // ==================== LANGUAGE ====================
 var lang = '{{ lang }}';
-if (lang === '{{ lang }}') lang = 'hy';  // fallback
+// Validate language, fallback to hy only if invalid
+if (lang !== 'hy' && lang !== 'ru' && lang !== 'en') {
+    lang = 'hy';
+}
+console.log('Language set to:', lang);  // կարող ես հետո հեռացնել
 
 // ==================== TRANSLATION FUNCTIONS ====================
 function translateVirus(virusEn) {
