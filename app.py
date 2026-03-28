@@ -133,6 +133,18 @@ virus_data = {
 }
 
 # ===== ROUTES =====
+
+@app.context_processor
+def inject_lang():
+    lang = get_lang()
+    return {'lang': lang}
+
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in ['hy', 'ru', 'en']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('home'))
+    
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -220,6 +232,22 @@ def page_not_found(e):
 with app.app_context():
     db.create_all()
 
+# ===== LANGUAGE SUPPORT =====
+def get_lang():
+    # 1. Check URL parameter
+    lang = request.args.get('lang')
+    if lang in ['hy', 'ru', 'en']:
+        session['lang'] = lang
+        return lang
+    # 2. Check session
+    if 'lang' in session:
+        return session['lang']
+    # 3. Default Armenian
+    return 'hy'
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+
