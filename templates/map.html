@@ -48,9 +48,8 @@
 </div>
 
 <script>
-// ===== TRANSLATIONS FOR POPUPS =====
+// ==================== TRANSLATIONS DICTIONARIES ====================
 var translations = {
-    // Viruses
     virus: {
         'Ebola': { hy: 'Էբոլա', ru: 'Эбола', en: 'Ebola' },
         'Mpox': { hy: 'Mpox', ru: 'Оспа обезьян', en: 'Mpox' },
@@ -72,9 +71,9 @@ var translations = {
         'West Nile': { hy: 'Արևմտյան Նեղոս', ru: 'Западный Нил', en: 'West Nile' },
         'Oropouche': { hy: 'Օրոպուչ', ru: 'Оропуш', en: 'Oropouche' },
         'Ross River': { hy: 'Ռոս գետ', ru: 'Росс-Ривер', en: 'Ross River' },
-        'Japanese encephalitis': { hy: 'Ճապոնական էնցեֆալիտ', ru: 'Японский энцефалит', en: 'Japanese encephalitis' }
+        'Japanese encephalitis': { hy: 'Ճապոնական էնցեֆալիտ', ru: 'Японский энцефалит', en: 'Japanese encephalitis' },
+        'Influenza H3N2': { hy: 'Գրիպ H3N2', ru: 'Грипп H3N2', en: 'Influenza H3N2' }
     },
-    // Risk levels (already translated in template, but we'll use them here too)
     risk: {
         high: { hy: '🔴 Բարձր', ru: '🔴 Высокий', en: '🔴 High' },
         medium: { hy: '🟠 Միջին', ru: '🟠 Средний', en: '🟠 Medium' },
@@ -82,9 +81,23 @@ var translations = {
     }
 };
 
+// ==================== LANGUAGE ====================
 var lang = '{{ lang }}';
-if (lang === '{{ lang }}') lang = 'hy';  // fallback, եթե Jinja2-ը չի փոխարինել
-// ==================== OUTBREAKS DATA ====================
+if (lang === '{{ lang }}') lang = 'hy';  // fallback
+
+// ==================== TRANSLATION FUNCTIONS ====================
+function translateVirus(virusEn) {
+    if (translations.virus[virusEn] && translations.virus[virusEn][lang]) {
+        return translations.virus[virusEn][lang];
+    }
+    return virusEn;
+}
+
+function translateRisk(riskEn) {
+    return translations.risk[riskEn] ? translations.risk[riskEn][lang] : riskEn;
+}
+
+// ==================== OUTBREAKS DATA (WORLD) ====================
 var outbreaks = [
     { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
     { lat: -4.33, lon: 15.32, name: "Kinshasa (Limete), DRC", virus: "Ebola", cases: 45, deaths: 23, risk: "medium" },
@@ -314,14 +327,24 @@ var outbreaks = [
 var worldMap = L.map('main-map').setView([20, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(worldMap);
 
-var worldMarkers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
+var worldMarkers = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
     iconCreateFunction: function(cluster) {
         var count = cluster.getChildCount();
-        return L.divIcon({ html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>', className: 'marker-cluster', iconSize: L.point(40, 40) });
+        return L.divIcon({
+            html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>',
+            className: 'marker-cluster',
+            iconSize: L.point(40, 40)
+        });
     }
 });
 
-function getColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa'; }
+function getColor(risk) {
+    return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa';
+}
 
 outbreaks.forEach(function(item) {
     var radius = Math.sqrt(item.cases) / 6 + 4;
@@ -333,13 +356,10 @@ outbreaks.forEach(function(item) {
         fillColor: getColor(item.risk),
         fillOpacity: 0.8
     });
-    
-    // Translate virus name
+
     var virusName = translateVirus(item.virus);
-    // Translate risk text (or use pre-defined from template)
     var riskText = translateRisk(item.risk);
     
-    // Labels based on current language
     var virusLabel = lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus');
     var casesLabel = lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases');
     var deathsLabel = lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths');
@@ -474,7 +494,13 @@ function getRegionName(region) {
 armenianOutbreaks.forEach(function(item) {
     var radius = Math.sqrt(item.cases) / 6 + 4;
     radius = Math.min(radius, 20);
-    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getArmeniaColor(item.risk), fillOpacity: 0.8 });
+    var circle = L.circleMarker([item.lat, item.lon], {
+        radius: radius,
+        color: '#fff',
+        weight: 1.5,
+        fillColor: getArmeniaColor(item.risk),
+        fillOpacity: 0.8
+    });
     
     var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
     
@@ -505,7 +531,13 @@ window.filterRegion = function(region) {
     filtered.forEach(function(item) {
         var radius = Math.sqrt(item.cases) / 6 + 4;
         radius = Math.min(radius, 20);
-        var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getArmeniaColor(item.risk), fillOpacity: 0.8 });
+        var circle = L.circleMarker([item.lat, item.lon], {
+            radius: radius,
+            color: '#fff',
+            weight: 1.5,
+            fillColor: getArmeniaColor(item.risk),
+            fillOpacity: 0.8
+        });
         
         var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
         
@@ -530,16 +562,5 @@ window.filterRegion = function(region) {
     document.getElementById('total-villages').innerText = filtered.filter(i => i.type === 'village').length;
     document.getElementById('total-historical').innerText = filtered.filter(i => i.type === 'historical').length;
 };
-
-    function translateVirus(virusEn) {
-    if (translations.virus[virusEn] && translations.virus[virusEn][lang]) {
-        return translations.virus[virusEn][lang];
-    }
-    return virusEn; // fallback to English
-}
-
-function translateRisk(riskEn) {
-    return translations.risk[riskEn] ? translations.risk[riskEn][lang] : riskEn;
-}
 </script>
 {% endblock %}
