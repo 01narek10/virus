@@ -6,22 +6,23 @@
     <h2>{{ t.quiz_title }} — {{ level_name }}</h2>
     <form id="quizForm">
         {% for q in questions %}
-        <div class="quiz-question">
+        <div class="quiz-question" style="margin-bottom: 30px; background: rgba(6,20,45,0.5); padding: 15px; border-radius: 15px;">
             <p><strong>{{ loop.index }}. {{ q.question }}</strong></p>
             {% for opt in q.options %}
-            <label>
-                <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}">
+            <label style="display: block; margin: 8px 0; cursor: pointer;">
+                <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}" style="margin-right: 10px;">
                 {{ opt }}
-            </label><br>
+            </label>
             {% endfor %}
         </div>
         {% endfor %}
-        <div class="quiz-buttons">
-            <button type="button" onclick="submitQuiz()" class="btn-primary">{{ t.submit }}</button>
-            <button type="button" onclick="resetQuiz()" class="btn-secondary">{{ t.reset }}</button>
+        
+        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+            <button type="button" onclick="submitQuiz()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">{{ t.submit }}</button>
+            <button type="button" onclick="resetQuiz()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">{{ t.reset }}</button>
         </div>
     </form>
-    <div id="quiz-result"></div>
+    <div id="quiz-result" style="margin-top: 30px; text-align: center; font-size: 1.2rem;"></div>
 </div>
 
 <script>
@@ -37,12 +38,12 @@ function submitQuiz() {
     {% endfor %}
     const percent = Math.round((score / total) * 100);
     const name = prompt("{{ t.your_name }}", "Guest");
-    if (name) {
+    if (name && name.trim()) {
         fetch('/save_score', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                name: name,
+                name: name.trim(),
                 level: '{{ level }}',
                 score: score,
                 total: total,
@@ -50,13 +51,16 @@ function submitQuiz() {
             })
         }).then(() => {
             window.location.href = '/leaderboard';
+        }).catch(() => {
+            document.getElementById('quiz-result').innerHTML = `<div class="result" style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
         });
     } else {
-        document.getElementById('quiz-result').innerHTML = `<div class="result">Ձեր արդյունքը: ${score}/${total} (${percent}%)</div>`;
+        document.getElementById('quiz-result').innerHTML = `<div class="result" style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
     }
 }
 function resetQuiz() {
     document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.getElementById('quiz-result').innerHTML = '';
 }
 </script>
 {% endblock %}
