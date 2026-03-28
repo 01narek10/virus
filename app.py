@@ -200,7 +200,7 @@ translations = {
         'villages': 'Գյուղեր',
         'historical_sites': 'Պատմական վայրեր',
         # Quiz
-        'quiz_title': '🧪 Վիրուսաբանական վիկտորինա',
+         'quiz_title': '🧪 Վիրուսաբանական վիկտորինա',
         'quiz_desc': 'Ստուգիր գիտելիքներդ վիրուսների մասին',
         'select_level': 'Ընտրիր դժվարության մակարդակ',
         'very_easy': 'Շատ հեշտ',
@@ -212,6 +212,10 @@ translations = {
         'submit': 'Ուղարկել',
         'reset': 'Մաքրել',
         'result': 'Արդյունք',
+        'leaderboard': 'Ցուցակ',
+        'no_scores': 'Դեռևս արդյունքներ չկան',
+        'date': 'Ամսաթիվ',
+        'score': 'Միավոր'
         # Simulator
         'simulator_title': '🧬 Վիրուսային սիմուլյատոր',
         'simulator_desc': 'Դիտեք, թե ինչպես է վիրուսը տարածվում բջիջների միջև:',
