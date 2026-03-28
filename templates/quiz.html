@@ -20,6 +20,19 @@
     </div>
 </div>
 
+<!-- MODAL WINDOW -->
+<div id="nameModal" class="modal">
+    <div class="modal-content">
+        <h3>{{ t.your_name }}</h3>
+        <input type="text" id="playerName" placeholder="{{ t.your_name }}" autocomplete="off">
+        <div class="modal-buttons">
+            <button class="btn-cancel" id="modalCancel">{{ t.cancel|default('Չեղարկել') }}</button>
+            <button class="btn-ok" id="modalOk">{{ t.ok|default('Շարունակել') }}</button>
+        </div>
+    </div>
+</div>
+
+
 <script>
 // ===== QUIZ DATA =====
 const questions = [
@@ -47,6 +60,92 @@ const optionsContainer = document.getElementById('options-container');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const resultDiv = document.getElementById('quiz-result');
+
+// ===== FINISH QUIZ =====
+function finishQuiz() {
+    let score = 0;
+    for (let i = 0; i < total; i++) {
+        if (answers[i] !== null && answers[i] === questions[i].correct) {
+            score++;
+        }
+    }
+    const percent = Math.round((score / total) * 100);
+    
+    // Show modal instead of prompt
+    const modal = document.getElementById('nameModal');
+    const nameInput = document.getElementById('playerName');
+    modal.style.display = 'flex';
+    nameInput.value = '';
+    nameInput.focus();
+    
+    // Resolve promise style
+    let resolved = false;
+    const submitScore = (name) => {
+        if (resolved) return;
+        resolved = true;
+        modal.style.display = 'none';
+        if (name && name.trim()) {
+            fetch('/save_score', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: name.trim(),
+                    level: '{{ level }}',
+                    score: score,
+                    total: total,
+                    percent: percent
+                })
+            }).then(() => {
+                window.location.href = '/leaderboard';
+            }).catch(() => {
+                resultDiv.innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+                nextBtn.disabled = true;
+                prevBtn.disabled = true;
+            });
+        } else {
+            resultDiv.innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+            nextBtn.disabled = true;
+            prevBtn.disabled = true;
+        }
+    };
+    
+    // Handle OK button
+    const okBtn = document.getElementById('modalOk');
+    const cancelBtn = document.getElementById('modalCancel');
+    const handleEnter = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitScore(nameInput.value);
+        }
+    };
+    const okHandler = () => submitScore(nameInput.value);
+    const cancelHandler = () => submitScore('');
+    
+    okBtn.addEventListener('click', okHandler);
+    cancelBtn.addEventListener('click', cancelHandler);
+    nameInput.addEventListener('keypress', handleEnter);
+    
+    // Clean up event listeners after modal closes (optional, but prevents multiple)
+    const cleanup = () => {
+        okBtn.removeEventListener('click', okHandler);
+        cancelBtn.removeEventListener('click', cancelHandler);
+        nameInput.removeEventListener('keypress', handleEnter);
+    };
+    // We'll call cleanup after submitScore is called (inside it)
+    // We'll override submitScore to call cleanup
+    const originalSubmit = submitScore;
+    window.submitScoreWrapper = (name) => {
+        cleanup();
+        originalSubmit(name);
+    };
+    // Fix the handlers to use wrapper
+    okBtn.onclick = () => window.submitScoreWrapper(nameInput.value);
+    cancelBtn.onclick = () => window.submitScoreWrapper('');
+    nameInput.onkeypress = (e) => {
+        if (e.key === 'Enter') window.submitScoreWrapper(nameInput.value);
+    };
+}
+    
 
 // ===== CREATE BUTTONS FOR OPTIONS =====
 function createOptionButtons() {
