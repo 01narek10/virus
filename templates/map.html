@@ -48,6 +48,10 @@
 </div>
 
 <script>
+console.log('lang from template:', '{{ lang }}');
+var lang = '{{ lang }}';
+if (lang === '{{ lang }}') lang = 'hy';
+console.log('lang after fallback:', lang);
 // ==================== TRANSLATIONS DICTIONARIES ====================
 var translations = {
     virus: {
