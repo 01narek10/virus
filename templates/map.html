@@ -1,924 +1,313 @@
 {% extends "base.html" %}
-{% block title %}Համաշխարհային քարտեզ 2026{% endblock %}
+{% block title %}{{ t.map_title }}{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <style>
-#main-map, #armenia-map { height: 500px; width: 100%; border-radius: 20px; margin: 20px 0; }
+    #main-map, #armenia-map { height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin: 20px 0; z-index: 1; }
+    .map-controls { background: rgba(6,20,45,0.95); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; margin: 20px 0; border-left: 5px solid #2cc3ff; }
+    .legend { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .color-dot { width: 20px; height: 20px; border-radius: 50%; }
+    .stats-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: rgba(44,195,255,0.1); padding: 25px; border-radius: 20px; border: 1px solid #2cc3ff; margin: 20px 0; }
+    .stat-card { text-align: center; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 15px; }
+    .stat-card h3 { font-size: 2.2rem; color: #2cc3ff; margin: 0; }
+    .stat-card p { margin: 5px 0 0; font-size: 1rem; opacity: 0.9; }
+    .region-btn { background: rgba(44,195,255,0.2); border: 1px solid #2cc3ff; color: white; padding: 8px 16px; border-radius: 30px; cursor: pointer; margin: 5px; transition: all 0.3s; }
+    .region-btn:hover, .region-btn.active { background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- WORLD MAP SECTION -->
+<div class="card">
+    <h2>{{ t.map_title }}</h2>
+    <p>{{ t.map_desc|safe }}</p>
+</div>
+
+<div class="map-controls">
+    <div class="legend">
+        <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> {{ t.high_risk }}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> {{ t.medium_risk }}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> {{ t.low_risk }}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #aaa;"></span> {{ t.no_data }}</div>
+    </div>
+</div>
+
 <div id="main-map"></div>
-<div id="armenia-map"></div>
+
+<div class="stats-panel">
+    <div class="stat-card"><h3 id="total-outbreaks">0</h3><p>{{ t.active_outbreaks }}</p></div>
+    <div class="stat-card"><h3 id="total-countries">0</h3><p>{{ t.countries }}</p></div>
+    <div class="stat-card"><h3 id="total-cases">0</h3><p>{{ t.total_cases }}</p></div>
+    <div class="stat-card"><h3 id="total-deaths">0</h3><p>{{ t.total_deaths }}</p></div>
+</div>
+
 <script>
-// ==================== 1000+ ԲՌՆԿՈՒՄՆԵՐ ====================
+// ==================== OUTBREAKS DATA ====================
 var outbreaks = [
-    // ===== ԱՖՐԻԿԱ (200+ վայր) =====
-    { lat: -4.44, lon: 15.27, name: "Կինշասա, Կոնգոյի ԴՀ", virus: "Էբոլա", cases: 312, deaths: 187, risk: "high" },
-    { lat: -4.33, lon: 15.32, name: "Կինշասա (Լիմետե), Կոնգոյի ԴՀ", virus: "Էբոլա", cases: 45, deaths: 23, risk: "medium" },
-    { lat: -4.38, lon: 15.41, name: "Կինշասա (Նջիլի), Կոնգոյի ԴՀ", virus: "Էբոլա", cases: 78, deaths: 34, risk: "high" },
-    { lat: -5.89, lon: 22.42, name: "Կանակա, Կոնգոյի ԴՀ", virus: "Mpox", cases: 234, deaths: 12, risk: "medium" },
-    { lat: -6.17, lon: 23.59, name: "Մբուջի-Մայի, Կոնգոյի ԴՀ", virus: "Mpox", cases: 156, deaths: 8, risk: "medium" },
-    { lat: -11.66, lon: 27.48, name: "Լուբումբաշի, Կոնգոյի ԴՀ", virus: "Խոլերա", cases: 567, deaths: 34, risk: "high" },
-    { lat: 9.08, lon: 8.67, name: "Աբուջա, Նիգերիա", virus: "Դեղին տենդ", cases: 890, deaths: 134, risk: "high" },
-    { lat: 6.45, lon: 7.51, name: "Էնուգու, Նիգերիա", virus: "Lassa", cases: 234, deaths: 45, risk: "high" },
-    { lat: 7.38, lon: 3.90, name: "Իբադան, Նիգերիա", virus: "Lassa", cases: 178, deaths: 23, risk: "medium" },
-    { lat: 10.51, lon: 7.44, name: "Կադունա, Նիգերիա", virus: "Mpox", cases: 89, deaths: 5, risk: "low" },
-    { lat: 12.00, lon: 8.52, name: "Կանո, Նիգերիա", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 4.82, lon: 7.03, name: "Պորտ Հարկորտ, Նիգերիա", virus: "Խոլերա", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 6.52, lon: 3.38, name: "Լագոս (Վիկտորիա կղզի), Նիգերիա", virus: "Դեղին տենդ", cases: 234, deaths: 12, risk: "medium" },
-    { lat: 6.44, lon: 3.42, name: "Լագոս (Ապապա), Նիգերիա", virus: "Lassa", cases: 567, deaths: 34, risk: "high" },
-    { lat: 6.59, lon: 3.34, name: "Լագոս (Իկեջա), Նիգերիա", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
-    { lat: -26.20, lon: 28.04, name: "Յոհանեսբուրգ, ՀԱՀ", virus: "COVID-19", cases: 1250, deaths: 45, risk: "medium" },
-    { lat: -26.10, lon: 28.05, name: "Յոհանեսբուրգ (Սանդտոն), ՀԱՀ", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    { lat: -33.92, lon: 18.42, name: "Քեյփթաուն, ՀԱՀ", virus: "COVID-19", cases: 2345, deaths: 78, risk: "medium" },
-    { lat: -29.85, lon: 31.02, name: "Դուրբան, ՀԱՀ", virus: "Mpox", cases: 89, deaths: 4, risk: "low" },
-    { lat: -25.75, lon: 28.19, name: "Պրետորիա, ՀԱՀ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 15.50, lon: -12.50, name: "Բամակո, Մալի", virus: "Mpox", cases: 234, deaths: 12, risk: "medium" },
-    { lat: 13.45, lon: -16.58, name: "Բանջուլ, Գամբիա", virus: "Mpox", cases: 34, deaths: 5, risk: "low" },
-    { lat: 14.76, lon: -17.36, name: "Դակար, Սենեգալ", virus: "Զիկա", cases: 67, deaths: 2, risk: "low" },
-    { lat: 14.68, lon: -17.44, name: "Դակար (Յոֆ), Սենեգալ", virus: "Դենգե", cases: 45, deaths: 1, risk: "low" },
-    { lat: 30.06, lon: 31.25, name: "Կահիրե, Եգիպտոս", virus: "H5N1", cases: 78, deaths: 23, risk: "medium" },
-    { lat: 30.04, lon: 31.24, name: "Կահիրե (Գիզա), Եգիպտոս", virus: "H5N1", cases: 34, deaths: 8, risk: "low" },
-    { lat: 31.20, lon: 29.92, name: "Ալեքսանդրիա, Եգիպտոս", virus: "H5N1", cases: 23, deaths: 5, risk: "low" },
-    { lat: 26.82, lon: 30.80, name: "Ասյութ, Եգիպտոս", virus: "COVID-19", cases: 456, deaths: 23, risk: "medium" },
-    { lat: -18.87, lon: 47.50, name: "Անտանանարիվու, Մադագասկար", virus: "Ժանտախտ", cases: 45, deaths: 12, risk: "medium" },
-    { lat: -19.87, lon: 47.03, name: "Անտսիրաբե, Մադագասկար", virus: "Ժանտախտ", cases: 23, deaths: 5, risk: "low" },
-    { lat: -13.32, lon: 48.31, name: "Անցիրանանա, Մադագասկար", virus: "Mpox", cases: 12, deaths: 2, risk: "low" },
-    { lat: 12.37, lon: -1.53, name: "Ուագադուգու, Բուրկինա Ֆասո", virus: "Դենգե", cases: 234, deaths: 8, risk: "low" },
-    { lat: 11.18, lon: -4.30, name: "Բոբո-Դիուլասո, Բուրկինա Ֆասո", virus: "Դենգե", cases: 89, deaths: 3, risk: "low" },
-    { lat: 12.37, lon: -1.52, name: "Ուագադուգու (Կադիոգո), Բուրկինա Ֆասո", virus: "Մալարիա", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: -3.38, lon: 29.36, name: "Բուժումբուրա, Բուրունդի", virus: "Մալարիա", cases: 5678, deaths: 234, risk: "high" },
-    { lat: -3.38, lon: 29.37, name: "Բուժումբուրա (Մուտանգա), Բուրունդի", virus: "Մալարիա", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: -3.41, lon: 29.39, name: "Բուժումբուրա (Կամենգե), Բուրունդի", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 18.22, lon: -66.59, name: "Սան Խուան, Պուերտո Ռիկո", virus: "Դենգե", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 18.45, lon: -66.07, name: "Բայամոն, Պուերտո Ռիկո", virus: "Դենգե", cases: 234, deaths: 5, risk: "low" },
-    { lat: 18.43, lon: -66.62, name: "Արեսիբո, Պուերտո Ռիկո", virus: "Զիկա", cases: 67, deaths: 1, risk: "low" },
-    { lat: -8.84, lon: 13.23, name: "Լուանդա, Անգոլա", virus: "Դեղին տենդ", cases: 345, deaths: 67, risk: "high" },
-    { lat: -8.96, lon: 13.27, name: "Լուանդա (Կազենգա), Անգոլա", virus: "Դեղին տենդ", cases: 123, deaths: 23, risk: "medium" },
-    { lat: -12.55, lon: 13.42, name: "Բենգուելա, Անգոլա", virus: "Mpox", cases: 45, deaths: 5, risk: "low" },
-    { lat: -12.78, lon: 15.73, name: "Հուամբո, Անգոլա", virus: "COVID-19", cases: 678, deaths: 23, risk: "medium" },
-    { lat: 9.15, lon: 40.50, name: "Ադիս Աբեբա, Եթովպիա", virus: "Խոլերա", cases: 2345, deaths: 123, risk: "high" },
-    { lat: 9.03, lon: 38.75, name: "Ադիս Աբեբա (Բոլե), Եթովպիա", virus: "Խոլերա", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 11.56, lon: 37.37, name: "Բահիր Դար, Եթովպիա", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-    { lat: 13.50, lon: 39.47, name: "Մեկելե, Եթովպիա", virus: "Mpox", cases: 78, deaths: 5, risk: "low" },
-    { lat: 6.82, lon: -5.28, name: "Յամուսուկրո, Կոտ դ'Իվուար", virus: "Դենգե", cases: 234, deaths: 8, risk: "low" },
-    { lat: 5.34, lon: -4.03, name: "Աբիջան, Կոտ դ'Իվուար", virus: "Դենգե", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 5.31, lon: -4.02, name: "Աբիջան (Կոկոդի), Կոտ դ'Իվուար", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: -1.28, lon: 36.82, name: "Նայրոբի, Քենիա", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
-    { lat: -1.45, lon: 36.98, name: "Նայրոբի (Կասարանի), Քենիա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: -4.05, lon: 39.67, name: "Մոմբասա, Քենիա", virus: "Դենգե", cases: 567, deaths: 12, risk: "medium" },
-    { lat: -0.28, lon: 36.07, name: "Նակուրու, Քենիա", virus: "Mpox", cases: 78, deaths: 3, risk: "low" },
-    { lat: 6.45, lon: 7.49, name: "Էնուգու, Նիգերիա", virus: "Lassa", cases: 145, deaths: 23, risk: "medium" },
-    
-    // ===== ԱՍԻԱ (400+ վայր) =====
-    { lat: 20.59, lon: 78.96, name: "Նագպուր, Հնդկաստան", virus: "Nipah", cases: 78, deaths: 34, risk: "high" },
-    { lat: 21.15, lon: 79.09, name: "Նագպուր (Մանևադա), Հնդկաստան", virus: "Nipah", cases: 23, deaths: 12, risk: "medium" },
-    { lat: 21.14, lon: 79.11, name: "Նագպուր (Խապա), Հնդկաստան", virus: "Nipah", cases: 12, deaths: 5, risk: "low" },
-    { lat: 28.61, lon: 77.23, name: "Նյու Դելի, Հնդկաստան", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 28.63, lon: 77.22, name: "Նյու Դելի (Կոնոտ Փլեյս), Հնդկաստան", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 28.54, lon: 77.26, name: "Նյու Դելի (Նոյդա), Հնդկաստան", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 28.67, lon: 77.22, name: "Դելի (Շահդարա), Հնդկաստան", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
-    { lat: 19.08, lon: 72.88, name: "Մումբայ, Հնդկաստան", virus: "Դենգե", cases: 5678, deaths: 89, risk: "high" },
-    { lat: 19.11, lon: 72.90, name: "Մումբայ (Անդհերի), Հնդկաստան", virus: "Դենգե", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 19.03, lon: 72.85, name: "Մումբայ (Նարիման Փոյնթ), Հնդկաստան", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 19.21, lon: 72.97, name: "Թհանե, Հնդկաստան", virus: "Դենգե", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 19.16, lon: 72.95, name: "Մումբայ (Դադար), Հնդկաստան", virus: "Chikungunya", cases: 567, deaths: 5, risk: "low" },
-    { lat: 13.08, lon: 80.27, name: "Չեննայ, Հնդկաստան", virus: "Chikungunya", cases: 1234, deaths: 12, risk: "medium" },
-    { lat: 13.03, lon: 80.23, name: "Չեննայ (Ադյար), Հնդկաստան", virus: "Chikungunya", cases: 345, deaths: 4, risk: "low" },
-    { lat: 13.06, lon: 80.25, name: "Չեննայ (Տ-Նագար), Հնդկաստան", virus: "Դենգե", cases: 890, deaths: 8, risk: "medium" },
-    { lat: 35.86, lon: 104.19, name: "Պեկին, Չինաստան", virus: "COVID-19", cases: 4500, deaths: 89, risk: "medium" },
-    { lat: 39.90, lon: 116.40, name: "Պեկին (Չաոյանգ), Չինաստան", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 39.95, lon: 116.36, name: "Պեկին (Հայդյան), Չինաստան", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
-    { lat: 31.23, lon: 121.47, name: "Շանհայ, Չինաստան", virus: "H3N2", cases: 6789, deaths: 123, risk: "medium" },
-    { lat: 31.26, lon: 121.52, name: "Շանհայ (Պուդոնգ), Չինաստան", virus: "H3N2", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 31.20, lon: 121.43, name: "Շանհայ (Հոնկկոու), Չինաստան", virus: "H3N2", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 23.13, lon: 113.26, name: "Գուանչժոու, Չինաստան", virus: "H7N9", cases: 45, deaths: 23, risk: "high" },
-    { lat: 23.11, lon: 113.32, name: "Գուանչժոու (Թիանհե), Չինաստան", virus: "H7N9", cases: 12, deaths: 5, risk: "low" },
-    { lat: 23.01, lon: 113.12, name: "Ֆոշան, Չինաստան", virus: "H7N9", cases: 8, deaths: 3, risk: "low" },
-    { lat: 22.53, lon: 114.05, name: "Շենժեն, Չինաստան", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-    { lat: 22.55, lon: 114.10, name: "Շենժեն (Ֆութիան), Չինաստան", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-    { lat: 22.26, lon: 114.19, name: "Հոնգ Կոնգ", virus: "COVID-19", cases: 7890, deaths: 156, risk: "high" },
-    { lat: 22.31, lon: 114.17, name: "Հոնգ Կոնգ (Մոնգ Կոկ)", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 22.28, lon: 114.15, name: "Հոնգ Կոնգ (Սենտրալ)", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: -6.91, lon: 107.61, name: "Բանդունգ, Ինդոնեզիա", virus: "Rabies", cases: 67, deaths: 67, risk: "high" },
-    { lat: -6.92, lon: 107.60, name: "Բանդունգ (Չիկապունդունգ), Ինդոնեզիա", virus: "Rabies", cases: 23, deaths: 23, risk: "high" },
-    { lat: -6.90, lon: 107.62, name: "Բանդունգ (Լենգկոնգ), Ինդոնեզիա", virus: "Rabies", cases: 12, deaths: 12, risk: "medium" },
-    { lat: -7.79, lon: 110.36, name: "Յոգյակարտա, Ինդոնեզիա", virus: "Դենգե", cases: 2345, deaths: 78, risk: "high" },
-    { lat: -7.80, lon: 110.38, name: "Յոգյակարտա (Գոնդոկուսուման), Ինդոնեզիա", virus: "Դենգե", cases: 567, deaths: 23, risk: "medium" },
-    { lat: -7.78, lon: 110.35, name: "Սլեման, Ինդոնեզիա", virus: "Դենգե", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 3.59, lon: 98.67, name: "Մեդան, Ինդոնեզիա", virus: "Mpox", cases: 23, deaths: 4, risk: "low" },
-    { lat: 3.57, lon: 98.65, name: "Մեդան (Պոլոնիա), Ինդոնեզիա", virus: "Mpox", cases: 8, deaths: 1, risk: "low" },
-    { lat: 3.61, lon: 98.68, name: "Մեդան (Կամպունգ Բարու), Ինդոնեզիա", virus: "Mpox", cases: 5, deaths: 0, risk: "low" },
-    { lat: 14.59, lon: 120.98, name: "Մանիլա, Ֆիլիպիններ", virus: "Դենգե", cases: 4567, deaths: 234, risk: "high" },
-    { lat: 14.56, lon: 121.02, name: "Մակատի, Ֆիլիպիններ", virus: "Դենգե", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 14.55, lon: 121.00, name: "Պասայ, Ֆիլիպիններ", virus: "Դենգե", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 14.60, lon: 121.03, name: "Կեսոն Սիթի, Ֆիլիպիններ", virus: "COVID-19", cases: 3456, deaths: 89, risk: "medium" },
-    { lat: 14.51, lon: 120.99, name: "Պարանիակե, Ֆիլիպիններ", virus: "Դենգե", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 10.32, lon: 123.89, name: "Սեբու, Ֆիլիպիններ", virus: "Chikungunya", cases: 890, deaths: 5, risk: "medium" },
-    { lat: 10.29, lon: 123.90, name: "Սեբու (Լապու-Լապու), Ֆիլիպիններ", virus: "Chikungunya", cases: 234, deaths: 2, risk: "low" },
-    { lat: 10.33, lon: 123.91, name: "Մանդաուե, Ֆիլիպիններ", virus: "Chikungunya", cases: 156, deaths: 1, risk: "low" },
-    { lat: 13.73, lon: 100.50, name: "Բանգկոկ, Թաիլանդ", virus: "H1N1", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 13.75, lon: 100.52, name: "Բանգկոկ (Սուխումվիտ), Թաիլանդ", virus: "H1N1", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 13.78, lon: 100.54, name: "Բանգկոկ (Չատուչակ), Թաիլանդ", virus: "H1N1", cases: 567, deaths: 8, risk: "low" },
-    { lat: 13.73, lon: 100.56, name: "Բանգկոկ (Սաթորն), Թաիլանդ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 18.79, lon: 98.98, name: "Չիանգ Մայ, Թաիլանդ", virus: "Mpox", cases: 34, deaths: 2, risk: "low" },
-    { lat: 18.78, lon: 98.99, name: "Չիանգ Մայ (Նիման), Թաիլանդ", virus: "Mpox", cases: 12, deaths: 1, risk: "low" },
-    { lat: 18.80, lon: 98.97, name: "Չիանգ Մայ (Սան Կամֆաենգ), Թաիլանդ", virus: "Mpox", cases: 8, deaths: 0, risk: "low" },
-    { lat: 1.35, lon: 103.82, name: "Սինգապուր", virus: "COVID-19", cases: 890, deaths: 4, risk: "low" },
-    { lat: 1.33, lon: 103.84, name: "Սինգապուր (Չայնաթաուն)", virus: "COVID-19", cases: 234, deaths: 1, risk: "low" },
-    { lat: 1.28, lon: 103.85, name: "Սինգապուր (Սենտոսա)", virus: "COVID-19", cases: 89, deaths: 0, risk: "low" },
-    { lat: 1.36, lon: 103.87, name: "Սինգապուր (Անգ Մո Կիո)", virus: "COVID-19", cases: 156, deaths: 1, risk: "low" },
-    { lat: 3.14, lon: 101.69, name: "Կուալա Լումպուր, Մալայզիա", virus: "Nipah", cases: 12, deaths: 8, risk: "high" },
-    { lat: 3.15, lon: 101.71, name: "Կուալա Լումպուր (Բուկիտ Բինտանգ)", virus: "Nipah", cases: 5, deaths: 3, risk: "medium" },
-    { lat: 3.08, lon: 101.60, name: "Պետալինգ Ջայա, Մալայզիա", virus: "Nipah", cases: 3, deaths: 2, risk: "low" },
-    { lat: 5.41, lon: 100.33, name: "Ջորջթաուն, Մալայզիա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 1.49, lon: 103.78, name: "Ջոհոր Բահրու, Մալայզիա", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
-    { lat: 6.93, lon: 79.84, name: "Կոլոմբո, Շրի Լանկա", virus: "Դենգե", cases: 3456, deaths: 67, risk: "high" },
-    { lat: 6.91, lon: 79.86, name: "Կոլոմբո (Կոլլուպիտիյա), Շրի Լանկա", virus: "Դենգե", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 6.94, lon: 79.89, name: "Կոլոմբո (Բորելլա), Շրի Լանկա", virus: "Դենգե", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 7.29, lon: 80.63, name: "Կանդի, Շրի Լանկա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 27.70, lon: 85.32, name: "Կատմանդու, Նեպալ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 27.72, lon: 85.34, name: "Կատմանդու (Տհամել), Նեպալ", virus: "COVID-19", cases: 234, deaths: 5, risk: "low" },
-    { lat: 27.67, lon: 85.33, name: "Լալիտպուր, Նեպալ", virus: "COVID-19", cases: 156, deaths: 3, risk: "low" },
-    { lat: 33.88, lon: 35.50, name: "Բեյրութ, Լիբանան", virus: "Խոլերա", cases: 2345, deaths: 123, risk: "high" },
-    { lat: 33.90, lon: 35.48, name: "Բեյրութ (Աշրաֆիեհ), Լիբանան", virus: "Խոլերա", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 33.86, lon: 35.52, name: "Բեյրութ (Համրա), Լիբանան", virus: "Խոլերա", cases: 567, deaths: 23, risk: "medium" },
-    { lat: 39.93, lon: 32.86, name: "Անկարա, Թուրքիա", virus: "H5N1", cases: 234, deaths: 23, risk: "medium" },
-    { lat: 39.92, lon: 32.85, name: "Անկարա (Կիզիլայ), Թուրքիա", virus: "H5N1", cases: 89, deaths: 8, risk: "low" },
-    { lat: 39.88, lon: 32.86, name: "Անկարա (Մալտեպե), Թուրքիա", virus: "H5N1", cases: 45, deaths: 4, risk: "low" },
-    { lat: 41.01, lon: 28.97, name: "Ստամբուլ, Թուրքիա", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
-    { lat: 41.02, lon: 28.97, name: "Ստամբուլ (Թաքսիմ), Թուրքիա", virus: "COVID-19", cases: 3456, deaths: 89, risk: "medium" },
-    { lat: 40.99, lon: 28.92, name: "Ստամբուլ (Բաքըրքոյ), Թուրքիա", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 27.17, lon: 78.04, name: "Ագրա, Հնդկաստան", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 27.19, lon: 78.02, name: "Ագրա (Թաջ Գանջ), Հնդկաստան", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-    { lat: 22.57, lon: 88.36, name: "Կալկաթա, Հնդկաստան", virus: "Դենգե", cases: 3456, deaths: 45, risk: "high" },
-    { lat: 22.56, lon: 88.38, name: "Կալկաթա (Սոլթ Լեյք), Հնդկաստան", virus: "Դենգե", cases: 890, deaths: 12, risk: "medium" },
-    { lat: 22.51, lon: 88.35, name: "Կալկաթա (Ալիպոր), Հնդկաստան", virus: "Դենգե", cases: 567, deaths: 8, risk: "low" },
-    { lat: 31.55, lon: 74.34, name: "Լահոր, Պակիստան", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high" },
-    { lat: 31.57, lon: 74.36, name: "Լահոր (Գուլբերգ), Պակիստան", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 31.51, lon: 74.35, name: "Լահոր (Մոդել Թաուն), Պակիստան", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-    { lat: 24.86, lon: 67.01, name: "Կարաչի, Պակիստան", virus: "Խոլերա", cases: 5678, deaths: 234, risk: "high" },
-    { lat: 24.88, lon: 67.05, name: "Կարաչի (Դիֆենս), Պակիստան", virus: "Խոլերա", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 24.86, lon: 67.00, name: "Կարաչի (Սադար), Պակիստան", virus: "Խոլերա", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 33.51, lon: 36.29, name: "Դամասկոս, Սիրիա", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" },
-    { lat: 33.52, lon: 36.31, name: "Դամասկոս (Աբու Ռումանեհ), Սիրիա", virus: "COVID-19", cases: 234, deaths: 12, risk: "low" },
-    { lat: 34.01, lon: 36.20, name: "Բաալբեկ, Լիբանան", virus: "Խոլերա", cases: 567, deaths: 34, risk: "medium" },
-    { lat: 33.27, lon: 35.20, name: "Տիր, Լիբանան", virus: "Խոլերա", cases: 234, deaths: 12, risk: "medium" },
-    
-    // ===== ԵՎՐՈՊԱ (300+ վայր) =====
-    { lat: 51.51, lon: -0.13, name: "Լոնդոն, ՄԲ", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 51.52, lon: -0.12, name: "Լոնդոն (Սոհո), ՄԲ", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: 51.50, lon: -0.14, name: "Լոնդոն (Ուեսթմինսթեր), ՄԲ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 51.54, lon: -0.16, name: "Լոնդոն (Քեմդեն), ՄԲ", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: 51.51, lon: -0.08, name: "Լոնդոն (Սիթի), ՄԲ", virus: "COVID-19", cases: 456, deaths: 5, risk: "low" },
-    { lat: 48.86, lon: 2.35, name: "Փարիզ, Ֆրանսիա", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
-    { lat: 48.87, lon: 2.33, name: "Փարիզ (Օպերա), Ֆրանսիա", virus: "H3N2", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: 48.85, lon: 2.34, name: "Փարիզ (Լատինական թաղամաս), Ֆրանսիա", virus: "H3N2", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 48.89, lon: 2.36, name: "Փարիզ (Մոնմարտր), Ֆրանսիա", virus: "H3N2", cases: 567, deaths: 12, risk: "low" },
-    { lat: 43.30, lon: 5.37, name: "Մարսել, Ֆրանսիա", virus: "Դենգե", cases: 89, deaths: 2, risk: "low" },
-    { lat: 43.28, lon: 5.36, name: "Մարսել (Վյո Պոր), Ֆրանսիա", virus: "Դենգե", cases: 34, deaths: 1, risk: "low" },
-    { lat: 45.76, lon: 4.84, name: "Լիոն, Ֆրանսիա", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: 52.52, lon: 13.40, name: "Բեռլին, Գերմանիա", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 52.53, lon: 13.41, name: "Բեռլին (Միտտե), Գերմանիա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 52.51, lon: 13.38, name: "Բեռլին (Շարլոտենբուրգ), Գերմանիա", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: 48.14, lon: 11.58, name: "Մյունխեն, Գերմանիա", virus: "Mpox", cases: 45, deaths: 1, risk: "low" },
-    { lat: 48.15, lon: 11.59, name: "Մյունխեն (Մարիենպլաց), Գերմանիա", virus: "Mpox", cases: 12, deaths: 0, risk: "low" },
-    { lat: 50.11, lon: 8.68, name: "Ֆրանկֆուրտ, Գերմանիա", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 53.55, lon: 10.00, name: "Համբուրգ, Գերմանիա", virus: "COVID-19", cases: 1890, deaths: 45, risk: "medium" },
-    { lat: 41.90, lon: 12.50, name: "Հռոմ, Իտալիա", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-    { lat: 41.91, lon: 12.48, name: "Հռոմ (Վատիկան), Իտալիա", virus: "COVID-19", cases: 89, deaths: 2, risk: "low" },
-    { lat: 41.89, lon: 12.51, name: "Հռոմ (Կոլիզեյ), Իտալիա", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    { lat: 45.46, lon: 9.19, name: "Միլան, Իտալիա", virus: "H1N1", cases: 3456, deaths: 123, risk: "medium" },
-    { lat: 45.47, lon: 9.18, name: "Միլան (Դուոմո), Իտալիա", virus: "H1N1", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 45.44, lon: 9.20, name: "Միլան (Նավիլի), Իտալիա", virus: "H1N1", cases: 567, deaths: 12, risk: "low" },
-    { lat: 40.85, lon: 14.27, name: "Նեապոլ, Իտալիա", virus: "COVID-19", cases: 2345, deaths: 78, risk: "medium" },
-    { lat: 45.06, lon: 7.68, name: "Թուրին, Իտալիա", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: 40.42, lon: -3.70, name: "Մադրիդ, Իսպանիա", virus: "COVID-19", cases: 4567, deaths: 156, risk: "medium" },
-    { lat: 40.43, lon: -3.71, name: "Մադրիդ (Սոլ), Իսպանիա", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: 40.41, lon: -3.69, name: "Մադրիդ (Ռետիրո), Իսպանիա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 41.38, lon: 2.18, name: "Բարսելոնա, Իսպանիա", virus: "Դենգե", cases: 67, deaths: 0, risk: "low" },
-    { lat: 41.39, lon: 2.17, name: "Բարսելոնա (Գոտիկ), Իսպանիա", virus: "Դենգե", cases: 23, deaths: 0, risk: "low" },
-    { lat: 39.47, lon: -0.38, name: "Վալենսիա, Իսպանիա", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: 55.76, lon: 37.62, name: "Մոսկվա, Ռուսաստան", virus: "COVID-19", cases: 7890, deaths: 345, risk: "high" },
-    { lat: 55.77, lon: 37.60, name: "Մոսկվա (Կրեմլ), Ռուսաստան", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 55.74, lon: 37.65, name: "Մոսկվա (Տագանկա), Ռուսաստան", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-    { lat: 59.93, lon: 30.34, name: "Սանկտ Պետերբուրգ, Ռուսաստան", virus: "H5N1", cases: 567, deaths: 34, risk: "medium" },
-    { lat: 59.94, lon: 30.32, name: "Սանկտ Պետերբուրգ (Նևսկի), Ռուսաստան", virus: "H5N1", cases: 234, deaths: 12, risk: "low" },
-    { lat: 54.73, lon: 55.97, name: "Ուֆա, Ռուսաստան", virus: "COVID-19", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 56.84, lon: 60.61, name: "Եկատերինբուրգ, Ռուսաստան", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: 52.23, lon: 21.01, name: "Վարշավա, Լեհաստան", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 52.24, lon: 21.00, name: "Վարշավա (Ստարե Միաստո), Լեհաստան", virus: "COVID-19", cases: 345, deaths: 12, risk: "low" },
-    { lat: 50.06, lon: 19.94, name: "Կրակով, Լեհաստան", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 47.50, lon: 19.04, name: "Բուդապեշտ, Հունգարիա", virus: "H3N2", cases: 890, deaths: 34, risk: "medium" },
-    { lat: 47.51, lon: 19.05, name: "Բուդապեշտ (Պեշտ), Հունգարիա", virus: "H3N2", cases: 234, deaths: 8, risk: "low" },
-    { lat: 50.08, lon: 14.42, name: "Պրահա, Չեխիա", virus: "Mpox", cases: 23, deaths: 1, risk: "low" },
-    { lat: 50.09, lon: 14.41, name: "Պրահա (Հրադչանի), Չեխիա", virus: "Mpox", cases: 8, deaths: 0, risk: "low" },
-    { lat: 59.33, lon: 18.07, name: "Ստոկհոլմ, Շվեդիա", virus: "COVID-19", cases: 567, deaths: 23, risk: "low" },
-    { lat: 59.34, lon: 18.06, name: "Ստոկհոլմ (Գամլա Ստան), Շվեդիա", virus: "COVID-19", cases: 123, deaths: 4, risk: "low" },
-    { lat: 57.70, lon: 11.97, name: "Գյոթեբորգ, Շվեդիա", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-    { lat: 53.35, lon: -6.26, name: "Դուբլին, Իռլանդիա", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-    { lat: 53.34, lon: -6.27, name: "Դուբլին (Թեմփլ Բար), Իռլանդիա", virus: "COVID-19", cases: 123, deaths: 3, risk: "low" },
-    { lat: 57.15, lon: -2.11, name: "Աբերդին, Շոտլանդիա", virus: "COVID-19", cases: 234, deaths: 5, risk: "low" },
-    { lat: 55.95, lon: -3.19, name: "Էդինբուրգ, Շոտլանդիա", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    { lat: 60.17, lon: 24.94, name: "Հելսինկի, Ֆինլանդիա", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: 60.16, lon: 24.95, name: "Հելսինկի (Սենատի հրապարակ), Ֆինլանդիա", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-    
-    // ===== ՀՅՈՒՍԻՍԱՅԻՆ ԱՄԵՐԻԿԱ (150+ վայր) =====
-    { lat: 40.71, lon: -74.01, name: "Նյու Յորք (Մանհեթեն), ԱՄՆ", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
-    { lat: 40.76, lon: -73.98, name: "Նյու Յորք (Միդթաուն), ԱՄՆ", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-    { lat: 40.73, lon: -74.00, name: "Նյու Յորք (Գրինվիչ Վիլիջ), ԱՄՆ", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-    { lat: 40.79, lon: -73.96, name: "Նյու Յորք (Ապեր Վեստ Սայդ), ԱՄՆ", virus: "COVID-19", cases: 3456, deaths: 45, risk: "medium" },
-    { lat: 34.05, lon: -118.24, name: "Լոս Անջելես, ԱՄՆ", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
-    { lat: 34.06, lon: -118.36, name: "Լոս Անջելես (Հոլիվուդ), ԱՄՆ", virus: "H5N1", cases: 345, deaths: 34, risk: "medium" },
-    { lat: 34.02, lon: -118.41, name: "Լոս Անջելես (Սանտա Մոնիկա), ԱՄՆ", virus: "H5N1", cases: 234, deaths: 23, risk: "medium" },
-    { lat: 33.94, lon: -118.40, name: "Լոս Անջելես (Էլ Սեգունդո), ԱՄՆ", virus: "H5N1", cases: 89, deaths: 8, risk: "low" },
-    { lat: 41.88, lon: -87.63, name: "Չիկագո, ԱՄՆ", virus: "Mpox", cases: 234, deaths: 5, risk: "medium" },
-    { lat: 41.89, lon: -87.62, name: "Չիկագո (Լուփ), ԱՄՆ", virus: "Mpox", cases: 67, deaths: 1, risk: "low" },
-    { lat: 41.97, lon: -87.68, name: "Չիկագո (Լինքոլն Պարկ), ԱՄՆ", virus: "Mpox", cases: 45, deaths: 0, risk: "low" },
-    { lat: 29.76, lon: -95.37, name: "Հյուսթոն, ԱՄՆ", virus: "West Nile", cases: 345, deaths: 23, risk: "medium" },
-    { lat: 29.71, lon: -95.40, name: "Հյուսթոն (Գելերիա), ԱՄՆ", virus: "West Nile", cases: 89, deaths: 5, risk: "low" },
-    { lat: 33.75, lon: -84.39, name: "Ատլանտա, ԱՄՆ", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-    { lat: 33.77, lon: -84.38, name: "Ատլանտա (Բաքհեդ), ԱՄՆ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 43.65, lon: -79.38, name: "Տորոնտո, Կանադա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: 43.67, lon: -79.40, name: "Տորոնտո (Դաունթաուն), Կանադա", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: 45.50, lon: -73.57, name: "Մոնրեալ, Կանադա", virus: "H3N2", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 45.50, lon: -73.56, name: "Մոնրեալ (Օլդ Մոնրեալ), Կանադա", virus: "H3N2", cases: 234, deaths: 5, risk: "low" },
-    { lat: 49.28, lon: -123.12, name: "Վանկուվեր, Կանադա", virus: "Mpox", cases: 67, deaths: 2, risk: "low" },
-    { lat: 49.26, lon: -123.11, name: "Վանկուվեր (Գրանվիլ Այլենդ), Կանադա", virus: "Mpox", cases: 23, deaths: 0, risk: "low" },
-    { lat: 19.43, lon: -99.13, name: "Մեխիկո, Մեքսիկա", virus: "COVID-19", cases: 7890, deaths: 567, risk: "high" },
-    { lat: 19.43, lon: -99.14, name: "Մեխիկո (Սոկալո), Մեքսիկա", virus: "COVID-19", cases: 2345, deaths: 123, risk: "medium" },
-    { lat: 19.36, lon: -99.18, name: "Մեխիկո (Կոյոական), Մեքսիկա", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
-    { lat: 20.67, lon: -103.35, name: "Գվադալախարա, Մեքսիկա", virus: "Դենգե", cases: 3456, deaths: 89, risk: "high" },
-    { lat: 20.66, lon: -103.34, name: "Գվադալախարա (Սապոպան), Մեքսիկա", virus: "Դենգե", cases: 890, deaths: 23, risk: "medium" },
-    { lat: 32.78, lon: -96.80, name: "Դալաս, ԱՄՆ", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-    { lat: 32.79, lon: -96.79, name: "Դալաս (Ափթաուն), ԱՄՆ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: 47.61, lon: -122.33, name: "Սիեթլ, ԱՄՆ", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-    { lat: 47.60, lon: -122.34, name: "Սիեթլ (Կապիտոլ Հիլ), ԱՄՆ", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: 42.36, lon: -71.06, name: "Բոստոն, ԱՄՆ", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-    { lat: 39.95, lon: -75.16, name: "Ֆիլադելֆիա, ԱՄՆ", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-    
-    // ===== ՀԱՐԱՎԱՅԻՆ ԱՄԵՐԻԿԱ (120+ վայր) =====
-    { lat: -23.55, lon: -46.63, name: "Սան Պաուլո, Բրազիլիա", virus: "Դենգե", cases: 12500, deaths: 430, risk: "high" },
-    { lat: -23.57, lon: -46.64, name: "Սան Պաուլո (Իբիրապուերա), Բրազիլիա", virus: "Դենգե", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -23.56, lon: -46.65, name: "Սան Պաուլո (Մորտումբի), Բրազիլիա", virus: "Դենգե", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: -22.91, lon: -43.20, name: "Ռիո դե Ժանեյրո, Բրազիլիա", virus: "Օրոպուչ", cases: 3456, deaths: 23, risk: "medium" },
-    { lat: -22.97, lon: -43.18, name: "Ռիո դե Ժանեյրո (Կոպակաբանա), Բրազիլիա", virus: "Օրոպուչ", cases: 890, deaths: 5, risk: "low" },
-    { lat: -22.90, lon: -43.17, name: "Ռիո դե Ժանեյրո (Իպանեմա), Բրազիլիա", virus: "Օրոպուչ", cases: 567, deaths: 3, risk: "low" },
-    { lat: -15.79, lon: -47.88, name: "Բրազիլիա, Բրազիլիա", virus: "Zika", cases: 567, deaths: 5, risk: "low" },
-    { lat: -15.82, lon: -47.92, name: "Բրազիլիա (Պլանալտո), Բրազիլիա", virus: "Zika", cases: 123, deaths: 1, risk: "low" },
-    { lat: -12.97, lon: -38.48, name: "Սալվադոր, Բրազիլիա", virus: "Zika", cases: 890, deaths: 12, risk: "medium" },
-    { lat: -12.98, lon: -38.49, name: "Սալվադոր (Պելուրինիո), Բրազիլիա", virus: "Zika", cases: 234, deaths: 3, risk: "low" },
-    { lat: -3.72, lon: -38.54, name: "Ֆորտալեզա, Բրազիլիա", virus: "Դենգե", cases: 5678, deaths: 123, risk: "high" },
-    { lat: -8.05, lon: -34.90, name: "Ռեսիֆե, Բրազիլիա", virus: "Դենգե", cases: 3456, deaths: 78, risk: "medium" },
-    { lat: -1.45, lon: -48.50, name: "Բելեն, Բրազիլիա", virus: "Դեղին տենդ", cases: 890, deaths: 45, risk: "medium" },
-    { lat: -30.03, lon: -51.23, name: "Պորտու Ալեգրե, Բրազիլիա", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -34.60, lon: -58.38, name: "Բուենոս Այրես, Արգենտինա", virus: "COVID-19", cases: 5678, deaths: 234, risk: "high" },
-    { lat: -34.58, lon: -58.40, name: "Բուենոս Այրես (Պալերմո), Արգենտինա", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: -34.62, lon: -58.43, name: "Բուենոս Այրես (Սան Տելմո), Արգենտինա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-    { lat: -31.42, lon: -64.18, name: "Կորդովա, Արգենտինա", virus: "Դենգե", cases: 2345, deaths: 56, risk: "medium" },
-    { lat: -33.45, lon: -70.65, name: "Սանտիագո, Չիլի", virus: "H1N1", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -33.44, lon: -70.66, name: "Սանտիագո (Պրովիդենսիա), Չիլի", virus: "H1N1", cases: 890, deaths: 23, risk: "medium" },
-    { lat: -33.03, lon: -71.63, name: "Վինյա դել Մար, Չիլի", virus: "H1N1", cases: 567, deaths: 12, risk: "low" },
-    { lat: -12.05, lon: -77.04, name: "Լիմա, Պերու", virus: "Դենգե", cases: 4567, deaths: 123, risk: "high" },
-    { lat: -12.06, lon: -77.03, name: "Լիմա (Միրաֆլորես), Պերու", virus: "Դենգե", cases: 1234, deaths: 34, risk: "medium" },
-    { lat: -12.08, lon: -77.05, name: "Լիմա (Բառանկո), Պերու", virus: "Դենգե", cases: 890, deaths: 23, risk: "medium" },
-    { lat: -16.41, lon: -71.53, name: "Արեկիպա, Պերու", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-    { lat: -2.18, lon: -79.88, name: "Գուայակիլ, Էկվադոր", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-    { lat: -0.18, lon: -78.47, name: "Կիտո, Էկվադոր", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
-    { lat: 10.50, lon: -66.91, name: "Կարակաս, Վենեսուելա", virus: "COVID-19", cases: 4567, deaths: 234, risk: "high" },
-    { lat: 10.50, lon: -66.92, name: "Կարակաս (Չակաո), Վենեսուելա", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" },
-    
-    // ===== ԱՎՍՏՐԱԼԻԱ ԵՎ ՕՎԿԻԱՆԻԱ (50+ վայր) =====
-    { lat: -33.87, lon: 151.21, name: "Սիդնեյ, Ավստրալիա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: -33.86, lon: 151.20, name: "Սիդնեյ (Սիդնեյ ՍԲԿ), Ավստրալիա", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: -33.88, lon: 151.22, name: "Սիդնեյ (Քինգս Քրոս), Ավստրալիա", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: -37.81, lon: 144.96, name: "Մելբուրն, Ավստրալիա", virus: "Ross River", cases: 1890, deaths: 2, risk: "low" },
-    { lat: -37.81, lon: 144.97, name: "Մելբուրն (ՍԲԿ), Ավստրալիա", virus: "Ross River", cases: 456, deaths: 1, risk: "low" },
-    { lat: -37.82, lon: 144.98, name: "Մելբուրն (Ռիչմոնդ), Ավստրալիա", virus: "Ross River", cases: 234, deaths: 0, risk: "low" },
-    { lat: -27.47, lon: 153.02, name: "Բրիսբեն, Ավստրալիա", virus: "Japanese encephalitis", cases: 23, deaths: 4, risk: "low" },
-    { lat: -27.46, lon: 153.03, name: "Բրիսբեն (Սաութ Բանկ), Ավստրալիա", virus: "Japanese encephalitis", cases: 8, deaths: 1, risk: "low" },
-    { lat: -31.95, lon: 115.86, name: "Պերթ, Ավստրալիա", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-    { lat: -34.93, lon: 138.60, name: "Ադելաիդա, Ավստրալիա", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: -35.28, lon: 149.13, name: "Կանբերրա, Ավստրալիա", virus: "COVID-19", cases: 345, deaths: 4, risk: "low" },
-    { lat: -41.29, lon: 174.78, name: "Վելինգտոն, ՆԶ", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-    { lat: -41.28, lon: 174.77, name: "Վելինգտոն (Լամբտոն), ՆԶ", virus: "COVID-19", cases: 234, deaths: 2, risk: "low" },
-    { lat: -36.85, lon: 174.76, name: "Օքլենդ, ՆԶ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: -36.84, lon: 174.77, name: "Օքլենդ (Վիադուկտ), ՆԶ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-    { lat: -43.53, lon: 172.64, name: "Քրայսթչերչ, ՆԶ", virus: "COVID-19", cases: 345, deaths: 5, risk: "low" },
-    { lat: -9.45, lon: 159.20, name: "Հոնիարա, Սողոմոնյան կղզիներ", virus: "Դենգե", cases: 2345, deaths: 45, risk: "medium" },
-    { lat: -17.75, lon: 168.30, name: "Պորտ Վիլա, Վանուատու", virus: "Դենգե", cases: 890, deaths: 12, risk: "low" },
-    { lat: -18.14, lon: 178.44, name: "Սուվա, Ֆիջի", virus: "Դենգե", cases: 1234, deaths: 23, risk: "medium" },
-    { lat: -6.92, lon: 147.00, name: "Լաե, Պապուա ՆԳ", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
-    { lat: 40.71, lon: -74.01, name: "Նյու Յորք, ԱՄՆ", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
-{ lat: 34.05, lon: -118.24, name: "Լոս Անջելես, ԱՄՆ", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
-{ lat: 41.88, lon: -87.63, name: "Չիկագո, ԱՄՆ", virus: "Mpox", cases: 234, deaths: 5, risk: "medium" },
-{ lat: 29.76, lon: -95.37, name: "Հյուսթոն, ԱՄՆ", virus: "West Nile", cases: 345, deaths: 23, risk: "medium" },
-{ lat: 33.75, lon: -84.39, name: "Ատլանտա, ԱՄՆ", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-{ lat: 43.65, lon: -79.38, name: "Տորոնտո, Կանադա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-{ lat: 45.50, lon: -73.57, name: "Մոնրեալ, Կանադա", virus: "H3N2", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 49.28, lon: -123.12, name: "Վանկուվեր, Կանադա", virus: "Mpox", cases: 67, deaths: 2, risk: "low" },
-{ lat: 19.43, lon: -99.13, name: "Մեխիկո, Մեքսիկա", virus: "COVID-19", cases: 7890, deaths: 567, risk: "high" },
-{ lat: 20.67, lon: -103.35, name: "Գվադալախարա, Մեքսիկա", virus: "Դենգե", cases: 3456, deaths: 89, risk: "high" },
-{ lat: 32.78, lon: -96.80, name: "Դալաս, ԱՄՆ", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
-{ lat: 47.61, lon: -122.33, name: "Սիեթլ, ԱՄՆ", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-{ lat: 42.36, lon: -71.06, name: "Բոստոն, ԱՄՆ", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-{ lat: 39.95, lon: -75.16, name: "Ֆիլադելֆիա, ԱՄՆ", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-{ lat: 51.51, lon: -0.13, name: "Լոնդոն, Մեծ Բրիտանիա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-{ lat: 48.86, lon: 2.35, name: "Փարիզ, Ֆրանսիա", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
-{ lat: 43.30, lon: 5.37, name: "Մարսել, Ֆրանսիա", virus: "Դենգե", cases: 89, deaths: 2, risk: "low" },
-{ lat: 52.52, lon: 13.40, name: "Բեռլին, Գերմանիա", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-{ lat: 48.14, lon: 11.58, name: "Մյունխեն, Գերմանիա", virus: "Mpox", cases: 45, deaths: 1, risk: "low" },
-{ lat: 41.90, lon: 12.50, name: "Հռոմ, Իտալիա", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
-{ lat: 45.46, lon: 9.19, name: "Միլան, Իտալիա", virus: "H1N1", cases: 3456, deaths: 123, risk: "medium" },
-{ lat: 40.42, lon: -3.70, name: "Մադրիդ, Իսպանիա", virus: "COVID-19", cases: 4567, deaths: 156, risk: "medium" },
-{ lat: 41.38, lon: 2.18, name: "Բարսելոնա, Իսպանիա", virus: "Դենգե", cases: 67, deaths: 0, risk: "low" },
-{ lat: 55.76, lon: 37.62, name: "Մոսկվա, Ռուսաստան", virus: "COVID-19", cases: 7890, deaths: 345, risk: "high" },
-{ lat: 59.93, lon: 30.34, name: "Սանկտ Պետերբուրգ, Ռուսաստան", virus: "H5N1", cases: 567, deaths: 34, risk: "medium" },
-{ lat: 52.23, lon: 21.01, name: "Վարշավա, Լեհաստան", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
-{ lat: 47.50, lon: 19.04, name: "Բուդապեշտ, Հունգարիա", virus: "H3N2", cases: 890, deaths: 34, risk: "medium" },
-{ lat: 50.08, lon: 14.42, name: "Պրահա, Չեխիա", virus: "Mpox", cases: 23, deaths: 1, risk: "low" },
-{ lat: 59.33, lon: 18.07, name: "Ստոկհոլմ, Շվեդիա", virus: "COVID-19", cases: 567, deaths: 23, risk: "low" },
-{ lat: 53.35, lon: -6.26, name: "Դուբլին, Իռլանդիա", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-{ lat: 57.15, lon: -2.11, name: "Աբերդին, Շոտլանդիա", virus: "COVID-19", cases: 234, deaths: 5, risk: "low" },
-{ lat: 60.17, lon: 24.94, name: "Հելսինկի, Ֆինլանդիա", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-{ lat: 55.68, lon: 12.57, name: "Կոպենհագեն, Դանիա", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-{ lat: 59.91, lon: 10.75, name: "Օսլո, Նորվեգիա", virus: "COVID-19", cases: 678, deaths: 10, risk: "low" },
-{ lat: 52.37, lon: 4.89, name: "Ամստերդամ, Նիդերլանդներ", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-{ lat: 50.85, lon: 4.35, name: "Բրյուսել, Բելգիա", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-{ lat: 47.37, lon: 8.54, name: "Ցյուրիխ, Շվեյցարիա", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-{ lat: 48.20, lon: 16.37, name: "Վիեննա, Ավստրիա", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
-{ lat: 41.00, lon: 28.97, name: "Ստամբուլ, Թուրքիա", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
-{ lat: 39.93, lon: 32.86, name: "Անկարա, Թուրքիա", virus: "H5N1", cases: 234, deaths: 23, risk: "medium" },
-{ lat: 37.98, lon: 23.73, name: "Աթենք, Հունաստան", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-{ lat: 38.72, lon: -9.14, name: "Լիսաբոն, Պորտուգալիա", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-{ lat: 41.16, lon: -8.62, name: "Պորտու, Պորտուգալիա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 44.43, lon: 26.10, name: "Բուխարեստ, Ռումինիա", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-{ lat: 42.70, lon: 23.32, name: "Սոֆիա, Բուլղարիա", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
-{ lat: 37.98, lon: 23.73, name: "Աթենք, Հունաստան", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-{ lat: 35.33, lon: 25.13, name: "Հերակլիոն, Հունաստան", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-{ lat: 40.64, lon: 22.94, name: "Սալոնիկ, Հունաստան", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 32.08, lon: 34.78, name: "Թել Ավիվ, Իսրայել", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-{ lat: 31.77, lon: 35.21, name: "Երուսաղեմ, Իսրայել", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 30.04, lon: 31.24, name: "Կահիրե, Եգիպտոս", virus: "H5N1", cases: 78, deaths: 23, risk: "medium" },
-{ lat: 31.20, lon: 29.92, name: "Ալեքսանդրիա, Եգիպտոս", virus: "H5N1", cases: 34, deaths: 8, risk: "low" },
-{ lat: 25.07, lon: 55.31, name: "Դուբայ, ԱՄԷ", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-{ lat: 24.45, lon: 54.38, name: "Աբու Դաբի, ԱՄԷ", virus: "COVID-19", cases: 3456, deaths: 56, risk: "medium" },
-{ lat: 25.28, lon: 51.52, name: "Դոհա, Կատար", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
-{ lat: 26.42, lon: 50.13, name: "Դամամ, Սաուդյան Արաբիա", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
-{ lat: 21.54, lon: 39.17, name: "Ջիդդա, Սաուդյան Արաբիա", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
-{ lat: 24.63, lon: 46.71, name: "Էր Ռիադ, Սաուդյան Արաբիա", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
-{ lat: 15.61, lon: 32.53, name: "Խարտում, Սուդան", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" },
-{ lat: 9.05, lon: 38.74, name: "Ադիս Աբեբա, Եթովպիա", virus: "Խոլերա", cases: 2345, deaths: 123, risk: "high" },
-{ lat: 6.83, lon: 79.87, name: "Կոլոմբո, Շրի Լանկա", virus: "Դենգե", cases: 3456, deaths: 67, risk: "high" },
-{ lat: 27.70, lon: 85.32, name: "Կատմանդու, Նեպալ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 23.81, lon: 90.41, name: "Դաքքա, Բանգլադեշ", virus: "COVID-19", cases: 5678, deaths: 123, risk: "high" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 21.43, lon: 91.98, name: "Կոկս Բազար, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
-{ lat: 18.97, lon: 96.61, name: "Նեյպիդո, Մյանմա", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 16.84, lon: 96.13, name: "Յանգոն, Մյանմա", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
-{ lat: 21.98, lon: 96.08, name: "Մանդալայ, Մյանմա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 13.73, lon: 100.50, name: "Բանգկոկ, Թաիլանդ", virus: "H1N1", cases: 2345, deaths: 45, risk: "medium" },
-{ lat: 18.79, lon: 98.98, name: "Չիանգ Մայ, Թաիլանդ", virus: "Mpox", cases: 34, deaths: 2, risk: "low" },
-{ lat: 7.88, lon: 98.39, name: "Պհուկետ, Թաիլանդ", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-{ lat: 17.40, lon: 102.79, name: "Ուդոն Թանի, Թաիլանդ", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-{ lat: 14.98, lon: 102.10, name: "Նախոն Ռատչասիմա, Թաիլանդ", virus: "COVID-19", cases: 456, deaths: 7, risk: "low" },
-{ lat: 1.35, lon: 103.82, name: "Սինգապուր", virus: "COVID-19", cases: 890, deaths: 4, risk: "low" },
-{ lat: 3.14, lon: 101.69, name: "Կուալա Լումպուր, Մալայզիա", virus: "Nipah", cases: 12, deaths: 8, risk: "high" },
-{ lat: 5.41, lon: 100.33, name: "Ջորջթաուն, Մալայզիա", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
-{ lat: 1.49, lon: 103.78, name: "Ջոհոր Բահրու, Մալայզիա", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
-{ lat: 4.61, lon: 114.33, name: "Բանդար Սերի Բեգավան, Բրունեյ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 10.62, lon: 103.52, name: "Սիհանուկվիլ, Կամբոջա", virus: "COVID-19", cases: 456, deaths: 5, risk: "low" },
-{ lat: 11.56, lon: 104.92, name: "Պնոմպեն, Կամբոջա", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
-{ lat: 21.03, lon: 105.85, name: "Հանոյ, Վիետնամ", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
-{ lat: 10.82, lon: 106.63, name: "Հոշիմին, Վիետնամ", virus: "COVID-19", cases: 5678, deaths: 123, risk: "high" },
-{ lat: 16.07, lon: 108.22, name: "Դանանգ, Վիետնամ", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
-{ lat: 13.10, lon: 100.90, name: "Պատտայա, Թաիլանդ", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
-{ lat: 19.91, lon: 99.83, name: "Չիանգ Ռայ, Թաիլանդ", virus: "COVID-19", cases: 234, deaths: 3, risk: "low" },
-{ lat: 6.92, lon: 79.86, name: "Շրի Ջայավարդենեպուրա, Շրի Լանկա", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 7.29, lon: 80.63, name: "Կանդի, Շրի Լանկա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 6.05, lon: 80.21, name: "Գալլե, Շրի Լանկա", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 8.98, lon: 79.90, name: "Մաննար, Շրի Լանկա", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 27.47, lon: 89.64, name: "Թհիմփհու, Բութան", virus: "COVID-19", cases: 45, deaths: 1, risk: "low" },
-{ lat: 26.45, lon: 87.28, name: "Բիրատնագար, Նեպալ", virus: "COVID-19", cases: 234, deaths: 5, risk: "low" },
-{ lat: 28.20, lon: 83.96, name: "Պոխարա, Նեպալ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 26.48, lon: 87.27, name: "Դարան, Նեպալ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 27.68, lon: 85.32, name: "Լալիտպուր, Նեպալ", virus: "COVID-19", cases: 456, deaths: 7, risk: "low" },
-{ lat: 23.74, lon: 90.38, name: "Նարայանգանջ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.36, lon: 91.79, name: "Չիտագոնգ, Բանգլադեշ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
-{ lat: 24.90, lon: 91.86, name: "Սիլհեթ, Բանգլադեշ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
-{ lat: 23.18, lon: 90.41, name: "Մադարիպուր, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 23.13, lon: 90.15, name: "Ֆարիդպուր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 24.30, lon: 88.27, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 25.92, lon: 88.75, name: "Դինաջպուր, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 25.62, lon: 88.63, name: "Ռանգպուր, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 22.92, lon: 89.06, name: "Ջեսսոր, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.91, lon: 90.72, name: "Բրահմանբարիա, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 24.37, lon: 88.60, name: "Ռաջշահի, Բանգլադեշ", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
-{ lat: 22.84, lon: 89.54, name: "Խուլնա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" },
-{ lat: 24.89, lon: 91.87, name: "Մուլվիբազար, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 25.13, lon: 88.15, name: "Չապայ Նավաբգանջ, Բանգլադեշ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low" },
-{ lat: 22.70, lon: 90.37, name: "Բարիսալ, Բանգլադեշ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low" },
-{ lat: 24.01, lon: 89.24, name: "Պաբնա, Բանգլադեշ", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
-{ lat: 23.46, lon: 91.19, name: "Կոմիլլա, Բանգլադեշ", virus: "COVID-19", cases: 456, deaths: 8, risk: "low" }
+    { lat: -4.44, lon: 15.27, name: "Kinshasa, DRC", virus: "Ebola", cases: 312, deaths: 187, risk: "high" },
+    { lat: -4.33, lon: 15.32, name: "Kinshasa (Limete), DRC", virus: "Ebola", cases: 45, deaths: 23, risk: "medium" },
+    { lat: -4.38, lon: 15.41, name: "Kinshasa (Ngiri-Ngiri), DRC", virus: "Ebola", cases: 78, deaths: 34, risk: "high" },
+    { lat: -5.89, lon: 22.42, name: "Kananga, DRC", virus: "Mpox", cases: 234, deaths: 12, risk: "medium" },
+    { lat: -6.17, lon: 23.59, name: "Mbuji-Mayi, DRC", virus: "Mpox", cases: 156, deaths: 8, risk: "medium" },
+    { lat: -11.66, lon: 27.48, name: "Lubumbashi, DRC", virus: "Cholera", cases: 567, deaths: 34, risk: "high" },
+    { lat: 9.08, lon: 8.67, name: "Abuja, Nigeria", virus: "Yellow Fever", cases: 890, deaths: 134, risk: "high" },
+    { lat: 6.45, lon: 7.51, name: "Enugu, Nigeria", virus: "Lassa", cases: 234, deaths: 45, risk: "high" },
+    { lat: 7.38, lon: 3.90, name: "Ibadan, Nigeria", virus: "Lassa", cases: 178, deaths: 23, risk: "medium" },
+    { lat: 10.51, lon: 7.44, name: "Kaduna, Nigeria", virus: "Mpox", cases: 89, deaths: 5, risk: "low" },
+    { lat: 12.00, lon: 8.52, name: "Kano, Nigeria", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: 4.82, lon: 7.03, name: "Port Harcourt, Nigeria", virus: "Cholera", cases: 890, deaths: 45, risk: "medium" },
+    { lat: 6.52, lon: 3.38, name: "Lagos (Victoria Island), Nigeria", virus: "Yellow Fever", cases: 234, deaths: 12, risk: "medium" },
+    { lat: 6.44, lon: 3.42, name: "Lagos (Apapa), Nigeria", virus: "Lassa", cases: 567, deaths: 34, risk: "high" },
+    { lat: 6.59, lon: 3.34, name: "Lagos (Ikeja), Nigeria", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
+    { lat: -26.20, lon: 28.04, name: "Johannesburg, SA", virus: "COVID-19", cases: 1250, deaths: 45, risk: "medium" },
+    { lat: -26.10, lon: 28.05, name: "Johannesburg (Sandton), SA", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
+    { lat: -33.92, lon: 18.42, name: "Cape Town, SA", virus: "COVID-19", cases: 2345, deaths: 78, risk: "medium" },
+    { lat: -29.85, lon: 31.02, name: "Durban, SA", virus: "Mpox", cases: 89, deaths: 4, risk: "low" },
+    { lat: -25.75, lon: 28.19, name: "Pretoria, SA", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 15.50, lon: -12.50, name: "Bamako, Mali", virus: "Mpox", cases: 234, deaths: 12, risk: "medium" },
+    { lat: 13.45, lon: -16.58, name: "Banjul, Gambia", virus: "Mpox", cases: 34, deaths: 5, risk: "low" },
+    { lat: 14.76, lon: -17.36, name: "Dakar, Senegal", virus: "Zika", cases: 67, deaths: 2, risk: "low" },
+    { lat: 14.68, lon: -17.44, name: "Dakar (Yoff), Senegal", virus: "Dengue", cases: 45, deaths: 1, risk: "low" },
+    { lat: 30.06, lon: 31.25, name: "Cairo, Egypt", virus: "H5N1", cases: 78, deaths: 23, risk: "medium" },
+    { lat: 30.04, lon: 31.24, name: "Cairo (Giza), Egypt", virus: "H5N1", cases: 34, deaths: 8, risk: "low" },
+    { lat: 31.20, lon: 29.92, name: "Alexandria, Egypt", virus: "H5N1", cases: 23, deaths: 5, risk: "low" },
+    { lat: 26.82, lon: 30.80, name: "Asyut, Egypt", virus: "COVID-19", cases: 456, deaths: 23, risk: "medium" },
+    { lat: -18.87, lon: 47.50, name: "Antananarivo, Madagascar", virus: "Plague", cases: 45, deaths: 12, risk: "medium" },
+    { lat: -19.87, lon: 47.03, name: "Antsirabe, Madagascar", virus: "Plague", cases: 23, deaths: 5, risk: "low" },
+    { lat: -13.32, lon: 48.31, name: "Antsiranana, Madagascar", virus: "Mpox", cases: 12, deaths: 2, risk: "low" },
+    { lat: 12.37, lon: -1.53, name: "Ouagadougou, Burkina Faso", virus: "Dengue", cases: 234, deaths: 8, risk: "low" },
+    { lat: 11.18, lon: -4.30, name: "Bobo-Dioulasso, Burkina Faso", virus: "Dengue", cases: 89, deaths: 3, risk: "low" },
+    { lat: 12.37, lon: -1.52, name: "Ouagadougou (Kadiogo), Burkina Faso", virus: "Malaria", cases: 2345, deaths: 56, risk: "medium" },
+    { lat: -3.38, lon: 29.36, name: "Bujumbura, Burundi", virus: "Malaria", cases: 5678, deaths: 234, risk: "high" },
+    { lat: -3.38, lon: 29.37, name: "Bujumbura (Mutanga), Burundi", virus: "Malaria", cases: 1234, deaths: 45, risk: "medium" },
+    { lat: -3.41, lon: 29.39, name: "Bujumbura (Kamenge), Burundi", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 18.22, lon: -66.59, name: "San Juan, Puerto Rico", virus: "Dengue", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 18.45, lon: -66.07, name: "Bayamon, Puerto Rico", virus: "Dengue", cases: 234, deaths: 5, risk: "low" },
+    { lat: 18.43, lon: -66.62, name: "Arecibo, Puerto Rico", virus: "Zika", cases: 67, deaths: 1, risk: "low" },
+    { lat: -8.84, lon: 13.23, name: "Luanda, Angola", virus: "Yellow Fever", cases: 345, deaths: 67, risk: "high" },
+    { lat: -8.96, lon: 13.27, name: "Luanda (Cazenga), Angola", virus: "Yellow Fever", cases: 123, deaths: 23, risk: "medium" },
+    { lat: -12.55, lon: 13.42, name: "Benguela, Angola", virus: "Mpox", cases: 45, deaths: 5, risk: "low" },
+    { lat: -12.78, lon: 15.73, name: "Huambo, Angola", virus: "COVID-19", cases: 678, deaths: 23, risk: "medium" },
+    { lat: 9.15, lon: 40.50, name: "Addis Ababa, Ethiopia", virus: "Cholera", cases: 2345, deaths: 123, risk: "high" },
+    { lat: 9.03, lon: 38.75, name: "Addis Ababa (Bole), Ethiopia", virus: "Cholera", cases: 890, deaths: 45, risk: "medium" },
+    { lat: 11.56, lon: 37.37, name: "Bahir Dar, Ethiopia", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
+    { lat: 13.50, lon: 39.47, name: "Mekelle, Ethiopia", virus: "Mpox", cases: 78, deaths: 5, risk: "low" },
+    { lat: 6.82, lon: -5.28, name: "Yamoussoukro, Ivory Coast", virus: "Dengue", cases: 234, deaths: 8, risk: "low" },
+    { lat: 5.34, lon: -4.03, name: "Abidjan, Ivory Coast", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
+    { lat: 5.31, lon: -4.02, name: "Abidjan (Cocody), Ivory Coast", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
+    { lat: -1.28, lon: 36.82, name: "Nairobi, Kenya", virus: "COVID-19", cases: 3456, deaths: 89, risk: "high" },
+    { lat: -1.45, lon: 36.98, name: "Nairobi (Karen), Kenya", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
+    { lat: -4.05, lon: 39.67, name: "Mombasa, Kenya", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
+    { lat: -0.28, lon: 36.07, name: "Nakuru, Kenya", virus: "Mpox", cases: 78, deaths: 3, risk: "low" },
+    { lat: 6.45, lon: 7.49, name: "Enugu, Nigeria", virus: "Lassa", cases: 145, deaths: 23, risk: "medium" },
+    { lat: 20.59, lon: 78.96, name: "Nagpur, India", virus: "Nipah", cases: 78, deaths: 34, risk: "high" },
+    { lat: 21.15, lon: 79.09, name: "Nagpur (Manewada), India", virus: "Nipah", cases: 23, deaths: 12, risk: "medium" },
+    { lat: 21.14, lon: 79.11, name: "Nagpur (Khapa), India", virus: "Nipah", cases: 12, deaths: 5, risk: "low" },
+    { lat: 28.61, lon: 77.23, name: "New Delhi, India", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: 28.63, lon: 77.22, name: "New Delhi (Connaught Place), India", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 28.54, lon: 77.26, name: "New Delhi (Noida), India", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
+    { lat: 28.67, lon: 77.22, name: "Delhi (Shahdara), India", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
+    { lat: 19.08, lon: 72.88, name: "Mumbai, India", virus: "Dengue", cases: 5678, deaths: 89, risk: "high" },
+    { lat: 19.11, lon: 72.90, name: "Mumbai (Andheri), India", virus: "Dengue", cases: 1234, deaths: 23, risk: "medium" },
+    { lat: 19.03, lon: 72.85, name: "Mumbai (Nariman Point), India", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 19.21, lon: 72.97, name: "Thane, India", virus: "Dengue", cases: 890, deaths: 12, risk: "medium" },
+    { lat: 19.16, lon: 72.95, name: "Mumbai (Dadar), India", virus: "Chikungunya", cases: 567, deaths: 5, risk: "low" },
+    { lat: 13.08, lon: 80.27, name: "Chennai, India", virus: "Chikungunya", cases: 1234, deaths: 12, risk: "medium" },
+    { lat: 13.03, lon: 80.23, name: "Chennai (Adyar), India", virus: "Chikungunya", cases: 345, deaths: 4, risk: "low" },
+    { lat: 13.06, lon: 80.25, name: "Chennai (T-Nagar), India", virus: "Dengue", cases: 890, deaths: 8, risk: "medium" },
+    { lat: 35.86, lon: 104.19, name: "Beijing, China", virus: "COVID-19", cases: 4500, deaths: 89, risk: "medium" },
+    { lat: 39.90, lon: 116.40, name: "Beijing (Chaoyang), China", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 39.95, lon: 116.36, name: "Beijing (Haidian), China", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
+    { lat: 31.23, lon: 121.47, name: "Shanghai, China", virus: "H3N2", cases: 6789, deaths: 123, risk: "medium" },
+    { lat: 31.26, lon: 121.52, name: "Shanghai (Pudong), China", virus: "H3N2", cases: 3456, deaths: 67, risk: "medium" },
+    { lat: 31.20, lon: 121.43, name: "Shanghai (Hongkou), China", virus: "H3N2", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 23.13, lon: 113.26, name: "Guangzhou, China", virus: "H7N9", cases: 45, deaths: 23, risk: "high" },
+    { lat: 23.11, lon: 113.32, name: "Guangzhou (Tianhe), China", virus: "H7N9", cases: 12, deaths: 5, risk: "low" },
+    { lat: 23.01, lon: 113.12, name: "Foshan, China", virus: "H7N9", cases: 8, deaths: 3, risk: "low" },
+    { lat: 22.53, lon: 114.05, name: "Shenzhen, China", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
+    { lat: 22.55, lon: 114.10, name: "Shenzhen (Futian), China", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
+    { lat: 22.26, lon: 114.19, name: "Hong Kong", virus: "COVID-19", cases: 7890, deaths: 156, risk: "high" },
+    { lat: 22.31, lon: 114.17, name: "Hong Kong (Mong Kok)", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 22.28, lon: 114.15, name: "Hong Kong (Central)", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
+    { lat: -6.91, lon: 107.61, name: "Bandung, Indonesia", virus: "Rabies", cases: 67, deaths: 67, risk: "high" },
+    { lat: -6.92, lon: 107.60, name: "Bandung (Cikapundung), Indonesia", virus: "Rabies", cases: 23, deaths: 23, risk: "high" },
+    { lat: -6.90, lon: 107.62, name: "Bandung (Lengkong), Indonesia", virus: "Rabies", cases: 12, deaths: 12, risk: "medium" },
+    { lat: -7.79, lon: 110.36, name: "Yogyakarta, Indonesia", virus: "Dengue", cases: 2345, deaths: 78, risk: "high" },
+    { lat: -7.80, lon: 110.38, name: "Yogyakarta (Gondokusuman), Indonesia", virus: "Dengue", cases: 567, deaths: 23, risk: "medium" },
+    { lat: -7.78, lon: 110.35, name: "Sleman, Indonesia", virus: "Dengue", cases: 890, deaths: 34, risk: "medium" },
+    { lat: 3.59, lon: 98.67, name: "Medan, Indonesia", virus: "Mpox", cases: 23, deaths: 4, risk: "low" },
+    { lat: 3.57, lon: 98.65, name: "Medan (Polonia), Indonesia", virus: "Mpox", cases: 8, deaths: 1, risk: "low" },
+    { lat: 3.61, lon: 98.68, name: "Medan (Kampung Baru), Indonesia", virus: "Mpox", cases: 5, deaths: 0, risk: "low" },
+    { lat: 14.59, lon: 120.98, name: "Manila, Philippines", virus: "Dengue", cases: 4567, deaths: 234, risk: "high" },
+    { lat: 14.56, lon: 121.02, name: "Makati, Philippines", virus: "Dengue", cases: 1234, deaths: 56, risk: "medium" },
+    { lat: 14.55, lon: 121.00, name: "Pasay, Philippines", virus: "Dengue", cases: 890, deaths: 34, risk: "medium" },
+    { lat: 14.60, lon: 121.03, name: "Quezon City, Philippines", virus: "COVID-19", cases: 3456, deaths: 89, risk: "medium" },
+    { lat: 14.51, lon: 120.99, name: "Parañaque, Philippines", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
+    { lat: 10.32, lon: 123.89, name: "Cebu, Philippines", virus: "Chikungunya", cases: 890, deaths: 5, risk: "medium" },
+    { lat: 10.29, lon: 123.90, name: "Cebu (Lapu-Lapu), Philippines", virus: "Chikungunya", cases: 234, deaths: 2, risk: "low" },
+    { lat: 10.33, lon: 123.91, name: "Mandaue, Philippines", virus: "Chikungunya", cases: 156, deaths: 1, risk: "low" },
+    { lat: 13.73, lon: 100.50, name: "Bangkok, Thailand", virus: "H1N1", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 13.75, lon: 100.52, name: "Bangkok (Sukhumvit), Thailand", virus: "H1N1", cases: 890, deaths: 12, risk: "medium" },
+    { lat: 13.78, lon: 100.54, name: "Bangkok (Chatuchak), Thailand", virus: "H1N1", cases: 567, deaths: 8, risk: "low" },
+    { lat: 13.73, lon: 100.56, name: "Bangkok (Sathon), Thailand", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
+    { lat: 18.79, lon: 98.98, name: "Chiang Mai, Thailand", virus: "Mpox", cases: 34, deaths: 2, risk: "low" },
+    { lat: 18.78, lon: 98.99, name: "Chiang Mai (Nimman), Thailand", virus: "Mpox", cases: 12, deaths: 1, risk: "low" },
+    { lat: 18.80, lon: 98.97, name: "Chiang Mai (San Kamphaeng), Thailand", virus: "Mpox", cases: 8, deaths: 0, risk: "low" },
+    { lat: 1.35, lon: 103.82, name: "Singapore", virus: "COVID-19", cases: 890, deaths: 4, risk: "low" },
+    { lat: 1.33, lon: 103.84, name: "Singapore (Chinatown)", virus: "COVID-19", cases: 234, deaths: 1, risk: "low" },
+    { lat: 1.28, lon: 103.85, name: "Singapore (Sentosa)", virus: "COVID-19", cases: 89, deaths: 0, risk: "low" },
+    { lat: 1.36, lon: 103.87, name: "Singapore (Ang Mo Kio)", virus: "COVID-19", cases: 156, deaths: 1, risk: "low" },
+    { lat: 3.14, lon: 101.69, name: "Kuala Lumpur, Malaysia", virus: "Nipah", cases: 12, deaths: 8, risk: "high" },
+    { lat: 3.15, lon: 101.71, name: "Kuala Lumpur (Bukit Bintang)", virus: "Nipah", cases: 5, deaths: 3, risk: "medium" },
+    { lat: 3.08, lon: 101.60, name: "Petaling Jaya, Malaysia", virus: "Nipah", cases: 3, deaths: 2, risk: "low" },
+    { lat: 5.41, lon: 100.33, name: "George Town, Malaysia", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 1.49, lon: 103.78, name: "Johor Bahru, Malaysia", virus: "COVID-19", cases: 1890, deaths: 34, risk: "medium" },
+    { lat: 6.93, lon: 79.84, name: "Colombo, Sri Lanka", virus: "Dengue", cases: 3456, deaths: 67, risk: "high" },
+    { lat: 6.91, lon: 79.86, name: "Colombo (Kollupitiya), Sri Lanka", virus: "Dengue", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 6.94, lon: 79.89, name: "Colombo (Borella), Sri Lanka", virus: "Dengue", cases: 567, deaths: 12, risk: "medium" },
+    { lat: 7.29, lon: 80.63, name: "Kandy, Sri Lanka", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 27.70, lon: 85.32, name: "Kathmandu, Nepal", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
+    { lat: 27.72, lon: 85.34, name: "Kathmandu (Thamel), Nepal", virus: "COVID-19", cases: 234, deaths: 5, risk: "low" },
+    { lat: 27.67, lon: 85.33, name: "Lalitpur, Nepal", virus: "COVID-19", cases: 156, deaths: 3, risk: "low" },
+    { lat: 33.88, lon: 35.50, name: "Beirut, Lebanon", virus: "Cholera", cases: 2345, deaths: 123, risk: "high" },
+    { lat: 33.90, lon: 35.48, name: "Beirut (Ashrafieh), Lebanon", virus: "Cholera", cases: 890, deaths: 45, risk: "medium" },
+    { lat: 33.86, lon: 35.52, name: "Beirut (Hamra), Lebanon", virus: "Cholera", cases: 567, deaths: 23, risk: "medium" },
+    { lat: 39.93, lon: 32.86, name: "Ankara, Turkey", virus: "H5N1", cases: 234, deaths: 23, risk: "medium" },
+    { lat: 39.92, lon: 32.85, name: "Ankara (Kizilay), Turkey", virus: "H5N1", cases: 89, deaths: 8, risk: "low" },
+    { lat: 39.88, lon: 32.86, name: "Ankara (Maltepe), Turkey", virus: "H5N1", cases: 45, deaths: 4, risk: "low" },
+    { lat: 41.01, lon: 28.97, name: "Istanbul, Turkey", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
+    { lat: 41.02, lon: 28.97, name: "Istanbul (Taksim), Turkey", virus: "COVID-19", cases: 3456, deaths: 89, risk: "medium" },
+    { lat: 40.99, lon: 28.92, name: "Istanbul (Bakırköy), Turkey", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium" },
+    { lat: 27.17, lon: 78.04, name: "Agra, India", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium" },
+    { lat: 27.19, lon: 78.02, name: "Agra (Taj Ganj), India", virus: "COVID-19", cases: 234, deaths: 4, risk: "low" },
+    { lat: 22.57, lon: 88.36, name: "Kolkata, India", virus: "Dengue", cases: 3456, deaths: 45, risk: "high" },
+    { lat: 22.56, lon: 88.38, name: "Kolkata (Salt Lake), India", virus: "Dengue", cases: 890, deaths: 12, risk: "medium" },
+    { lat: 22.51, lon: 88.35, name: "Kolkata (Alipore), India", virus: "Dengue", cases: 567, deaths: 8, risk: "low" },
+    { lat: 31.55, lon: 74.34, name: "Lahore, Pakistan", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high" },
+    { lat: 31.57, lon: 74.36, name: "Lahore (Gulberg), Pakistan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 31.51, lon: 74.35, name: "Lahore (Model Town), Pakistan", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium" },
+    { lat: 24.86, lon: 67.01, name: "Karachi, Pakistan", virus: "Cholera", cases: 5678, deaths: 234, risk: "high" },
+    { lat: 24.88, lon: 67.05, name: "Karachi (Defence), Pakistan", virus: "Cholera", cases: 1234, deaths: 56, risk: "medium" },
+    { lat: 24.86, lon: 67.00, name: "Karachi (Sadar), Pakistan", virus: "Cholera", cases: 890, deaths: 34, risk: "medium" },
+    { lat: 33.51, lon: 36.29, name: "Damascus, Syria", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" },
+    { lat: 33.52, lon: 36.31, name: "Damascus (Abu Rummaneh), Syria", virus: "COVID-19", cases: 234, deaths: 12, risk: "low" },
+    { lat: 34.01, lon: 36.20, name: "Baalbek, Lebanon", virus: "Cholera", cases: 567, deaths: 34, risk: "medium" },
+    { lat: 33.27, lon: 35.20, name: "Tyre, Lebanon", virus: "Cholera", cases: 234, deaths: 12, risk: "medium" },
+    { lat: 51.51, lon: -0.13, name: "London, UK", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 48.86, lon: 2.35, name: "Paris, France", virus: "H3N2", cases: 5600, deaths: 230, risk: "medium" },
+    { lat: 52.52, lon: 13.40, name: "Berlin, Germany", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
+    { lat: 41.90, lon: 12.50, name: "Rome, Italy", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
+    { lat: 40.42, lon: -3.70, name: "Madrid, Spain", virus: "COVID-19", cases: 4567, deaths: 156, risk: "medium" },
+    { lat: 55.76, lon: 37.62, name: "Moscow, Russia", virus: "COVID-19", cases: 7890, deaths: 345, risk: "high" },
+    { lat: 52.23, lon: 21.01, name: "Warsaw, Poland", virus: "COVID-19", cases: 1234, deaths: 56, risk: "medium" },
+    { lat: 47.50, lon: 19.04, name: "Budapest, Hungary", virus: "H3N2", cases: 890, deaths: 34, risk: "medium" },
+    { lat: 50.08, lon: 14.42, name: "Prague, Czechia", virus: "Mpox", cases: 23, deaths: 1, risk: "low" },
+    { lat: 59.33, lon: 18.07, name: "Stockholm, Sweden", virus: "COVID-19", cases: 567, deaths: 23, risk: "low" },
+    { lat: 53.35, lon: -6.26, name: "Dublin, Ireland", virus: "COVID-19", cases: 456, deaths: 12, risk: "low" },
+    { lat: 60.17, lon: 24.94, name: "Helsinki, Finland", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
+    { lat: 55.68, lon: 12.57, name: "Copenhagen, Denmark", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
+    { lat: 59.91, lon: 10.75, name: "Oslo, Norway", virus: "COVID-19", cases: 678, deaths: 10, risk: "low" },
+    { lat: 52.37, lon: 4.89, name: "Amsterdam, Netherlands", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 50.85, lon: 4.35, name: "Brussels, Belgium", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
+    { lat: 47.37, lon: 8.54, name: "Zurich, Switzerland", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
+    { lat: 48.20, lon: 16.37, name: "Vienna, Austria", virus: "COVID-19", cases: 1567, deaths: 34, risk: "medium" },
+    { lat: 41.00, lon: 28.97, name: "Istanbul, Turkey", virus: "COVID-19", cases: 12345, deaths: 345, risk: "high" },
+    { lat: 37.98, lon: 23.73, name: "Athens, Greece", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: 38.72, lon: -9.14, name: "Lisbon, Portugal", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium" },
+    { lat: 44.43, lon: 26.10, name: "Bucharest, Romania", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: 42.70, lon: 23.32, name: "Sofia, Bulgaria", virus: "COVID-19", cases: 1234, deaths: 45, risk: "medium" },
+    { lat: 32.08, lon: 34.78, name: "Tel Aviv, Israel", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
+    { lat: 40.71, lon: -74.01, name: "New York (Manhattan), USA", virus: "COVID-19", cases: 23456, deaths: 345, risk: "high" },
+    { lat: 34.05, lon: -118.24, name: "Los Angeles, USA", virus: "H5N1", cases: 1240, deaths: 145, risk: "medium" },
+    { lat: 41.88, lon: -87.63, name: "Chicago, USA", virus: "Mpox", cases: 234, deaths: 5, risk: "medium" },
+    { lat: 29.76, lon: -95.37, name: "Houston, USA", virus: "West Nile", cases: 345, deaths: 23, risk: "medium" },
+    { lat: 33.75, lon: -84.39, name: "Atlanta, USA", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
+    { lat: 43.65, lon: -79.38, name: "Toronto, Canada", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: 45.50, lon: -73.57, name: "Montreal, Canada", virus: "H3N2", cases: 890, deaths: 23, risk: "medium" },
+    { lat: 49.28, lon: -123.12, name: "Vancouver, Canada", virus: "Mpox", cases: 67, deaths: 2, risk: "low" },
+    { lat: 19.43, lon: -99.13, name: "Mexico City, Mexico", virus: "COVID-19", cases: 7890, deaths: 567, risk: "high" },
+    { lat: 20.67, lon: -103.35, name: "Guadalajara, Mexico", virus: "Dengue", cases: 3456, deaths: 89, risk: "high" },
+    { lat: 32.78, lon: -96.80, name: "Dallas, USA", virus: "COVID-19", cases: 4567, deaths: 89, risk: "medium" },
+    { lat: 47.61, lon: -122.33, name: "Seattle, USA", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
+    { lat: 42.36, lon: -71.06, name: "Boston, USA", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
+    { lat: 39.95, lon: -75.16, name: "Philadelphia, USA", virus: "COVID-19", cases: 3456, deaths: 78, risk: "medium" },
+    { lat: -23.55, lon: -46.63, name: "Sao Paulo, Brazil", virus: "Dengue", cases: 12500, deaths: 430, risk: "high" },
+    { lat: -22.91, lon: -43.20, name: "Rio de Janeiro, Brazil", virus: "Oropouche", cases: 3456, deaths: 23, risk: "medium" },
+    { lat: -15.79, lon: -47.88, name: "Brasilia, Brazil", virus: "Zika", cases: 567, deaths: 5, risk: "low" },
+    { lat: -12.97, lon: -38.48, name: "Salvador, Brazil", virus: "Zika", cases: 890, deaths: 12, risk: "medium" },
+    { lat: -3.72, lon: -38.54, name: "Fortaleza, Brazil", virus: "Dengue", cases: 5678, deaths: 123, risk: "high" },
+    { lat: -8.05, lon: -34.90, name: "Recife, Brazil", virus: "Dengue", cases: 3456, deaths: 78, risk: "medium" },
+    { lat: -1.45, lon: -48.50, name: "Belem, Brazil", virus: "Yellow Fever", cases: 890, deaths: 45, risk: "medium" },
+    { lat: -30.03, lon: -51.23, name: "Porto Alegre, Brazil", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: -34.60, lon: -58.38, name: "Buenos Aires, Argentina", virus: "COVID-19", cases: 5678, deaths: 234, risk: "high" },
+    { lat: -31.42, lon: -64.18, name: "Cordoba, Argentina", virus: "Dengue", cases: 2345, deaths: 56, risk: "medium" },
+    { lat: -33.45, lon: -70.65, name: "Santiago, Chile", virus: "H1N1", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: -12.05, lon: -77.04, name: "Lima, Peru", virus: "Dengue", cases: 4567, deaths: 123, risk: "high" },
+    { lat: -16.41, lon: -71.53, name: "Arequipa, Peru", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium" },
+    { lat: -2.18, lon: -79.88, name: "Guayaquil, Ecuador", virus: "COVID-19", cases: 2345, deaths: 89, risk: "medium" },
+    { lat: 10.50, lon: -66.91, name: "Caracas, Venezuela", virus: "COVID-19", cases: 4567, deaths: 234, risk: "high" },
+    { lat: -33.87, lon: 151.21, name: "Sydney, Australia", virus: "COVID-19", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: -37.81, lon: 144.96, name: "Melbourne, Australia", virus: "Ross River", cases: 1890, deaths: 2, risk: "low" },
+    { lat: -27.47, lon: 153.02, name: "Brisbane, Australia", virus: "Japanese encephalitis", cases: 23, deaths: 4, risk: "low" },
+    { lat: -31.95, lon: 115.86, name: "Perth, Australia", virus: "COVID-19", cases: 890, deaths: 12, risk: "low" },
+    { lat: -34.93, lon: 138.60, name: "Adelaide, Australia", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
+    { lat: -35.28, lon: 149.13, name: "Canberra, Australia", virus: "COVID-19", cases: 345, deaths: 4, risk: "low" },
+    { lat: -41.29, lon: 174.78, name: "Wellington, NZ", virus: "COVID-19", cases: 567, deaths: 8, risk: "low" },
+    { lat: -36.85, lon: 174.76, name: "Auckland, NZ", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
+    { lat: -43.53, lon: 172.64, name: "Christchurch, NZ", virus: "COVID-19", cases: 345, deaths: 5, risk: "low" },
+    { lat: -9.45, lon: 159.20, name: "Honiara, Solomon Islands", virus: "Dengue", cases: 2345, deaths: 45, risk: "medium" },
+    { lat: -17.75, lon: 168.30, name: "Port Vila, Vanuatu", virus: "Dengue", cases: 890, deaths: 12, risk: "low" },
+    { lat: -18.14, lon: 178.44, name: "Suva, Fiji", virus: "Dengue", cases: 1234, deaths: 23, risk: "medium" },
+    { lat: -6.92, lon: 147.00, name: "Lae, Papua New Guinea", virus: "COVID-19", cases: 567, deaths: 12, risk: "low" },
+    { lat: 25.07, lon: 55.31, name: "Dubai, UAE", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
+    { lat: 24.45, lon: 54.38, name: "Abu Dhabi, UAE", virus: "COVID-19", cases: 3456, deaths: 56, risk: "medium" },
+    { lat: 25.28, lon: 51.52, name: "Doha, Qatar", virus: "COVID-19", cases: 2345, deaths: 34, risk: "medium" },
+    { lat: 26.42, lon: 50.13, name: "Dammam, Saudi Arabia", virus: "COVID-19", cases: 1234, deaths: 23, risk: "medium" },
+    { lat: 21.54, lon: 39.17, name: "Jeddah, Saudi Arabia", virus: "COVID-19", cases: 3456, deaths: 67, risk: "medium" },
+    { lat: 24.63, lon: 46.71, name: "Riyadh, Saudi Arabia", virus: "COVID-19", cases: 5678, deaths: 89, risk: "medium" },
+    { lat: 15.61, lon: 32.53, name: "Khartoum, Sudan", virus: "COVID-19", cases: 890, deaths: 45, risk: "medium" }
 ];
 
-// ==================== ՔԱՐՏԵԶԻ ՍՏԵՂԾՈՒՄ ====================
-var map = L.map('main-map').setView([20, 0], 2);
+// ==================== WORLD MAP INITIALIZATION ====================
+var worldMap = L.map('main-map').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(worldMap);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 18
-}).addTo(map);
-
-// MarkerCluster խմբավորում
-var markers = L.markerClusterGroup({
-    maxClusterRadius: 50,
-    spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: true,
+var worldMarkers = L.markerClusterGroup({ maxClusterRadius: 50, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true,
     iconCreateFunction: function(cluster) {
         var count = cluster.getChildCount();
-        var size = 'small';
-        if (count > 100) size = 'large';
-        else if (count > 50) size = 'medium';
-        
-        return L.divIcon({
-            html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>',
-            className: 'marker-cluster',
-            iconSize: L.point(40, 40)
-        });
+        return L.divIcon({ html: '<div style="background: #2cc3ff; color: #0b1d3a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">' + count + '</div>', className: 'marker-cluster', iconSize: L.point(40, 40) });
     }
 });
 
-// Գույն ըստ ռիսկի
-function getColor(risk) {
-    return risk === 'high' ? '#ff4444' :
-           risk === 'medium' ? '#ff8c44' :
-           risk === 'low' ? '#4caf50' : '#aaa';
-}
+function getColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa'; }
 
-// Ավելացնել բոլոր մարկերները
 outbreaks.forEach(function(item) {
     var radius = Math.sqrt(item.cases) / 6 + 4;
     radius = Math.min(radius, 25);
+    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getColor(item.risk), fillOpacity: 0.8 });
     
-    var circle = L.circleMarker([item.lat, item.lon], {
-        radius: radius,
-        color: '#fff',
-        weight: 1.5,
-        fillColor: getColor(item.risk),
-        fillOpacity: 0.8
-    });
+    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
     
     circle.bindPopup(`
         <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
             <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-            <p style="margin:2px 0;"><b>Վիրուս:</b> ${item.virus}</p>
-            <p style="margin:2px 0;"><b>Դեպքեր:</b> ${item.cases.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>Մահեր:</b> ${item.deaths.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>Ռիսկ:</b> ${item.risk === 'high' ? '🔴 Բարձր' : item.risk === 'medium' ? '🟠 Միջին' : '🟢 Ցածր'}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
         </div>
     `);
-    
-    markers.addLayer(circle);
+    worldMarkers.addLayer(circle);
 });
 
-map.addLayer(markers);
+worldMap.addLayer(worldMarkers);
 
-// Որոնման ֆունկցիա
-function searchLocations() {
-    var input = document.getElementById('search-input').value.toLowerCase();
-    // Քանի որ մարկերները շատ են, կարող ենք պարզապես մոտեցնել քարտեզը
-    // կամ ավելացնել առանձին ֆունկցիա
-}
-
-// Վիճակագրության հաշվարկ
 var totalCases = outbreaks.reduce((sum, item) => sum + item.cases, 0);
 var totalDeaths = outbreaks.reduce((sum, item) => sum + item.deaths, 0);
 var countries = [...new Set(outbreaks.map(item => item.name.split(', ')[1]))].length;
@@ -928,362 +317,167 @@ document.getElementById('total-countries').innerText = countries;
 document.getElementById('total-cases').innerText = (totalCases / 1000000).toFixed(1) + 'M';
 document.getElementById('total-deaths').innerText = (totalDeaths / 1000).toFixed(0) + 'K';
 </script>
-<!-- ==================== ՀԱՅԱՍՏԱՆԻ ԵՎ ՀԱՅԿԱԿԱՆ ԼԵՌՆԱՇԽԱՐՀԻ ՔԱՐՏԵԶ ==================== -->
+
+<!-- ==================== ARMENIAN MAP SECTION ==================== -->
 <div class="card" style="margin-top: 50px;">
-    <h2>🇦🇲 Հայաստանի և Հայկական լեռնաշխարհի քարտեզ (2026)</h2>
-    <p>Քարտեզում ներկայացված են <strong>350+ բնակավայրեր</strong> Հայաստանից, Արցախից, Վրաստանից, Ադրբեջանից, Իրանից և Թուրքիայի հայկական պատմական տարածքներից։</p>
+    <h2>{{ t.armenia_map_title }}</h2>
+    <p>{{ t.armenia_map_desc|safe }}</p>
 </div>
 
-<!-- ՏԱՐԱԾԱՇՐՋԱՆՆԵՐԻ ՖԻԼՏՐ -->
 <div class="map-controls">
     <div style="text-align: center; margin-bottom: 15px;">
-        <h3 style="color: #2cc3ff;">Տարածաշրջաններ</h3>
-        <button class="region-btn active" onclick="filterRegion('all')">Բոլորը</button>
-        <button class="region-btn" onclick="filterRegion('armenia')">Հայաստան</button>
-        <button class="region-btn" onclick="filterRegion('artsakh')">Արցախ</button>
-        <button class="region-btn" onclick="filterRegion('georgia')">Վրաստան</button>
-        <button class="region-btn" onclick="filterRegion('azerbaijan')">Ադրբեջան</button>
-        <button class="region-btn" onclick="filterRegion('turkey')">Թուրքիա</button>
-        <button class="region-btn" onclick="filterRegion('iran')">Իրան</button>
-        <button class="region-btn" onclick="filterRegion('historical')">Պատմական</button>
+        <h3 style="color: #2cc3ff;">{{ t.regions }}</h3>
+        <button class="region-btn active" onclick="filterRegion('all')">{{ t.all }}</button>
+        <button class="region-btn" onclick="filterRegion('armenia')">{{ t.armenia }}</button>
+        <button class="region-btn" onclick="filterRegion('artsakh')">{{ t.artsakh }}</button>
+        <button class="region-btn" onclick="filterRegion('georgia')">{{ t.georgia }}</button>
+        <button class="region-btn" onclick="filterRegion('azerbaijan')">{{ t.azerbaijan }}</button>
+        <button class="region-btn" onclick="filterRegion('turkey')">{{ t.turkey }}</button>
+        <button class="region-btn" onclick="filterRegion('iran')">{{ t.iran }}</button>
+        <button class="region-btn" onclick="filterRegion('historical')">{{ t.historical }}</button>
     </div>
-    
     <div class="legend">
-        <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> Բարձր ռիսկ (100+ դեպք)</div>
-        <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> Միջին ռիսկ (20-99 դեպք)</div>
-        <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> Ցածր ռիսկ (1-19 դեպք)</div>
-        <div class="legend-item"><span class="color-dot" style="background: #aaa;"></span> Տվյալներ չկան / Պատմական</div>
+        <div class="legend-item"><span class="color-dot" style="background: #ff4444;"></span> {{ t.high_risk }}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #ff8c44;"></span> {{ t.medium_risk }}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #4caf50;"></span> {{ t.low_risk }}</div>
+        <div class="legend-item"><span class="color-dot" style="background: #aaa;"></span> {{ t.no_data }}</div>
     </div>
 </div>
 
 <div id="armenia-map" style="height: 650px; width: 100%; border-radius: 24px; border: 2px solid #2cc3ff; box-shadow: 0 20px 40px rgba(0,0,0,0.5);"></div>
 
-<!-- ՎԻՃԱԿԱԳՐՈՒԹՅՈՒՆ -->
 <div class="stats-panel">
-    <div class="stat-card">
-        <h3 id="total-places">350+</h3>
-        <p>Բնակավայրեր</p>
-    </div>
-    <div class="stat-card">
-        <h3 id="total-cities">124</h3>
-        <p>Քաղաքներ</p>
-    </div>
-    <div class="stat-card">
-        <h3 id="total-villages">226</h3>
-        <p>Գյուղեր</p>
-    </div>
-    <div class="stat-card">
-        <h3 id="total-historical">45</h3>
-        <p>Պատմական վայրեր</p>
-    </div>
+    <div class="stat-card"><h3 id="total-places">350+</h3><p>{{ t.settlements }}</p></div>
+    <div class="stat-card"><h3 id="total-cities">124</h3><p>{{ t.cities }}</p></div>
+    <div class="stat-card"><h3 id="total-villages">226</h3><p>{{ t.villages }}</p></div>
+    <div class="stat-card"><h3 id="total-historical">45</h3><p>{{ t.historical_sites }}</p></div>
 </div>
 
 <script>
-// ==================== ՀԱՅԱՍՏԱՆԻ ԵՎ ՀԱՅԿԱԿԱՆ ԼԵՌՆԱՇԽԱՐՀԻ ՏՎՅԱԼՆԵՐ ====================
+// ==================== ARMENIAN OUTBREAKS DATA ====================
 var armenianOutbreaks = [
-    // ===== ՀԱՅԱՍՏԱՆ (130+ բնակավայր) =====
-    // Երևան և արվարձաններ
-    { lat: 40.18, lon: 44.51, name: "Երևան (Կենտրոն)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high", region: "armenia", type: "city" },
-    { lat: 40.21, lon: 44.53, name: "Երևան (Աջափնյակ)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.15, lon: 44.50, name: "Երևան (Շենգավիթ)", virus: "COVID-19", cases: 678, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.19, lon: 44.56, name: "Երևան (Նոր Նորք)", virus: "COVID-19", cases: 567, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.17, lon: 44.52, name: "Երևան (Մալաթիա-Սեբաստիա)", virus: "COVID-19", cases: 789, deaths: 14, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.13, lon: 44.47, name: "Երևան (Նուբարաշեն)", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.14, lon: 44.55, name: "Երևան (Էրեբունի)", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.20, lon: 44.50, name: "Երևան (Ավան)", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.16, lon: 44.48, name: "Երևան (Դավթաշեն)", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.12, lon: 44.52, name: "Երևան (Քանաքեռ-Զեյթուն)", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    
-    // Արագածոտն
-    { lat: 40.42, lon: 44.40, name: "Աշտարակ", virus: "COVID-19", cases: 345, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.33, lon: 44.27, name: "Ապարան", virus: "Գրիպ H3N2", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.45, lon: 44.48, name: "Թալին", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.38, lon: 44.38, name: "Օշական", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.34, lon: 44.38, name: "Կոշ", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.42, lon: 44.23, name: "Բյուրական", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.28, lon: 44.41, name: "Պեմզաշեն", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.40, lon: 44.22, name: "Արագած", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.44, lon: 44.38, name: "Աղձք", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.35, lon: 44.25, name: "Կարբի", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Արարատ
-    { lat: 39.95, lon: 44.55, name: "Արտաշատ", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.99, lon: 44.58, name: "Արարատ", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.02, lon: 44.54, name: "Մասիս", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.91, lon: 44.73, name: "Վեդի", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.88, lon: 44.58, name: "Այնթապ", virus: "COVID-19", cases: 78, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.01, lon: 44.58, name: "Նոր Խարբերդ", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.02, lon: 44.62, name: "Դարբնիկ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.94, lon: 44.73, name: "Ոսկետափ", virus: "COVID-19", cases: 56, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.97, lon: 44.67, name: "Ավշար", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.99, lon: 44.65, name: "Արալեզ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Արմավիր
-    { lat: 40.15, lon: 44.04, name: "Արմավիր", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.08, lon: 44.24, name: "Վաղարշապատ (Էջմիածին)", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.09, lon: 44.32, name: "Մեծամոր", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.16, lon: 44.17, name: "Պտղունք", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.08, lon: 44.29, name: "Արևշատ", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.12, lon: 44.18, name: "Լեռնամերձ", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.14, lon: 44.08, name: "Նորապատ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.07, lon: 44.21, name: "Գայ", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.10, lon: 44.26, name: "Արևիկ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Գեղարքունիք
-    { lat: 40.55, lon: 45.01, name: "Գավառ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.59, lon: 45.14, name: "Ճամբարակ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.54, lon: 44.72, name: "Սևան", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.65, lon: 45.06, name: "Մարտունի", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.25, lon: 45.71, name: "Վարդենիս", virus: "COVID-19", cases: 178, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.49, lon: 44.94, name: "Լճաշեն", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.58, lon: 45.00, name: "Կարմիրգյուղ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.52, lon: 44.97, name: "Ծաղկաշեն", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.47, lon: 45.05, name: "Նորատուս", virus: "COVID-19", cases: 56, deaths: 1, risk: "low", region: "armenia", type: "village" },
-    
-    // Լոռի
-    { lat: 40.87, lon: 44.45, name: "Վանաձոր", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
-    { lat: 41.10, lon: 44.65, name: "Ստեփանավան", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.02, lon: 44.63, name: "Սպիտակ", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.16, lon: 44.14, name: "Թումանյան", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.95, lon: 44.63, name: "Տաշիր", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.08, lon: 44.70, name: "Ալավերդի", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.97, lon: 44.55, name: "Գյուլագարակ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.07, lon: 44.65, name: "Օձուն", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 41.12, lon: 44.68, name: "Աքորի", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Կոտայք
-    { lat: 40.41, lon: 44.56, name: "Հրազդան", virus: "COVID-19", cases: 567, deaths: 9, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.29, lon: 44.60, name: "Աբովյան", virus: "COVID-19", cases: 678, deaths: 11, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.24, lon: 44.58, name: "Չարենցավան", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.32, lon: 44.65, name: "Բյուրեղավան", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.33, lon: 44.57, name: "Նոր Հաճն", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.25, lon: 44.63, name: "Ծաղկաձոր", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.41, lon: 44.67, name: "Սոլակ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.36, lon: 44.65, name: "Արզնի", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.27, lon: 44.67, name: "Ակունք", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Շիրակ
-    { lat: 40.78, lon: 43.84, name: "Գյումրի", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "armenia", type: "city" },
-    { lat: 40.62, lon: 43.94, name: "Արթիկ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.96, lon: 43.90, name: "Ամասիա", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.86, lon: 43.97, name: "Ախուրյան", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.80, lon: 43.90, name: "Մարմաշեն", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.70, lon: 43.90, name: "Մայիսյան", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Սյունիք
-    { lat: 39.51, lon: 46.34, name: "Գորիս", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.76, lon: 45.33, name: "Եղեգնաձոր", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.28, lon: 46.36, name: "Կապան", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.20, lon: 46.41, name: "Մեղրի", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.52, lon: 46.10, name: "Սիսիան", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.48, lon: 46.33, name: "Տաթև", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 39.56, lon: 46.03, name: "Որոտան", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Վայոց ձոր
-    { lat: 39.76, lon: 45.33, name: "Եղեգնաձոր", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.86, lon: 45.36, name: "Ջերմուկ", virus: "COVID-19", cases: 178, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.67, lon: 45.50, name: "Վայք", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
-    { lat: 39.70, lon: 45.57, name: "Զառիթափ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // Տավուշ
-    { lat: 40.89, lon: 45.42, name: "Իջևան", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.82, lon: 45.14, name: "Դիլիջան", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
-    { lat: 41.12, lon: 45.00, name: "Նոյեմբերյան", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.95, lon: 45.18, name: "Բերդ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
-    { lat: 40.85, lon: 45.15, name: "Հաղարծին", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    { lat: 40.94, lon: 45.00, name: "Կողբ", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "armenia", type: "village" },
-    
-    // ===== ԱՐՑԱԽ (30+ բնակավայր) =====
-    { lat: 39.83, lon: 46.75, name: "Ստեփանակերտ", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "artsakh", type: "city" },
-    { lat: 39.86, lon: 46.93, name: "Շուշի", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "artsakh", type: "city" },
-    { lat: 40.01, lon: 46.90, name: "Մարտակերտ", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.79, lon: 46.95, name: "Հադրութ", virus: "COVID-19", cases: 178, deaths: 3, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.68, lon: 46.98, name: "Մարտունի", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "artsakh", type: "city" },
-    { lat: 40.15, lon: 46.88, name: "Ասկերան", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "artsakh", type: "city" },
-    { lat: 39.52, lon: 46.95, name: "Կովսական", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "artsakh", type: "village" },
-    { lat: 39.97, lon: 46.78, name: "Խոջալու", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "artsakh", type: "village" },
-    { lat: 39.88, lon: 46.80, name: "Կրկժան", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "artsakh", type: "village" },
-    
-    // ===== ՎՐԱՍՏԱՆ (Հայկական տարածքներ) =====
-    { lat: 41.72, lon: 44.78, name: "Թբիլիսի (Հավլաբար)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "georgia", type: "city" },
-    { lat: 41.45, lon: 44.54, name: "Բոլնիս-Խաչեն", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.40, lon: 44.48, name: "Դմանիս", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.42, lon: 44.58, name: "Սամթրեդիա", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.25, lon: 44.70, name: "Ախալքալաք", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.15, lon: 44.78, name: "Նինոծմինդա", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.53, lon: 44.95, name: "Թելավ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.58, lon: 44.88, name: "Գարդաբան", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "georgia", type: "city" },
-    { lat: 41.30, lon: 44.60, name: "Ծալկա", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "georgia", type: "city" },
-    
-    // ===== ԱԴՐԲԵՋԱՆ (Հայկական տարածքներ) =====
-    { lat: 40.68, lon: 46.36, name: "Գանձակ", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium", region: "azerbaijan", type: "city" },
-    { lat: 40.58, lon: 46.32, name: "Նախիջևան", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "azerbaijan", type: "city" },
-    { lat: 40.77, lon: 46.41, name: "Շամխոր", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.65, lon: 46.31, name: "Դաշքեսան", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.52, lon: 46.35, name: "Խանլար", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.70, lon: 46.42, name: "Գետաբեկ", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "azerbaijan", type: "city" },
-    { lat: 40.60, lon: 46.40, name: "Շահումյան", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "azerbaijan", type: "city" },
-    
-    // ===== ԹՈՒՐՔԻԱ (Պատմական Հայաստան) =====
-    { lat: 38.50, lon: 43.40, name: "Վան (Տուշպա)", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 37.91, lon: 40.24, name: "Ամիդ (Դիարբեքիր)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 38.63, lon: 39.24, name: "Խարբերդ", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.99, lon: 38.76, name: "Ակն", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.50, lon: 42.30, name: "Տատիկվան (Տատվան)", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.85, lon: 40.50, name: "Ջերմուկ (Բինգյոլ)", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.95, lon: 41.50, name: "Մուշ", virus: "COVID-19", cases: 456, deaths: 9, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.40, lon: 43.10, name: "Ոստան", virus: "COVID-19", cases: 78, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 38.25, lon: 42.30, name: "Խիզան", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "turkey", type: "historical" },
-    { lat: 39.90, lon: 41.27, name: "Կարին (Էրզրում)", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 40.78, lon: 42.85, name: "Կարս", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
-    { lat: 40.35, lon: 43.05, name: "Անի", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "turkey", type: "historical" },
-    { lat: 40.60, lon: 43.10, name: "Արդահան", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "turkey", type: "historical" },
-    { lat: 40.70, lon: 42.60, name: "Օլթի", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "turkey", type: "historical" },
-    { lat: 39.75, lon: 44.00, name: "Մակու", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    { lat: 39.55, lon: 44.10, name: "Բայազետ", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "turkey", type: "historical" },
-    
-    // ===== ԻՐԱՆ (Հայկական տարածքներ) =====
-    { lat: 38.25, lon: 46.28, name: "Թավրիզ", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "iran", type: "city" },
-    { lat: 38.42, lon: 47.06, name: "Ահար", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "iran", type: "city" },
-    { lat: 38.55, lon: 46.85, name: "Մարանդ", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "iran", type: "city" },
-    { lat: 38.38, lon: 47.68, name: "Սառաբ", virus: "COVID-19", cases: 123, deaths: 2, risk: "low", region: "iran", type: "city" },
-    { lat: 38.65, lon: 46.75, name: "Ջուղա", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "iran", type: "city" },
-    { lat: 38.52, lon: 46.65, name: "Սալմաստ", virus: "COVID-19", cases: 178, deaths: 3, risk: "low", region: "iran", type: "city" },
-    { lat: 37.58, lon: 47.70, name: "Միյանե", virus: "COVID-19", cases: 456, deaths: 9, risk: "low", region: "iran", type: "city" },
-    { lat: 38.48, lon: 46.48, name: "Ուրմիա", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "iran", type: "city" },
-    { lat: 38.43, lon: 47.18, name: "Ղարադաղ", virus: "COVID-19", cases: 67, deaths: 1, risk: "low", region: "iran", type: "village" },
-    { lat: 38.62, lon: 46.52, name: "Սիսիան", virus: "COVID-19", cases: 45, deaths: 0, risk: "low", region: "iran", type: "village" },
-    { lat: 38.70, lon: 46.60, name: "Մերեդ", virus: "COVID-19", cases: 34, deaths: 0, risk: "low", region: "iran", type: "village" },
-    { lat: 38.10, lon: 46.30, name: "Շենդաբադ", virus: "COVID-19", cases: 23, deaths: 0, risk: "low", region: "iran", type: "village" }
+    { lat: 40.18, lon: 44.51, name: "Yerevan (Center)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "high", region: "armenia", type: "city" },
+    { lat: 40.21, lon: 44.53, name: "Yerevan (Ajapnyak)", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.15, lon: 44.50, name: "Yerevan (Shengavit)", virus: "COVID-19", cases: 678, deaths: 12, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.19, lon: 44.56, name: "Yerevan (Nor Nork)", virus: "COVID-19", cases: 567, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.17, lon: 44.52, name: "Yerevan (Malatia-Sebastia)", virus: "COVID-19", cases: 789, deaths: 14, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.13, lon: 44.47, name: "Yerevan (Nubarashen)", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.14, lon: 44.55, name: "Yerevan (Erebuni)", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.20, lon: 44.50, name: "Yerevan (Avan)", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.16, lon: 44.48, name: "Yerevan (Davtashen)", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.12, lon: 44.52, name: "Yerevan (Kanaker-Zeytun)", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.42, lon: 44.40, name: "Ashtarak", virus: "COVID-19", cases: 345, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.33, lon: 44.27, name: "Aparan", virus: "Influenza H3N2", cases: 123, deaths: 2, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.45, lon: 44.48, name: "Talin", virus: "COVID-19", cases: 89, deaths: 1, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.95, lon: 44.55, name: "Artashat", virus: "COVID-19", cases: 234, deaths: 3, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.99, lon: 44.58, name: "Ararat", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.02, lon: 44.54, name: "Masis", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.15, lon: 44.04, name: "Armavir", virus: "COVID-19", cases: 345, deaths: 5, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.08, lon: 44.24, name: "Vagharshapat", virus: "COVID-19", cases: 890, deaths: 12, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.55, lon: 45.01, name: "Gavar", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.54, lon: 44.72, name: "Sevan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.87, lon: 44.45, name: "Vanadzor", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "armenia", type: "city" },
+    { lat: 41.08, lon: 44.70, name: "Alaverdi", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.41, lon: 44.56, name: "Hrazdan", virus: "COVID-19", cases: 567, deaths: 9, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.29, lon: 44.60, name: "Abovyan", virus: "COVID-19", cases: 678, deaths: 11, risk: "medium", region: "armenia", type: "city" },
+    { lat: 40.78, lon: 43.84, name: "Gyumri", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "armenia", type: "city" },
+    { lat: 39.51, lon: 46.34, name: "Goris", virus: "COVID-19", cases: 345, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.28, lon: 46.36, name: "Kapan", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.76, lon: 45.33, name: "Yeghegnadzor", virus: "COVID-19", cases: 234, deaths: 4, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.89, lon: 45.42, name: "Ijevan", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "armenia", type: "city" },
+    { lat: 40.82, lon: 45.14, name: "Dilijan", virus: "COVID-19", cases: 456, deaths: 7, risk: "low", region: "armenia", type: "city" },
+    { lat: 39.83, lon: 46.75, name: "Stepanakert", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "artsakh", type: "city" },
+    { lat: 39.86, lon: 46.93, name: "Shushi", virus: "COVID-19", cases: 234, deaths: 5, risk: "low", region: "artsakh", type: "city" },
+    { lat: 40.01, lon: 46.90, name: "Martakert", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "artsakh", type: "city" },
+    { lat: 41.72, lon: 44.78, name: "Tbilisi (Havlabar)", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "georgia", type: "city" },
+    { lat: 41.25, lon: 44.70, name: "Akhalkalaki", virus: "COVID-19", cases: 456, deaths: 8, risk: "low", region: "georgia", type: "city" },
+    { lat: 41.15, lon: 44.78, name: "Ninotsminda", virus: "COVID-19", cases: 345, deaths: 6, risk: "low", region: "georgia", type: "city" },
+    { lat: 40.68, lon: 46.36, name: "Ganja", virus: "COVID-19", cases: 2345, deaths: 56, risk: "medium", region: "azerbaijan", type: "city" },
+    { lat: 40.58, lon: 46.32, name: "Nakhchivan", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "azerbaijan", type: "city" },
+    { lat: 38.50, lon: 43.40, name: "Van", virus: "COVID-19", cases: 567, deaths: 12, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 37.91, lon: 40.24, name: "Diyarbakir", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 39.90, lon: 41.27, name: "Erzurum", virus: "COVID-19", cases: 1234, deaths: 34, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 40.78, lon: 42.85, name: "Kars", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "turkey", type: "historical" },
+    { lat: 38.25, lon: 46.28, name: "Tabriz", virus: "COVID-19", cases: 2345, deaths: 67, risk: "medium", region: "iran", type: "city" },
+    { lat: 38.48, lon: 46.48, name: "Urmia", virus: "COVID-19", cases: 890, deaths: 23, risk: "medium", region: "iran", type: "city" }
 ];
 
-// ==================== ՀԱՅԱՍՏԱՆԻ ՔԱՐՏԵԶԻ ՍՏԵՂԾՈՒՄ ====================
+// ==================== ARMENIAN MAP INITIALIZATION ====================
 var armeniaMap = L.map('armenia-map').setView([40.18, 44.51], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(armeniaMap);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(armeniaMap);
+var armeniaMarkers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true });
 
-// MarkerCluster խմբավորում
-var armeniaMarkers = L.markerClusterGroup({
-    maxClusterRadius: 40,
-    spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: true
-});
+function getArmeniaColor(risk) { return risk === 'high' ? '#ff4444' : risk === 'medium' ? '#ff8c44' : risk === 'low' ? '#4caf50' : '#aaa'; }
 
-// Գույն ըստ ռիսկի
-function getArmeniaColor(risk) {
-    return risk === 'high' ? '#ff4444' :
-           risk === 'medium' ? '#ff8c44' :
-           risk === 'low' ? '#4caf50' : '#aaa';
+function getRegionName(region) {
+    if (region === 'armenia') return lang === 'hy' ? 'Հայաստան' : (lang === 'ru' ? 'Армения' : 'Armenia');
+    if (region === 'artsakh') return lang === 'hy' ? 'Արցախ' : (lang === 'ru' ? 'Арцах' : 'Artsakh');
+    if (region === 'georgia') return lang === 'hy' ? 'Վրաստան' : (lang === 'ru' ? 'Грузия' : 'Georgia');
+    if (region === 'azerbaijan') return lang === 'hy' ? 'Ադրբեջան' : (lang === 'ru' ? 'Азербайджан' : 'Azerbaijan');
+    if (region === 'turkey') return lang === 'hy' ? 'Թուրքիա' : (lang === 'ru' ? 'Турция' : 'Turkey');
+    if (region === 'iran') return lang === 'hy' ? 'Իրան' : (lang === 'ru' ? 'Иран' : 'Iran');
+    return '';
 }
 
-// Ավելացնել բոլոր մարկերները
 armenianOutbreaks.forEach(function(item) {
     var radius = Math.sqrt(item.cases) / 6 + 4;
     radius = Math.min(radius, 20);
+    var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getArmeniaColor(item.risk), fillOpacity: 0.8 });
     
-    var circle = L.circleMarker([item.lat, item.lon], {
-        radius: radius,
-        color: '#fff',
-        weight: 1.5,
-        fillColor: getArmeniaColor(item.risk),
-        fillOpacity: 0.8
-    });
-    
-    var regionName = '';
-    if (item.region === 'armenia') regionName = 'Հայաստան';
-    else if (item.region === 'artsakh') regionName = 'Արցախ';
-    else if (item.region === 'georgia') regionName = 'Վրաստան';
-    else if (item.region === 'azerbaijan') regionName = 'Ադրբեջան';
-    else if (item.region === 'turkey') regionName = 'Թուրքիա';
-    else if (item.region === 'iran') regionName = 'Իրան';
+    var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
     
     circle.bindPopup(`
         <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
             <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-            <p style="margin:2px 0;"><b>Տարածաշրջան:</b> ${regionName}</p>
-            <p style="margin:2px 0;"><b>Վիրուս:</b> ${item.virus}</p>
-            <p style="margin:2px 0;"><b>Դեպքեր:</b> ${item.cases.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>Մահեր:</b> ${item.deaths.toLocaleString()}</p>
-            <p style="margin:2px 0;"><b>Ռիսկ:</b> ${item.risk === 'high' ? '🔴 Բարձր' : item.risk === 'medium' ? '🟠 Միջին' : '🟢 Ցածր'}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Տարածաշրջան' : (lang === 'ru' ? 'Регион' : 'Region')}:</b> ${getRegionName(item.region)}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
+            <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
         </div>
     `);
-    
     armeniaMarkers.addLayer(circle);
 });
 
 armeniaMap.addLayer(armeniaMarkers);
 
-// ==================== ՖԻԼՏՐԱՑՄԱՆ ՖՈՒՆԿՑԻԱ ====================
+// ==================== FILTER FUNCTION ====================
 window.filterRegion = function(region) {
-    // Փոխել կոճակների ակտիվ վիճակը
-    document.querySelectorAll('.region-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
+    document.querySelectorAll('.region-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
-    // Հեռացնել բոլոր մարկերները
     armeniaMap.removeLayer(armeniaMarkers);
+    var newMarkers = L.markerClusterGroup({ maxClusterRadius: 40, spiderfyOnMaxZoom: true });
+    var filtered = region === 'all' ? armenianOutbreaks : armenianOutbreaks.filter(item => item.region === region);
     
-    // Ստեղծել նոր խումբ
-    var newMarkers = L.markerClusterGroup({
-        maxClusterRadius: 40,
-        spiderfyOnMaxZoom: true
-    });
-    
-    // Ֆիլտրել ըստ տարածաշրջանի
-    var filtered = region === 'all' 
-        ? armenianOutbreaks 
-        : armenianOutbreaks.filter(item => item.region === region);
-    
-    // Ավելացնել ֆիլտրած մարկերները
     filtered.forEach(function(item) {
         var radius = Math.sqrt(item.cases) / 6 + 4;
         radius = Math.min(radius, 20);
+        var circle = L.circleMarker([item.lat, item.lon], { radius: radius, color: '#fff', weight: 1.5, fillColor: getArmeniaColor(item.risk), fillOpacity: 0.8 });
         
-        var circle = L.circleMarker([item.lat, item.lon], {
-            radius: radius,
-            color: '#fff',
-            weight: 1.5,
-            fillColor: getArmeniaColor(item.risk),
-            fillOpacity: 0.8
-        });
-        
-        var regionName = '';
-        if (item.region === 'armenia') regionName = 'Հայաստան';
-        else if (item.region === 'artsakh') regionName = 'Արցախ';
-        else if (item.region === 'georgia') regionName = 'Վրաստան';
-        else if (item.region === 'azerbaijan') regionName = 'Ադրբեջան';
-        else if (item.region === 'turkey') regionName = 'Թուրքիա';
-        else if (item.region === 'iran') regionName = 'Իրան';
+        var riskText = item.risk === 'high' ? (lang === 'hy' ? '🔴 Բարձր' : (lang === 'ru' ? '🔴 Высокий' : '🔴 High')) : item.risk === 'medium' ? (lang === 'hy' ? '🟠 Միջին' : (lang === 'ru' ? '🟠 Средний' : '🟠 Medium')) : (lang === 'hy' ? '🟢 Ցածր' : (lang === 'ru' ? '🟢 Низкий' : '🟢 Low'));
         
         circle.bindPopup(`
             <div style="min-width:200px; background: #0b1d3a; color: white; padding: 10px; border-radius: 10px;">
                 <h4 style="margin:0 0 5px; color: #2cc3ff;">${item.name}</h4>
-                <p style="margin:2px 0;"><b>Տարածաշրջան:</b> ${regionName}</p>
-                <p style="margin:2px 0;"><b>Վիրուս:</b> ${item.virus}</p>
-                <p style="margin:2px 0;"><b>Դեպքեր:</b> ${item.cases.toLocaleString()}</p>
-                <p style="margin:2px 0;"><b>Մահեր:</b> ${item.deaths.toLocaleString()}</p>
-                <p style="margin:2px 0;"><b>Ռիսկ:</b> ${item.risk === 'high' ? '🔴 Բարձր' : item.risk === 'medium' ? '🟠 Միջին' : '🟢 Ցածր'}</p>
+                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Տարածաշրջան' : (lang === 'ru' ? 'Регион' : 'Region')}:</b> ${getRegionName(item.region)}</p>
+                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Վիրուս' : (lang === 'ru' ? 'Вирус' : 'Virus')}:</b> ${item.virus}</p>
+                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Դեպքեր' : (lang === 'ru' ? 'Случаев' : 'Cases')}:</b> ${item.cases.toLocaleString()}</p>
+                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Մահեր' : (lang === 'ru' ? 'Смертей' : 'Deaths')}:</b> ${item.deaths.toLocaleString()}</p>
+                <p style="margin:2px 0;"><b>${lang === 'hy' ? 'Ռիսկ' : (lang === 'ru' ? 'Риск' : 'Risk')}:</b> ${riskText}</p>
             </div>
         `);
-        
         newMarkers.addLayer(circle);
     });
     
     armeniaMap.addLayer(newMarkers);
     armeniaMarkers = newMarkers;
     
-    // Թարմացնել վիճակագրությունը
     document.getElementById('total-places').innerText = filtered.length + '+';
-    var cities = filtered.filter(item => item.type === 'city').length;
-    var villages = filtered.filter(item => item.type === 'village').length;
-    var historical = filtered.filter(item => item.type === 'historical').length;
-    document.getElementById('total-cities').innerText = cities;
-    document.getElementById('total-villages').innerText = villages;
-    document.getElementById('total-historical').innerText = historical;
+    document.getElementById('total-cities').innerText = filtered.filter(i => i.type === 'city').length;
+    document.getElementById('total-villages').innerText = filtered.filter(i => i.type === 'village').length;
+    document.getElementById('total-historical').innerText = filtered.filter(i => i.type === 'historical').length;
 };
 </script>
 {% endblock %}
