@@ -209,6 +209,11 @@ def quiz_choice():
 def quiz(level):
     return render_template("quiz.html", level=level)
 
+@app.context_processor
+def inject_lang():
+    lang = get_lang()  # կամ ցանկացած ֆունկցիա, որը վերադարձնում է ընթացիկ լեզուն
+    return {'lang': lang}
+
 @app.route("/leaderboard")
 def show_leaderboard():
     scores = Score.query.order_by(Score.percent.desc(), Score.score.desc()).limit(50).all()
