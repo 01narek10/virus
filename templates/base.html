@@ -32,6 +32,49 @@
     </script>
     {% block extra_head %}{% endblock %}
     <style>
+            /* DEFAULT DARK THEME (այն, ինչ հիմա ունես) */
+:root {
+    --bg-primary: #0b1d3a;
+    --bg-secondary: #06142d;
+    --card-bg: rgba(6,20,45,0.8);
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #2cc3ff;
+    --button-bg: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+}
+
+/* LIGHT THEME */
+[data-theme="light"] {
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #ffffff;
+    --card-bg: rgba(255,255,255,0.95);
+    --text-primary: #0b1d3a;
+    --text-secondary: #2c3e50;
+    --border-color: #0b5e7e;
+    --button-bg: linear-gradient(135deg, #0b5e7e, #0a4a64);
+}
+
+/* Կիրառել փոփոխականները ամբողջ կայքում */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card, .simulator-container, .quiz-card, .compare-card {
+    background: var(--card-bg) !important;
+    color: var(--text-primary);
+}
+
+/* Այլ տարրեր, որոնք պետք է փոխվեն */
+.navbar, footer {
+    background-color: var(--bg-secondary);
+}
+
+.btn-primary {
+    background: var(--button-bg) !important;
+    color: var(--bg-primary) !important;
+}
         /* CHATBOT */
         .chatbot-button {
             position: fixed;
@@ -258,6 +301,10 @@
     <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
 
+<button id="themeToggle" class="theme-toggle" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 15px; vertical-align: middle;">
+    🌙
+</button>
+        
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
@@ -514,6 +561,33 @@ function sendMessage() {
         addMessage(errorText, 'bot');
     });
 }
+
+        // ==================== DARK/LIGHT MODE ====================
+const themeToggle = document.getElementById('themeToggle');
+const currentTheme = localStorage.getItem('theme') || 'dark'; // լռելյայն մութ
+
+// Կիրառել պահպանված թեման
+if (currentTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    themeToggle.textContent = '☀️';
+} else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeToggle.textContent = '🌙';
+}
+
+// Կոճակի աշխատանքը
+themeToggle.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '☀️';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '🌙';
+    }
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
