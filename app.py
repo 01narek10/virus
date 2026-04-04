@@ -178,7 +178,7 @@ translations = {
         'compare': '🔍 Համեմատել',
         # Footer
         'footer': '© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են',
-        'footer_update': 'Տվյալները թարմացվել են՝ 2026 մարտի 7',
+        'footer_update': 'Տվյալները թարմացվել են՝ 2026 ապրիլի 4',
         # Hero
         'hero_title': '🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ',
         'hero_subtitle': 'Բացահայտիր անտեսանելի թշնամուն. 2026 թվականի ամենաթարմ տվյալներ',
@@ -303,7 +303,7 @@ translations = {
         'simulator': '🧬 Симулятор',
         'compare': '🔍 Сравнить',
         'footer': '© 2026 Платформа изучения вирусов | Все права защищены',
-        'footer_update': 'Данные обновлены: 7 марта 2026',
+        'footer_update': 'Данные обновлены: 4 апреля 2026',
         'hero_title': '🦠 МИР ВИРУСОВ',
         'hero_subtitle': 'Открой невидимого врага. Самые свежие данные 2026 года',
         'hero_stat1': 'Вирусов человека',
@@ -415,7 +415,7 @@ translations = {
         'simulator': '🧬 Simulator',
         'compare': '🔍 Compare',
         'footer': '© 2026 Virus Study Platform | All rights reserved',
-        'footer_update': 'Data updated: March 7, 2026',
+        'footer_update': 'Data updated: April 4, 2026',
         'hero_title': '🦠 WORLD OF VIRUSES',
         'hero_subtitle': 'Discover the invisible enemy. Latest data for 2026',
         'hero_stat1': 'Human viruses',
