@@ -603,7 +603,7 @@ themeToggle.addEventListener('click', () => {
     let mouseX = null, mouseY = null;
     
     // Պարամետրեր
-    const PARTICLE_COUNT = 80;
+    const PARTICLE_COUNT = 15;
     const MAX_RADIUS = 35;
     const MIN_RADIUS = 8;
     
@@ -701,9 +701,9 @@ themeToggle.addEventListener('click', () => {
             const x = Math.random() * (width - radius * 2) + radius;
             const y = Math.random() * (height - radius * 2) + radius;
             const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-            const speedX = (Math.random() - 0.5) * 0.6;
-            const speedY = (Math.random() - 0.5) * 0.6;
-            const pulseSpeed = 0.02 + Math.random() * 0.04;
+            const speedX = (Math.random() - 0.5) * 2;
+            const speedY = (Math.random() - 0.5) * 1․5;
+            const pulseSpeed = 0.02 + Math.random() * 0.10;
             particles.push(new AnimatedParticle(x, y, radius, color, speedX, speedY, pulseSpeed));
         }
     }
