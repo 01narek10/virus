@@ -291,7 +291,9 @@ translations = {
         'next': 'Հաջորդ ▶',
         'finish': '✔ Ավարտել',
         'result': 'Արդյունք',
-        'quarantine': '🔒 Կարանտին (նվազեցնում է վարակումը 50%)'
+        'quarantine': '🔒 Կարանտին (նվազեցնում է վարակումը 50%)',
+        'share_title': '📢 Կիսվել',
+        'share_text': 'Ստուգեք այս հիանալի կայքը՝ վիրուսների մասին'
     },
     'ru': {
         'home': '🏠 Главная',
@@ -402,6 +404,8 @@ translations = {
         'finish': '✔ Закончить',
         'result': 'Результаты',
         'quarantine': '🔒 Карантин (снижает заражение на 50%)',
+        'share_title': '📢 Поделиться',
+        'share_text': 'Посмотрите этот отличный сайт о вирусах'
     },
     'en': {
         'home': '🏠 Home',
@@ -511,7 +515,9 @@ translations = {
         'next': 'Next ▶',
         'finish': '✔ Finish',
         'result': 'Result',
-        'quarantine': '🔒 Quarantine (reduces infection by 50%)'
+        'quarantine': '🔒 Quarantine (reduces infection by 50%)',
+        'share_title': '📢 Share',
+        'share_text': 'Check out this great website about viruses'
     }
 }
 
