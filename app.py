@@ -508,7 +508,8 @@ translations = {
         'prev': '◀ Previous',
         'next': 'Next ▶',
         'finish': '✔ Finish',
-        'result': 'Result'
+        'result': 'Result',
+        'quarantine': '🔒 Կարանտին (նվազեցնում է վարակումը 50%)'
     }
 }
 
