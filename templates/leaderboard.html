@@ -22,7 +22,7 @@
             <tr style="border-bottom: 1px solid rgba(44,195,255,0.3);">
                 <td style="padding: 12px; text-align: center; color: white;">{{ loop.index }}</td>
                 <td style="padding: 12px; text-align: center; color: white;">{{ score.name }}</td>
-                <td style="padding: 12px; text-align: center; color: white;">{{ score.level_display }}</td>
+                <td style="padding: 12px; text-align: center; color: white;"> {% if score.level == 'very_easy' %} {% if lang == 'hy' %}Շատ հեշտ{% elif lang == 'ru' %}Очень легкий {% else %}Very Easy{% endif %} {% elif score.level == 'easy' %} {% if lang == 'hy' %} Հեշտ {% elif lang == 'ru' %}Легкий {% else %}Easy{% endif %} {% elif score.level == 'medium' %} {% if lang == 'hy' %}Միջին {% elif lang == 'ru' %}Средний {% else %}Medium{% endif %} {% elif score.level == 'hard' %} {% if lang == 'hy' %}Բարդ {% elif lang == 'ru' %}Сложный {% else %}Hard{% endif %} {% elif score.level == 'very_hard' %} {% if lang == 'hy' %}Շատ բարդ {% elif lang == 'ru' %}Очень сложный {% else %}Very Hard{% endif %} {% endif %}</td>
                 <td style="padding: 12px; text-align: center; color: white;">{{ score.score }}/{{ score.total }}</td>
                 <td style="padding: 12px; text-align: center; color: white;">{{ score.percent }}%</td>
                 <td style="padding: 12px; text-align: center; color: white;">{{ score.date }}</td>
