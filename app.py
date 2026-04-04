@@ -81,39 +81,69 @@ questions_db = {
 # ===== VIRUS DATA FOR COMPARE =====
 virus_data = {
     'covid19': {
-        'name': 'COVID-19', 'full_name': 'SARS-CoV-2', 'type': 'ՌՆԹ վիրուս',
-        'discovery': '2019', 'transmission': 'Օդակաթիլային', 'mortality': '2-3%',
-        'vaccine': '✅ Կա', 'symptoms': 'Ջերմություն, հազ, շնչառության դժվարություն',
+        'name': {'hy': 'COVID-19', 'ru': 'COVID-19', 'en': 'COVID-19'},
+        'full_name': {'hy': 'SARS-CoV-2', 'ru': 'SARS-CoV-2', 'en': 'SARS-CoV-2'},
+        'type': {'hy': 'ՌՆԹ վիրուս', 'ru': 'РНК-вирус', 'en': 'RNA virus'},
+        'discovery': {'hy': '2019', 'ru': '2019', 'en': '2019'},
+        'transmission': {'hy': 'Օդակաթիլային', 'ru': 'Воздушно-капельный', 'en': 'Airborne'},
+        'mortality': {'hy': '2-3%', 'ru': '2-3%', 'en': '2-3%'},
+        'vaccine': {'hy': '✅ Կա', 'ru': '✅ Есть', 'en': '✅ Yes'},
+        'symptoms': {'hy': 'Ջերմություն, հազ, շնչառության դժվարություն', 'ru': 'Лихорадка, кашель, затрудненное дыхание', 'en': 'Fever, cough, difficulty breathing'},
         'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/SARS-CoV-2_%28CDC-23312%29.png/500px-SARS-CoV-2_%28CDC-23312%29.png'
     },
     'ebola': {
-        'name': 'Էբոլա', 'full_name': 'Ebola virus', 'type': 'ՌՆԹ վիրուս',
-        'discovery': '1976', 'transmission': 'Արյան միջոցով', 'mortality': '50-90%',
-        'vaccine': '✅ Կա', 'symptoms': 'Արյունահոսություն, ջերմություն',
+        'name': {'hy': 'Էբոլա', 'ru': 'Эбола', 'en': 'Ebola'},
+        'full_name': {'hy': 'Ebola virus', 'ru': 'Вирус Эбола', 'en': 'Ebola virus'},
+        'type': {'hy': 'ՌՆԹ վիրուս', 'ru': 'РНК-вирус', 'en': 'RNA virus'},
+        'discovery': {'hy': '1976', 'ru': '1976', 'en': '1976'},
+        'transmission': {'hy': 'Արյան միջոցով', 'ru': 'Через кровь', 'en': 'Blood transmission'},
+        'mortality': {'hy': '50-90%', 'ru': '50-90%', 'en': '50-90%'},
+        'vaccine': {'hy': '✅ Կա', 'ru': '✅ Есть', 'en': '✅ Yes'},
+        'symptoms': {'hy': 'Արյունահոսություն, ջերմություն', 'ru': 'Кровотечение, лихорадка', 'en': 'Bleeding, fever'},
         'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg'
     },
     'hiv': {
-        'name': 'ՄԻԱՎ', 'full_name': 'HIV', 'type': 'ՌՆԹ վիրուս',
-        'discovery': '1983', 'transmission': 'Արյուն, սեռական', 'mortality': 'Բարձր',
-        'vaccine': '❌ Չկա', 'symptoms': 'Իմունային անբավարարություն',
+        'name': {'hy': 'ՄԻԱՎ', 'ru': 'ВИЧ', 'en': 'HIV'},
+        'full_name': {'hy': 'Human Immunodeficiency Virus', 'ru': 'Вирус иммунодефицита человека', 'en': 'Human Immunodeficiency Virus'},
+        'type': {'hy': 'ՌՆԹ վիրուս', 'ru': 'РНК-вирус', 'en': 'RNA virus'},
+        'discovery': {'hy': '1983', 'ru': '1983', 'en': '1983'},
+        'transmission': {'hy': 'Արյուն, սեռական', 'ru': 'Кровь, половой', 'en': 'Blood, sexual'},
+        'mortality': {'hy': 'Բարձր', 'ru': 'Высокая', 'en': 'High'},
+        'vaccine': {'hy': '❌ Չկա', 'ru': '❌ Нет', 'en': '❌ No'},
+        'symptoms': {'hy': 'Իմունային անբավարարություն', 'ru': 'Иммунодефицит', 'en': 'Immunodeficiency'},
         'image': 'https://upload.wikimedia.org/wikipedia/commons/1/1a/HIV-budding-Color.jpg'
     },
     'flu': {
-        'name': 'Գրիպ', 'full_name': 'Influenza', 'type': 'ՌՆԹ վիրուս',
-        'discovery': '1933', 'transmission': 'Օդակաթիլային', 'mortality': '0.1%',
-        'vaccine': '✅ Կա', 'symptoms': 'Ջերմություն, հազ, մկանացավ',
+        'name': {'hy': 'Գրիպ', 'ru': 'Грипп', 'en': 'Flu'},
+        'full_name': {'hy': 'Influenza virus', 'ru': 'Вирус гриппа', 'en': 'Influenza virus'},
+        'type': {'hy': 'ՌՆԹ վիրուս', 'ru': 'РНК-вирус', 'en': 'RNA virus'},
+        'discovery': {'hy': '1933', 'ru': '1933', 'en': '1933'},
+        'transmission': {'hy': 'Օդակաթիլային', 'ru': 'Воздушно-капельный', 'en': 'Airborne'},
+        'mortality': {'hy': '0.1%', 'ru': '0.1%', 'en': '0.1%'},
+        'vaccine': {'hy': '✅ Կա', 'ru': '✅ Есть', 'en': '✅ Yes'},
+        'symptoms': {'hy': 'Ջերմություն, հազ, մկանացավ', 'ru': 'Лихорадка, кашель, мышечная боль', 'en': 'Fever, cough, muscle pain'},
         'image': 'https://upload.wikimedia.org/wikipedia/commons/3/32/H1N1_Influenza_Virus_Particles_%288411599236%29.jpg'
     },
     'rotavirus': {
-        'name': 'Ռոտավիրուս', 'full_name': 'Rotavirus', 'type': 'ՌՆԹ վիրուս',
-        'discovery': '1973', 'transmission': 'Ֆեկալ-օրալ', 'mortality': '0.1%',
-        'vaccine': '✅ Կա', 'symptoms': 'Լուծ, փսխում, ջերմություն',
+        'name': {'hy': 'Ռոտավիրուս', 'ru': 'Ротавирус', 'en': 'Rotavirus'},
+        'full_name': {'hy': 'Rotavirus', 'ru': 'Ротавирус', 'en': 'Rotavirus'},
+        'type': {'hy': 'ՌՆԹ վիրուս', 'ru': 'РНК-вирус', 'en': 'RNA virus'},
+        'discovery': {'hy': '1973', 'ru': '1973', 'en': '1973'},
+        'transmission': {'hy': 'Ֆեկալ-օրալ', 'ru': 'Фекально-оральный', 'en': 'Fecal-oral'},
+        'mortality': {'hy': '0.1%', 'ru': '0.1%', 'en': '0.1%'},
+        'vaccine': {'hy': '✅ Կա', 'ru': '✅ Есть', 'en': '✅ Yes'},
+        'symptoms': {'hy': 'Լուծ, փսխում, ջերմություն', 'ru': 'Диарея, рвота, лихорадка', 'en': 'Diarrhea, vomiting, fever'},
         'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Rotavirus.jpg'
     },
     'adenovirus': {
-        'name': 'Ադենովիրուս', 'full_name': 'Adenovirus', 'type': 'ԴՆԹ վիրուս',
-        'discovery': '1953', 'transmission': 'Օդակաթիլային', 'mortality': '<1%',
-        'vaccine': '✅ Կա', 'symptoms': 'Մրսածություն, կոկորդի ցավ',
+        'name': {'hy': 'Ադենովիրուս', 'ru': 'Аденовирус', 'en': 'Adenovirus'},
+        'full_name': {'hy': 'Adenovirus', 'ru': 'Аденовирус', 'en': 'Adenovirus'},
+        'type': {'hy': 'ԴՆԹ վիրուս', 'ru': 'ДНК-вирус', 'en': 'DNA virus'},
+        'discovery': {'hy': '1953', 'ru': '1953', 'en': '1953'},
+        'transmission': {'hy': 'Օդակաթիլային', 'ru': 'Воздушно-капельный', 'en': 'Airborne'},
+        'mortality': {'hy': '<1%', 'ru': '<1%', 'en': '<1%'},
+        'vaccine': {'hy': '✅ Կա', 'ru': '✅ Есть', 'en': '✅ Yes'},
+        'symptoms': {'hy': 'Մրսածություն, կոկորդի ցավ', 'ru': 'Простуда, боль в горле', 'en': 'Cold, sore throat'},
         'image': 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Adenovirus_transmission_electron_micrograph_B82-0142_lores.jpg'
     }
 }
