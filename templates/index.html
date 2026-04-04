@@ -378,34 +378,14 @@
         {% elif lang == 'ru' %}📜 Самые смертоносные пандемии в истории (до н.э. - 2023)
         {% else %}📜 Deadliest pandemics in history (BC - 2023){% endif %}
     </h2>
-    <div class="timeline">
-        <div class="timeline-item"><div class="timeline-year">430-426 BC</div><div class="timeline-content"><h3>
-            {% if lang == 'hy' %}Աթենքի ժանտախտ
-            {% elif lang == 'ru' %}Чума Афин
-            {% else %}Plague of Athens{% endif %}
-        </h3><p>💀 75,000-100,000 victims (25% of Athens population)</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">165-180</div><div class="timeline-content"><h3>
-            {% if lang == 'hy' %}Անտոնինյան ժանտախտ
-            {% elif lang == 'ru' %}Антонинова чума
-            {% else %}Antonine Plague{% endif %}
-        </h3><p>💀 5-10 million victims</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">541-542</div><div class="timeline-content"><h3>
-            {% if lang == 'hy' %}Հուստինիանոսի ժանտախտ
-            {% elif lang == 'ru' %}Чума Юстиниана
-            {% else %}Plague of Justinian{% endif %}
-        </h3><p>💀 25-50 million victims (15-25% of world population)</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">1347-1351</div><div class="timeline-content"><h3>
-            {% if lang == 'hy' %}Սև մահ
-            {% elif lang == 'ru' %}Черная смерть
-            {% else %}Black Death{% endif %}
-        </h3><p>💀 75-200 million victims (30-60% of Europe population)</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">1918-1920</div><div class="timeline-content"><h3>
-            {% if lang == 'hy' %}Իսպանական գրիպ (H1N1)
-            {% elif lang == 'ru' %}Испанский грипп (H1N1)
-            {% else %}Spanish Flu (H1N1){% endif %}
-        </h3><p>💀 50-100 million victims (3-5% of world population)</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">1981-present</div><div class="timeline-content"><h3>HIV/AIDS</h3><p>💀 40+ million victims. 38 million people living with HIV</p></div></div>
-        <div class="timeline-item"><div class="timeline-year">2019-2023</div><div class="timeline-content"><h3>COVID-19</h3><p>💀 7+ million victims, 700+ million cases</p></div></div>
-    </div>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-year">430-426 BC</div><div class="timeline-content"><h3>{% if lang == 'hy' %}Աթենքի ժանտախտ{% elif lang == 'ru' %}Чума Афин{% else %}Plague of Athens{% endif %}</h3><p>💀 {% if lang == 'hy' %}75,000-100,000 զոհ (Աթենքի բնակչության 25%-ը){% elif lang == 'ru' %}75,000-100,000 жертв (25% населения Афин){% else %}75,000-100,000 victims (25% of Athens population){% endif %}</p></div></div>
+    <div class="timeline-item"><div class="timeline-year">165-180</div><div class="timeline-content"><h3>{% if lang == 'hy' %}Անտոնինյան ժանտախտ{% elif lang == 'ru' %}Антонинова чума{% else %}Antonine Plague{% endif %}</h3><p>💀 {% if lang == 'hy' %}5-10 միլիոն զոհ{% elif lang == 'ru' %}5-10 миллионов жертв{% else %}5-10 million victims{% endif %}</p></div></div>
+    <div class="timeline-item"><div class="timeline-year">541-542</div><div class="timeline-content"><h3>{% if lang == 'hy' %}Հուստինիանոսի ժանտախտ{% elif lang == 'ru' %}Чума Юстиниана{% else %}Plague of Justinian{% endif %}</h3><p>💀 {% if lang == 'hy' %}25-50 միլիոն զոհ (աշխարհի բնակչության 15-25%-ը){% elif lang == 'ru' %}25-50 миллионов жертв (15-25% населения мира){% else %}25-50 million victims (15-25% of world population){% endif %}</p></div></div>
+    <div class="timeline-item"><div class="timeline-year">1347-1351</div><div class="timeline-content"><h3>{% if lang == 'hy' %}Սև մահ{% elif lang == 'ru' %}Черная смерть{% else %}Black Death{% endif %}</h3><p>💀 {% if lang == 'hy' %}75-200 միլիոն զոհ (Եվրոպայի բնակչության 30-60%-ը){% elif lang == 'ru' %}75-200 миллионов жертв (30-60% населения Европы){% else %}75-200 million victims (30-60% of Europe population){% endif %}</p></div></div>
+    <div class="timeline-item"><div class="timeline-year">1918-1920</div><div class="timeline-content"><h3>{% if lang == 'hy' %}Իսպանական գրիպ (H1N1){% elif lang == 'ru' %}Испанский грипп (H1N1){% else %}Spanish Flu (H1N1){% endif %}</h3><p>💀 {% if lang == 'hy' %}50-100 միլիոն զոհ (աշխարհի բնակչության 3-5%-ը){% elif lang == 'ru' %}50-100 миллионов жертв (3-5% населения мира){% else %}50-100 million victims (3-5% of world population){% endif %}</p></div></div>
+    <div class="timeline-item"><div class="timeline-year">1981-present</div><div class="timeline-content"><h3>HIV/AIDS</h3><p>💀 {% if lang == 'hy' %}40+ միլիոն զոհ: 38 միլիոն մարդ ապրում են ՄԻԱՎ-ով{% elif lang == 'ru' %}40+ миллионов жертв. 38 миллионов человек живут с ВИЧ{% else %}40+ million victims. 38 million people living with HIV{% endif %}</p></div></div>
+    <div class="timeline-item"><div class="timeline-year">2019-2023</div><div class="timeline-content"><h3>COVID-19</h3><p>💀 {% if lang == 'hy' %}7+ միլիոն զոհ, 700+ միլիոն դեպք{% elif lang == 'ru' %}7+ миллионов жертв, 700+ миллионов случаев{% else %}7+ million victims, 700+ million cases{% endif %}</p></div></div>
+</div>
 </div>
 {% endblock %}
