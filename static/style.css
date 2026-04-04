@@ -3801,3 +3801,9 @@ footer::before {
         transform: translateY(0);
     }
 }
+
+.share-btn:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
