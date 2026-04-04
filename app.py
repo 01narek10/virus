@@ -290,7 +290,8 @@ translations = {
         'prev': '◀ Նախորդ',
         'next': 'Հաջորդ ▶',
         'finish': '✔ Ավարտել',
-        'result': 'Արդյունք'
+        'result': 'Արդյունք',
+        'quarantine': '🔒 Կարանտին (նվազեցնում է վարակումը 50%)'
     },
     'ru': {
         'home': '🏠 Главная',
@@ -399,7 +400,8 @@ translations = {
         'prev': '◀ Предыдущий',
         'next': 'Следующий ▶',
         'finish': '✔ Закончить',
-        'result': 'Результаты'
+        'result': 'Результаты',
+        'quarantine': '🔒 Карантин (снижает заражение на 50%)',
     },
     'en': {
         'home': '🏠 Home',
@@ -509,7 +511,7 @@ translations = {
         'next': 'Next ▶',
         'finish': '✔ Finish',
         'result': 'Result',
-        'quarantine': '🔒 Կարանտին (նվազեցնում է վարակումը 50%)'
+        'quarantine': '🔒 Quarantine (reduces infection by 50%)'
     }
 }
 
