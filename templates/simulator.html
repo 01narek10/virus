@@ -31,7 +31,7 @@
         <!-- ԿԱՐԱՆՏԻՆԻ ՌԵԺԻՄ -->
         <div style="margin-bottom: 20px; text-align: center;">
             <label style="color: #2cc3ff; font-weight: 600; margin-right: 15px;">
-                <input type="checkbox" id="quarantine" style="margin-right: 8px; transform: scale(1.2);"> 🔒 {{ t.quarantine|default('Կարանտին (նվազեցնում է վարակումը 50%)') }}
+                <input type="checkbox" id="quarantine" style="margin-right: 8px; transform: scale(1.2);"> {{ t.quarantine }}
             </label>
         </div>
 
@@ -70,7 +70,7 @@
             <button onclick="startSimulation()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">▶ {{ t.start }}</button>
             <button onclick="stopSimulation()" class="btn-warning" style="background: linear-gradient(135deg, #ffc107, #b27a00); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">⏸️ {{ t.stop }}</button>
             <button onclick="resetSimulation()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">🔄 {{ t.reset }}</button>
-            <button onclick="exportCSV()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">📊 CSV</button>
+            <button onclick="exportCSV()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">{{ t.csv_export }}</button>
         </div>
     </div>
 </div>
@@ -97,16 +97,35 @@ const STATES = { HEALTHY: 0, INFECTED: 1, RECOVERED: 2, DEAD: 3 };
 // ==================== CHART ====================
 let chart;
 function initChart() {
+    const lang = '{{ lang }}';
+    let healthyLabel, infectedLabel, recoveredLabel, deadLabel;
+    if (lang === 'hy') {
+        healthyLabel = 'Առողջ';
+        infectedLabel = 'Վարակված';
+        recoveredLabel = 'Ապաքինված';
+        deadLabel = 'Մահացած';
+    } else if (lang === 'ru') {
+        healthyLabel = 'Здоровые';
+        infectedLabel = 'Зараженные';
+        recoveredLabel = 'Выздоровевшие';
+        deadLabel = 'Умершие';
+    } else {
+        healthyLabel = 'Healthy';
+        infectedLabel = 'Infected';
+        recoveredLabel = 'Recovered';
+        deadLabel = 'Dead';
+    }
+    
     const ctxChart = document.getElementById('infectionChart').getContext('2d');
     chart = new Chart(ctxChart, {
         type: 'line',
         data: {
             labels: [],
             datasets: [
-                { label: 'Healthy', data: [], borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.1)', fill: true, tension: 0.3 },
-                { label: 'Infected', data: [], borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)', fill: true, tension: 0.3 },
-                { label: 'Recovered', data: [], borderColor: '#f1c40f', backgroundColor: 'rgba(241,196,15,0.1)', fill: true, tension: 0.3 },
-                { label: 'Dead', data: [], borderColor: '#2c3e50', backgroundColor: 'rgba(44,62,80,0.1)', fill: true, tension: 0.3 }
+                { label: healthyLabel, data: [], borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.1)', fill: true, tension: 0.3 },
+                { label: infectedLabel, data: [], borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)', fill: true, tension: 0.3 },
+                { label: recoveredLabel, data: [], borderColor: '#f1c40f', backgroundColor: 'rgba(241,196,15,0.1)', fill: true, tension: 0.3 },
+                { label: deadLabel, data: [], borderColor: '#2c3e50', backgroundColor: 'rgba(44,62,80,0.1)', fill: true, tension: 0.3 }
             ]
         },
         options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
@@ -247,7 +266,7 @@ function updateSimulation() {
 // ==================== CSV EXPORT ====================
 function exportCSV() {
     if (historyData.length === 0) {
-        alert("No data yet. Run simulation first.");
+        alert("{{ t.no_data_alert }}");
         return;
     }
     let csv = "Time,Healthy,Infected,Recovered,Dead\n";
