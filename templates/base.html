@@ -302,9 +302,7 @@ body {
     <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
 
-<button id="themeToggle" class="theme-toggle" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 15px; vertical-align: middle;">
-    🌙
-</button>
+
         
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
@@ -348,7 +346,11 @@ body {
         </div>
     </div>
 </nav>
-
+        
+<button id="themeToggle" class="theme-toggle" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 15px; vertical-align: middle;">
+    🌙
+</button>
+        
 <main class="container">
     {% block content %}{% endblock %}
 </main>
