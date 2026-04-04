@@ -285,6 +285,7 @@ body {
     </style>
 </head>
 <body>
+<canvas id="animatedBg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;"></canvas>
 <div class="virus-background">
     <div class="virus"></div><div class="virus"></div><div class="virus"></div>
     <div class="virus"></div><div class="virus"></div><div class="virus"></div>
@@ -588,6 +589,164 @@ themeToggle.addEventListener('click', () => {
         themeToggle.textContent = '🌙';
     }
 });
+
+// ==================== ԱՆԻՄԱՑԻԱՅԻ ՖՈՆ ====================
+(function() {
+    const canvas = document.getElementById('animatedBg');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    let mouseX = null, mouseY = null;
+    
+    // Պարամետրեր
+    const PARTICLE_COUNT = 80;
+    const MAX_RADIUS = 35;
+    const MIN_RADIUS = 8;
+    
+    // Գունային սխեմա (կախված թեմայից, բայց կարող ես հաստատուն դնել)
+    const COLORS = [
+        'rgba(44, 195, 255, 0.35)',   // կապույտ
+        'rgba(231, 76, 60, 0.3)',     // կարմիր
+        'rgba(46, 204, 113, 0.3)',    // կանաչ
+        'rgba(241, 196, 15, 0.3)',    // դեղին
+        'rgba(155, 89, 182, 0.3)'     // մանուշակ
+    ];
+    
+    class AnimatedParticle {
+        constructor(x, y, radius, color, speedX, speedY, pulseSpeed) {
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.baseRadius = radius;
+            this.color = color;
+            this.speedX = speedX;
+            this.speedY = speedY;
+            this.pulseSpeed = pulseSpeed;
+            this.angle = Math.random() * Math.PI * 2;
+            // spikes (վիրուսի փշերի համար)
+            this.spikes = Math.random() > 0.7 ? Math.floor(Math.random() * 6) + 5 : 0;
+        }
+        
+        update() {
+            // Շարժում
+            this.x += this.speedX;
+            this.y += this.speedY;
+            
+            // Պատերի բախում (հայելային անդրադարձ)
+            if (this.x - this.radius < 0) { this.x = this.radius; this.speedX = -this.speedX; }
+            if (this.x + this.radius > width) { this.x = width - this.radius; this.speedX = -this.speedX; }
+            if (this.y - this.radius < 0) { this.y = this.radius; this.speedY = -this.speedY; }
+            if (this.y + this.radius > height) { this.y = height - this.radius; this.speedY = -this.speedY; }
+            
+            // Մկնիկի վանողություն
+            if (mouseX !== null && mouseY !== null) {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const minDist = this.radius + 50;
+                if (dist < minDist) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (minDist - dist) / minDist * 2;
+                    this.x += Math.cos(angle) * force;
+                    this.y += Math.sin(angle) * force;
+                }
+            }
+            
+            // Պուլսացիա (շնչող էֆեկտ)
+            this.angle += this.pulseSpeed;
+            this.radius = this.baseRadius + Math.sin(this.angle) * 3;
+        }
+        
+        draw() {
+            ctx.save();
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = this.color.replace('0.35', '0.8');
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            
+            // Եթե մասնիկը ունի «փշեր» (վիրուսի տեսք)
+            if (this.spikes > 0) {
+                ctx.beginPath();
+                for (let i = 0; i < this.spikes; i++) {
+                    const angle = (Math.PI * 2 / this.spikes) * i;
+                    const x1 = this.x + Math.cos(angle) * (this.radius + 5);
+                    const y1 = this.y + Math.sin(angle) * (this.radius + 5);
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(x1, y1);
+                }
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Ներքին փայլ
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = this.color.replace('0.35', '0.2');
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+    
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const radius = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
+            const x = Math.random() * (width - radius * 2) + radius;
+            const y = Math.random() * (height - radius * 2) + radius;
+            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+            const speedX = (Math.random() - 0.5) * 0.6;
+            const speedY = (Math.random() - 0.5) * 0.6;
+            const pulseSpeed = 0.02 + Math.random() * 0.04;
+            particles.push(new AnimatedParticle(x, y, radius, color, speedX, speedY, pulseSpeed));
+        }
+    }
+    
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        initParticles();
+    }
+    
+    function animate() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        // Թափանցիկ մշուշում (հետքերի էֆեկտ)
+        ctx.fillStyle = 'rgba(11, 29, 58, 0.1)'; // dark theme overlay
+        ctx.fillRect(0, 0, width, height);
+        
+        for (let p of particles) {
+            p.update();
+            p.draw();
+        }
+        requestAnimationFrame(animate);
+    }
+    
+    // Մկնիկի հետևում
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        // Մկնիկի դիրքից արձակել մասնիկների փոքրիկ ալիք (ըստ ցանկության)
+    });
+    window.addEventListener('mouseleave', () => {
+        mouseX = null;
+        mouseY = null;
+    });
+    
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+    });
+    
+    resizeCanvas();
+    animate();
+})();
+        
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
