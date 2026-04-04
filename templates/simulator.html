@@ -8,7 +8,7 @@
 
     <div class="simulator-container" style="padding: 20px; background: rgba(6,20,45,0.8); border-radius: 20px; margin-top: 20px;">
         
-        <!-- ԿԱՌԱՎԱՐՄԱՆ ՎԱՀԻԿՆԵՐ -->
+        <!-- КНОПКИ УПРАВЛЕНИЯ -->
         <div class="simulator-controls" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
             <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
                 <label style="color: #2cc3ff; font-weight: 600;">{{ t.infection_rate }}</label>
@@ -28,20 +28,20 @@
             </div>
         </div>
 
-        <!-- ԿԱՐԱՆՏԻՆԻ ՌԵԺԻՄ -->
+        <!-- КАРАНТИН -->
         <div style="margin-bottom: 20px; text-align: center;">
             <label style="color: #2cc3ff; font-weight: 600; margin-right: 15px;">
                 <input type="checkbox" id="quarantine" style="margin-right: 8px; transform: scale(1.2);"> {{ t.quarantine }}
             </label>
         </div>
 
-        <!-- CANVAS (20x20) -->
+        <!-- ХОЛСТ -->
         <canvas id="simulatorCanvas" width="400" height="400" style="display: block; margin: 20px auto; background: #0a192f; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></canvas>
 
-        <!-- ԳՐԱՖԻԿ (CHART.JS) -->
+        <!-- ГРАФИК -->
         <canvas id="infectionChart" width="400" height="200" style="margin: 20px auto; display: block;"></canvas>
 
-        <!-- ՎԻՃԱԿԱԳՐՈՒԹՅՈՒՆ -->
+        <!-- СТАТИСТИКА -->
         <div class="simulator-stats" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 20px;">
             <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
                 <div style="width: 20px; height: 20px; background: #2ecc71; border-radius: 5px; box-shadow: 0 0 15px #2ecc71;"></div>
@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        <!-- ԿՈՃԱԿՆԵՐ -->
+        <!-- КНОПКИ -->
         <div class="simulator-buttons" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
             <button onclick="startSimulation()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">▶ {{ t.start }}</button>
             <button onclick="stopSimulation()" class="btn-warning" style="background: linear-gradient(135deg, #ffc107, #b27a00); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">⏸️ {{ t.stop }}</button>
@@ -87,7 +87,6 @@ let grid = [];
 let simulationInterval = null;
 let isRunning = false;
 
-// Պատմություն CSV-ի համար
 let historyData = [];
 
 // ==================== COLORS & STATES ====================
@@ -148,7 +147,7 @@ function updateChart(healthy, infected, recovered, dead) {
     chart.update();
 }
 
-// ==================== INIT GRID ====================
+// ==================== INIT GRID (БЕЗ ВЫЗДОРОВЕВШИХ) ====================
 function initGrid() {
     grid = [];
     for (let i = 0; i < rows; i++) {
@@ -163,21 +162,9 @@ function initGrid() {
         const j = Math.floor(Math.random() * cols);
         grid[i][j] = STATES.INFECTED;
     }
-    const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) || 20;
-    const totalCells = rows * cols;
-    const vaccinatedCount = Math.floor(totalCells * vaccinatedPercent / 100);
-    let vaccinated = 0;
-    while (vaccinated < vaccinatedCount) {
-        const i = Math.floor(Math.random() * rows);
-        const j = Math.floor(Math.random() * cols);
-        if (grid[i][j] === STATES.HEALTHY) {
-            grid[i][j] = STATES.RECOVERED;
-            vaccinated++;
-        }
-    }
+    // ВАКЦИНАЦИЯ НЕ ДОБАВЛЯЕТ ВЫЗДОРОВЕВШИХ
     drawGrid();
     updateStats();
-    // Reset history and chart
     historyData = [];
     if (chart) {
         chart.data.labels = [];
@@ -221,7 +208,6 @@ function updateStats() {
     document.getElementById('recoveredCount').innerText = recovered;
     document.getElementById('deadCount').innerText = dead;
     
-    // Save to history for CSV
     historyData.push({ healthy, infected, recovered, dead, time: historyData.length + 1 });
     updateChart(healthy, infected, recovered, dead);
 }
