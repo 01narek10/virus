@@ -1,11 +1,11 @@
 {
-  "name": "Վիրուսների հանրագիտարան",
-  "short_name": "VirusInfo",
+  "name": "Virus Encyclopedia 2026",
+  "short_name": "VirusEncyclopedia",
   "description": "Վիրուսների մասին ամբողջական տեղեկատվություն հայերեն, ռուսերեն, անգլերեն",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a192f",
-  "theme_color": "#2cc3ff",
+  "theme_color": "#0b1d3a",
+  "background_color": "#0b1d3a",
   "orientation": "portrait",
   "icons": [
     {
