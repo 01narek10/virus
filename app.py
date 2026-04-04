@@ -504,27 +504,28 @@ def quiz_choice():
 def quiz(level):
     if level not in questions_db:
         return redirect("/quiz")
-    questions = questions_db[level]
+    
+    # questions_db[level]-ն արդեն dictionary է {'hy': [...], 'ru': [...], 'en': [...]}
+    all_questions = questions_db[level]
+    
     level_names = {
-        'very_easy': 'Շատ հեշտ',
-        'easy': 'Հեշտ',
-        'medium': 'Միջին',
-        'hard': 'Բարդ',
-        'very_hard': 'Շատ բարդ'
+        'very_easy': {'hy': 'Շատ հեշտ', 'ru': 'Очень легкий', 'en': 'Very Easy'},
+        'easy': {'hy': 'Հեշտ', 'ru': 'Легкий', 'en': 'Easy'},
+        'medium': {'hy': 'Միջին', 'ru': 'Средний', 'en': 'Medium'},
+        'hard': {'hy': 'Բարդ', 'ru': 'Сложный', 'en': 'Hard'},
+        'very_hard': {'hy': 'Շատ բարդ', 'ru': 'Очень сложный', 'en': 'Very Hard'}
     }
     level_classes = {
-        'very_easy': 'very-easy',
-        'easy': 'easy',
-        'medium': 'medium',
-        'hard': 'hard',
-        'very_hard': 'very-hard'
+        'very_easy': 'very-easy', 'easy': 'easy', 'medium': 'medium',
+        'hard': 'hard', 'very_hard': 'very-hard'
     }
+    
     return render_template("quiz.html",
         level=level,
-        level_name=level_names[level],
+        level_name=level_names[level],      # dictionary 3 լեզվով
         level_class=level_classes[level],
-        questions=questions,
-        total=len(questions)
+        questions=all_questions,            # բոլոր լեզուների հարցերը
+        total=len(all_questions['hy'])      # total-ը կարող ենք վերցնել հայերենից
     )
 
 @app.route("/leaderboard")
