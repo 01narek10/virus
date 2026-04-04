@@ -702,7 +702,7 @@ themeToggle.addEventListener('click', () => {
             const y = Math.random() * (height - radius * 2) + radius;
             const color = COLORS[Math.floor(Math.random() * COLORS.length)];
             const speedX = (Math.random() - 0.5) * 2;
-            const speedY = (Math.random() - 0.5) * 1․5;
+            const speedY = (Math.random() - 0.5) * 1.5;
             const pulseSpeed = 0.02 + Math.random() * 0.10;
             particles.push(new AnimatedParticle(x, y, radius, color, speedX, speedY, pulseSpeed));
         }
