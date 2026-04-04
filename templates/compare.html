@@ -12,7 +12,7 @@
             <select id="virus1" class="compare-select" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
                 <option value="">-- {{ t.select }} --</option>
                 {% for key, virus in viruses.items() %}
-                <option value="{{ key }}">{{ virus.name }}</option>
+                <option value="{{ key }}">{{ virus.name[lang] }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -21,7 +21,7 @@
             <select id="virus2" class="compare-select" style="width: 100%; padding: 12px 20px; border-radius: 50px; border: 2px solid #2cc3ff; background: rgba(6,20,45,0.8); color: white;">
                 <option value="">-- {{ t.select }} --</option>
                 {% for key, virus in viruses.items() %}
-                <option value="{{ key }}">{{ virus.name }}</option>
+                <option value="{{ key }}">{{ virus.name[lang] }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -74,6 +74,7 @@
 
 <script>
 var viruses = {{ viruses | tojson }};
+var lang = '{{ lang }}';
 
 function updateComparison() {
     var v1 = document.getElementById('virus1').value;
@@ -91,24 +92,24 @@ function updateComparison() {
         var data1 = viruses[v1];
         var data2 = viruses[v2];
 
-        document.getElementById('virus1-name').innerText = data1.name;
-        document.getElementById('virus2-name').innerText = data2.name;
+        document.getElementById('virus1-name').innerText = data1.name[lang];
+        document.getElementById('virus2-name').innerText = data2.name[lang];
         document.getElementById('virus1-img').src = data1.image;
         document.getElementById('virus2-img').src = data2.image;
-        document.getElementById('virus1-full_name').innerText = data1.full_name;
-        document.getElementById('virus2-full_name').innerText = data2.full_name;
-        document.getElementById('virus1-type').innerText = data1.type;
-        document.getElementById('virus2-type').innerText = data2.type;
-        document.getElementById('virus1-discovery').innerText = data1.discovery;
-        document.getElementById('virus2-discovery').innerText = data2.discovery;
-        document.getElementById('virus1-transmission').innerText = data1.transmission;
-        document.getElementById('virus2-transmission').innerText = data2.transmission;
-        document.getElementById('virus1-mortality').innerText = data1.mortality;
-        document.getElementById('virus2-mortality').innerText = data2.mortality;
-        document.getElementById('virus1-vaccine').innerText = data1.vaccine;
-        document.getElementById('virus2-vaccine').innerText = data2.vaccine;
-        document.getElementById('virus1-symptoms').innerText = data1.symptoms;
-        document.getElementById('virus2-symptoms').innerText = data2.symptoms;
+        document.getElementById('virus1-full_name').innerText = data1.full_name[lang];
+        document.getElementById('virus2-full_name').innerText = data2.full_name[lang];
+        document.getElementById('virus1-type').innerText = data1.type[lang];
+        document.getElementById('virus2-type').innerText = data2.type[lang];
+        document.getElementById('virus1-discovery').innerText = data1.discovery[lang];
+        document.getElementById('virus2-discovery').innerText = data2.discovery[lang];
+        document.getElementById('virus1-transmission').innerText = data1.transmission[lang];
+        document.getElementById('virus2-transmission').innerText = data2.transmission[lang];
+        document.getElementById('virus1-mortality').innerText = data1.mortality[lang];
+        document.getElementById('virus2-mortality').innerText = data2.mortality[lang];
+        document.getElementById('virus1-vaccine').innerText = data1.vaccine[lang];
+        document.getElementById('virus2-vaccine').innerText = data2.vaccine[lang];
+        document.getElementById('virus1-symptoms').innerText = data1.symptoms[lang];
+        document.getElementById('virus2-symptoms').innerText = data2.symptoms[lang];
 
         table.style.display = 'block';
     } else {
