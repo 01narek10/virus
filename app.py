@@ -565,7 +565,8 @@ def show_leaderboard():
 
 @app.route("/compare")
 def compare():
-    return render_template("compare.html", viruses=virus_data)
+    lang = get_lang()
+    return render_template("compare.html", viruses=virus_data, lang=lang)
 
 @app.route("/simulator")
 def simulator():
