@@ -120,6 +120,13 @@
 </style>
 
 <script>
+// ===== GET CURRENT LANGUAGE =====
+const currentLang = '{{ lang }}';
+
+// ===== LOAD QUESTIONS FOR CURRENT LANGUAGE =====
+const allQuestions = {{ questions | tojson }};
+const questions = allQuestions[currentLang] || allQuestions['hy'];
+const total = questions.length;
 // ===== QUIZ DATA =====
 const questions = [
     {% for q in questions %}
