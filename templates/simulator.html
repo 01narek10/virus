@@ -7,27 +7,41 @@
     <p>{{ t.simulator_desc }}</p>
 
     <div class="simulator-container" style="padding: 20px; background: rgba(6,20,45,0.8); border-radius: 20px; margin-top: 20px;">
+        
+        <!-- ԿԱՌԱՎԱՐՄԱՆ ՎԱՀԻԿՆԵՐ -->
         <div class="simulator-controls" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
             <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
                 <label style="color: #2cc3ff; font-weight: 600;">{{ t.infection_rate }}</label>
-                <input type="range" id="speed" min="0.1" max="0.9" step="0.1" value="0.3" style="width: 100%; height: 8px; background: linear-gradient(90deg, #2cc3ff, #ff2c6d); border-radius: 10px; -webkit-appearance: none;">
+                <input type="range" id="speed" min="0.1" max="0.9" step="0.1" value="0.3" style="width: 100%;">
             </div>
             <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
                 <label style="color: #2cc3ff; font-weight: 600;">{{ t.mortality_rate }}</label>
-                <input type="range" id="mortality" min="0" max="30" step="1" value="10" style="width: 100%; height: 8px; background: linear-gradient(90deg, #2cc3ff, #ff2c6d); border-radius: 10px; -webkit-appearance: none;">
+                <input type="range" id="mortality" min="0" max="30" step="1" value="10" style="width: 100%;">
             </div>
             <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
                 <label style="color: #2cc3ff; font-weight: 600;">{{ t.vaccinated }}</label>
-                <input type="range" id="vaccinated" min="0" max="100" step="5" value="20" style="width: 100%; height: 8px; background: linear-gradient(90deg, #2cc3ff, #ff2c6d); border-radius: 10px; -webkit-appearance: none;">
+                <input type="range" id="vaccinated" min="0" max="100" step="5" value="20" style="width: 100%;">
             </div>
             <div class="control-group" style="display: flex; flex-direction: column; gap: 8px;">
                 <label style="color: #2cc3ff; font-weight: 600;">{{ t.initial_infected }}</label>
                 <input type="number" id="initial" min="1" max="20" value="3" style="background: rgba(255,255,255,0.1); border: 2px solid #2cc3ff; border-radius: 10px; padding: 8px; color: white;">
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <!-- ԿԱՐԱՆՏԻՆԻ ՌԵԺԻՄ -->
+        <div style="margin-bottom: 20px; text-align: center;">
+            <label style="color: #2cc3ff; font-weight: 600; margin-right: 15px;">
+                <input type="checkbox" id="quarantine" style="margin-right: 8px; transform: scale(1.2);"> 🔒 {{ t.quarantine|default('Կարանտին (նվազեցնում է վարակումը 50%)') }}
+            </label>
+        </div>
+
+        <!-- CANVAS (20x20) -->
         <canvas id="simulatorCanvas" width="400" height="400" style="display: block; margin: 20px auto; background: #0a192f; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></canvas>
 
+        <!-- ԳՐԱՖԻԿ (CHART.JS) -->
+        <canvas id="infectionChart" width="400" height="200" style="margin: 20px auto; display: block;"></canvas>
+
+        <!-- ՎԻՃԱԿԱԳՐՈՒԹՅՈՒՆ -->
         <div class="simulator-stats" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin: 20px 0; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 20px;">
             <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
                 <div style="width: 20px; height: 20px; background: #2ecc71; border-radius: 5px; box-shadow: 0 0 15px #2ecc71;"></div>
@@ -51,16 +65,19 @@
             </div>
         </div>
 
+        <!-- ԿՈՃԱԿՆԵՐ -->
         <div class="simulator-buttons" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-            <button onclick="startSimulation()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;"> {{ t.start }}</button>
-            <button onclick="stopSimulation()" class="btn-warning" style="background: linear-gradient(135deg, #ffc107, #b27a00); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;"> {{ t.stop }}</button>
+            <button onclick="startSimulation()" class="btn-primary" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">▶ {{ t.start }}</button>
+            <button onclick="stopSimulation()" class="btn-warning" style="background: linear-gradient(135deg, #ffc107, #b27a00); color: #0b1d3a; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer;">⏸️ {{ t.stop }}</button>
             <button onclick="resetSimulation()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">🔄 {{ t.reset }}</button>
+            <button onclick="exportCSV()" class="btn-secondary" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; cursor: pointer;">📊 CSV</button>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// ==================== SIMULATOR CONFIGURATION ====================
+// ==================== CONFIG ====================
 const canvas = document.getElementById('simulatorCanvas');
 const ctx = canvas.getContext('2d');
 const cellSize = 20;
@@ -69,24 +86,49 @@ const rows = 20;
 let grid = [];
 let simulationInterval = null;
 let isRunning = false;
+
+// Պատմություն CSV-ի համար
+let historyData = [];
+
+// ==================== COLORS & STATES ====================
+const COLORS = { HEALTHY: '#2ecc71', INFECTED: '#e74c3c', RECOVERED: '#f1c40f', DEAD: '#2c3e50' };
+const STATES = { HEALTHY: 0, INFECTED: 1, RECOVERED: 2, DEAD: 3 };
+
+// ==================== CHART ====================
 let chart;
+function initChart() {
+    const ctxChart = document.getElementById('infectionChart').getContext('2d');
+    chart = new Chart(ctxChart, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Healthy', data: [], borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.1)', fill: true, tension: 0.3 },
+                { label: 'Infected', data: [], borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)', fill: true, tension: 0.3 },
+                { label: 'Recovered', data: [], borderColor: '#f1c40f', backgroundColor: 'rgba(241,196,15,0.1)', fill: true, tension: 0.3 },
+                { label: 'Dead', data: [], borderColor: '#2c3e50', backgroundColor: 'rgba(44,62,80,0.1)', fill: true, tension: 0.3 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+    });
+}
 
+function updateChart(healthy, infected, recovered, dead) {
+    if (!chart) initChart();
+    const step = chart.data.labels.length + 1;
+    chart.data.labels.push(step);
+    chart.data.datasets[0].data.push(healthy);
+    chart.data.datasets[1].data.push(infected);
+    chart.data.datasets[2].data.push(recovered);
+    chart.data.datasets[3].data.push(dead);
+    if (chart.data.labels.length > 50) {
+        chart.data.labels.shift();
+        chart.data.datasets.forEach(ds => ds.data.shift());
+    }
+    chart.update();
+}
 
-const COLORS = {
-    HEALTHY: '#2ecc71',
-    INFECTED: '#e74c3c',
-    RECOVERED: '#f1c40f',
-    DEAD: '#2c3e50'
-};
-
-const STATES = {
-    HEALTHY: 0,
-    INFECTED: 1,
-    RECOVERED: 2,
-    DEAD: 3
-};
-
-// ==================== INITIALIZATION ====================
+// ==================== INIT GRID ====================
 function initGrid() {
     grid = [];
     for (let i = 0; i < rows; i++) {
@@ -95,14 +137,12 @@ function initGrid() {
             grid[i][j] = STATES.HEALTHY;
         }
     }
-
     const initialInfected = parseInt(document.getElementById('initial').value) || 3;
     for (let n = 0; n < initialInfected; n++) {
         const i = Math.floor(Math.random() * rows);
         const j = Math.floor(Math.random() * cols);
         grid[i][j] = STATES.INFECTED;
     }
-
     const vaccinatedPercent = parseInt(document.getElementById('vaccinated').value) || 20;
     const totalCells = rows * cols;
     const vaccinatedCount = Math.floor(totalCells * vaccinatedPercent / 100);
@@ -117,28 +157,15 @@ function initGrid() {
     }
     drawGrid();
     updateStats();
-}
-
-function initChart() {
-    const ctx = document.getElementById('infectionChart').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [{ label: 'Infected', data: [], borderColor: '#e74c3c', backgroundColor: 'rgba(231,76,60,0.1)' }] },
-        options: { responsive: true, maintainAspectRatio: true }
-    });
-}
-
-function updateChart(infected) {
-    if (!chart) initChart();
-    chart.data.labels.push(chart.data.labels.length + 1);
-    chart.data.datasets[0].data.push(infected);
-    if (chart.data.labels.length > 50) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
+    // Reset history and chart
+    historyData = [];
+    if (chart) {
+        chart.data.labels = [];
+        chart.data.datasets.forEach(ds => ds.data = []);
+        chart.update();
     }
-    chart.update();
 }
-    
+
 function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < rows; i++) {
@@ -173,11 +200,18 @@ function updateStats() {
     document.getElementById('infectedCount').innerText = infected;
     document.getElementById('recoveredCount').innerText = recovered;
     document.getElementById('deadCount').innerText = dead;
+    
+    // Save to history for CSV
+    historyData.push({ healthy, infected, recovered, dead, time: historyData.length + 1 });
+    updateChart(healthy, infected, recovered, dead);
 }
 
+// ==================== SIMULATION STEP ====================
 function updateSimulation() {
     const newGrid = JSON.parse(JSON.stringify(grid));
-    const infectionRate = parseFloat(document.getElementById('speed').value);
+    let baseInfectionRate = parseFloat(document.getElementById('speed').value);
+    const quarantine = document.getElementById('quarantine').checked;
+    let infectionRate = quarantine ? baseInfectionRate * 0.5 : baseInfectionRate;
     const mortalityRate = parseFloat(document.getElementById('mortality').value) / 100;
 
     for (let i = 0; i < rows; i++) {
@@ -208,7 +242,25 @@ function updateSimulation() {
     grid = newGrid;
     drawGrid();
     updateStats();
-    updateChart(infected);
+}
+
+// ==================== CSV EXPORT ====================
+function exportCSV() {
+    if (historyData.length === 0) {
+        alert("No data yet. Run simulation first.");
+        return;
+    }
+    let csv = "Time,Healthy,Infected,Recovered,Dead\n";
+    historyData.forEach(row => {
+        csv += `${row.time},${row.healthy},${row.infected},${row.recovered},${row.dead}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'simulation_data.csv';
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // ==================== CONTROL FUNCTIONS ====================
@@ -217,7 +269,6 @@ window.startSimulation = function() {
     isRunning = true;
     simulationInterval = setInterval(updateSimulation, 200);
 };
-
 window.stopSimulation = function() {
     if (simulationInterval) {
         clearInterval(simulationInterval);
@@ -225,13 +276,13 @@ window.stopSimulation = function() {
     }
     isRunning = false;
 };
-
 window.resetSimulation = function() {
     stopSimulation();
     initGrid();
 };
 
 // ==================== START ====================
+initChart();
 initGrid();
 </script>
 {% endblock %}
