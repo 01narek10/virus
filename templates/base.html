@@ -289,6 +289,97 @@ body {
             margin-top: 40px;
             color: #aaa;
         }
+
+        /* Հիմնական տեքստեր */
+h1, h2, h3, h4, h5, h6, p, span, li, a:not(.nav-link):not(.share-btn), label, .card-text, .stat-item span, .simulator-stats span {
+    color: var(--text-primary);
+}
+
+/* Navbar-ի հղումները */
+.nav-link {
+    color: var(--text-primary) !important;
+}
+.nav-link:hover {
+    color: var(--border-color) !important;
+}
+
+/* Footer */
+footer p {
+    color: var(--text-secondary);
+}
+
+/* Language selector-ի կոճակները */
+.lang-btn {
+    color: var(--text-primary);
+}
+.lang-btn.active {
+    color: #0a192f !important; /* մուգ թեմայի ժամանակ մնում է կապույտի վրա */
+}
+
+/* Share buttons-ի տեքստը (սպիտակ է մնում, ինչպես պետք է) */
+.share-btn {
+    color: white !important;
+}
+
+/* Կոճակների տեքստը (btn-primary, btn-secondary) */
+.btn-primary, .btn-warning, .btn-secondary {
+    color: var(--bg-primary) !important;
+}
+
+/* Simulator-ի վահանակներ */
+.simulator-container label {
+    color: var(--border-color) !important;
+}
+
+/* Stat items */
+.stat-item span:first-child {
+    color: var(--text-secondary);
+}
+.stat-item span:last-child {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+            [data-theme="light"] {
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #ffffff;
+    --card-bg: rgba(255,255,255,0.95);
+    --text-primary: #0b1d3a;   /* մուգ կապույտ/սև */
+    --text-secondary: #2c3e50;
+    --border-color: #0b5e7e;
+    --button-bg: linear-gradient(135deg, #0b5e7e, #0a4a64);
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .simulator-container,
+[data-theme="light"] .quiz-card,
+[data-theme="light"] .compare-card {
+    background: var(--card-bg) !important;
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .navbar,
+[data-theme="light"] footer {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="light"] .chatbot-window {
+    background: var(--bg-secondary);
+}
+
+[data-theme="light"] .chatbot-messages {
+    background: var(--bg-secondary);
+}
+
+[data-theme="light"] .message.bot .message-content {
+    background: #e0e7f0;
+    color: #0b1d3a;
+    border-color: var(--border-color);
+}
+
+[data-theme="light"] .chatbot-input {
+    background: var(--bg-secondary);
+}
     </style>
 </head>
 <body>
@@ -723,19 +814,21 @@ themeToggle.addEventListener('click', () => {
         initParticles();
     }
     
-    function animate() {
-        if (!ctx) return;
-        ctx.clearRect(0, 0, width, height);
-        // Թափանցիկ մշուշում (հետքերի էֆեկտ)
-        ctx.fillStyle = 'rgba(11, 29, 58, 0.1)'; // dark theme overlay
-        ctx.fillRect(0, 0, width, height);
-        
-        for (let p of particles) {
-            p.update();
-            p.draw();
-        }
-        requestAnimationFrame(animate);
+   function animate() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+    
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const trailColor = isDark ? 'rgba(11, 29, 58, 0.1)' : 'rgba(240, 244, 248, 0.2)';
+    ctx.fillStyle = trailColor;
+    ctx.fillRect(0, 0, width, height);
+    
+    for (let p of particles) {
+        p.update();
+        p.draw();
     }
+    requestAnimationFrame(animate);
+}
     
     // Մկնիկի հետևում
     window.addEventListener('mousemove', (e) => {
