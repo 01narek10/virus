@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, session
+from flask import Flask, render_template, request, jsonify, redirect, session, Response, stream_with_context
 from datetime import datetime
 from groq import Groq
 from flask_sqlalchemy import SQLAlchemy
@@ -164,28 +164,49 @@ def inject_lang():
 def set_language(lang):
     if lang in ['hy', 'ru', 'en']:
         session['lang'] = lang
-    return redirect(request.referrer or url_for('home'))
+    return redirect(request.referrer or '/')
+
+
+# ===== KNOWLEDGE BASE FOR AI =====
+VIRUS_KNOWLEDGE = """
+🦠 COVID-19 (SARS-CoV-2): հայտնաբերվել է 2019թ., օդակաթիլային փոխանցում, մահացությունը ~2%, ախտանիշներ՝ ջերմություն, հազ, շնչահեղձություն: Պատվաստանյութը mRNA (Pfizer, Moderna):
+🦠 Էբոլա (Ebola): հայտնաբերվել է 1976թ., փոխանցվում է մարմնի հեղուկներով, մահացությունը 50-90%, ախտանիշներ՝ արյունահոսություն, ջերմություն: Պատվաստանյութը Ervebo (2019):
+🦠 ՄԻԱՎ (HIV): հայտնաբերվել է 1983թ., արյան և սեռական ճանապարհով, մահացությունը բուժման դեպքում <0.1%, ախտանիշներ՝ իմունային անբավարարություն: Պատվաստանյութ չկա:
+🦠 Գրիպ (Influenza): ամենատարածված վիրուսային հիվանդությունը, օդակաթիլային, մահացությունը ~0.1%, ամենամյա պատվաստանյութ:
+🦠 Ռոտավիրուս (Rotavirus): հայտնաբերվել է 1973թ., ֆեկալ-օրալ, մահացությունը 0.1%, կա պատվաստանյութ (Rotarix, RotaTeq):
+🦠 Ադենովիրուս (Adenovirus): հայտնաբերվել է 1953թ., օդակաթիլային, մահացությունը <1%, կա պատվաստանյութ (Ad4, Ad7):
+🦠 Դենգե (Dengue): մոծակների միջոցով, ախտանիշներ՝ բարձր ջերմություն, ցան, հոդացավ, մահացությունը <1%:
+🦠 Hantavirus: կրծողների միջոցով, ախտանիշներ՝ շնչառական սինդրոմ, մահացությունը 38%:
+🦠 Nipah: չղջիկների միջոցով, ախտանիշներ՝ էնցեֆալիտ, մահացությունը 70%:
+🦠 Zika: մոծակների միջոցով, ախտանիշներ՝ միկրոցեֆալիա նորածինների մոտ:
+🦠 MERS-CoV: ուղտերի միջոցով, մահացությունը 35%:
+🦠 Պոլիո (Poliovirus): ֆեկալ-օրալ, կաթվածահարում, պատվաստանյութը վերացրել է հիվանդությունը:
+🦠 Կարմրուկ (Measles): օդակաթիլային, մահացությունը 0.2%, ախտանիշներ՝ ցան, ջերմություն, հազ:
+🦠 Ջրծաղիկ (Smallpox): Variola major, վերացվել է 1980թ., 30% մահացություն:
+🦠 HPV (Papillomavirus): սեռական ճանապարհով, առաջացնում է արգանդի վզիկի քաղցկեղ, կա պատվաստանյութ:
+🦠 RSV (Respiratory Syncytial Virus): մանկական շնչառական վարակ, մահացությունը 0.1%:
+🦠 H1N1 (Swine flu): 2009 թ. համաճարակ, 18% մահացություն:
+🦠 Lassa: կրծողների միջոցով, մահացությունը 1%:
+🦠 Marburg: Էբոլայի նման, 90% մահացություն:
+🦠 Norovirus: ստամոքս-աղիքային, փսխում, լուծ, 0.01% մահացություն:
+"""
 
 # ===== TRANSLATIONS =====
 translations = {
     'hy': {
-        # Navbar
         'home': '🏠 Գլխավոր',
         'map': '🗺️ Քարտեզ',
         'quiz': '🧪 Վիկտորինա',
         'leaderboard': '🏆 Ցուցակ',
         'simulator': '🧬 Սիմուլյատոր',
         'compare': '🔍 Համեմատել',
-        # Footer
         'footer': '© 2026 Վիրուսների ուսումնասիրման հարթակ | Բոլոր իրավունքները պաշտպանված են',
-        'footer_update': 'Տվյալները թարմացվել են՝ 2026 ապրիլի 4',
-        # Hero
+        'footer_update': 'Տվյալները թարմացվել են՝ 2026 ապրիլի 11',
         'hero_title': '🦠 ՎԻՐՈՒՍՆԵՐԻ ԱՇԽԱՐՀ',
         'hero_subtitle': 'Բացահայտիր անտեսանելի թշնամուն. 2026 թվականի ամենաթարմ տվյալներ',
         'hero_stat1': 'Մարդկային վիրուսներ',
         'hero_stat2': 'Հետազոտություններ',
         'hero_stat3': 'Պատվաստանյութեր',
-        # What are viruses
         'what_are_viruses': '🔬 Ի՞նչ են վիրուսները',
         'virus_desc1': 'Վիրուսները միկրոսկոպիկ ինֆեկցիոն ագենտներ են, որոնք կարող են վարակել բոլոր կենդանի օրգանիզմները։',
         'virus_desc2': 'Դրանք կանգնած են կենդանի և ոչ կենդանի սահմանին․ չեն կարող բազմանալ ինքնուրույն, սակայն ունեն գենետիկ նյութ։',
@@ -203,7 +224,6 @@ translations = {
         'phage_therapy': 'Ֆագային թերապիա',
         'phage_therapy_text': 'Օգտագործվում է բակտերիալ ինֆեկցիաների բուժման համար, հատկապես երբ բակտերիաները կայուն են հակաբիոտիկների նկատմամբ։',
         'timeline_title': '📜 Պատմական ամենամահաբեր համաճարակները',
-        # Map
         'map_title': '🗺️ Համաշխարհային վիրուսային բռնկումներ (2026)',
         'map_desc': 'Քարտեզում ներկայացված են <strong>1,000+ ակտիվ բռնկումներ</strong> 150+ երկրներից։',
         'high_risk': 'Բարձր ռիսկ (100+ դեպք)',
@@ -215,7 +235,7 @@ translations = {
         'total_cases': 'Ընդհանուր դեպքեր',
         'total_deaths': 'Ընդհանուր մահեր',
         'armenia_map_title': '🇦🇲 Հայաստանի և Հայկական լեռնաշխարհի քարտեզ',
-        'armenia_map_desc': 'Քարտեզում ներկայացված են <strong>350+ բնակավայրեր</strong> Հայաստանից, Արցախից, Վրաստանից, Ադրբեջանից, Իրանից և Թուրքիայի հայկական պատմական տարածքներից։',
+        'armenia_map_desc': 'Քարտեզում ներկայացված են <strong>350+ բնակավայրեր</strong>',
         'regions': 'Տարածաշրջաններ',
         'all': 'Բոլորը',
         'armenia': 'Հայաստան',
@@ -229,8 +249,7 @@ translations = {
         'cities': 'Քաղաքներ',
         'villages': 'Գյուղեր',
         'historical_sites': 'Պատմական վայրեր',
-        # Quiz
-         'quiz_title': '🧪 Վիրուսաբանական վիկտորինա',
+        'quiz_title': '🧪 Վիրուսաբանական վիկտորինա',
         'quiz_desc': 'Ստուգիր գիտելիքներդ վիրուսների մասին',
         'select_level': 'Ընտրիր դժվարության մակարդակ',
         'very_easy': 'Շատ հեշտ',
@@ -242,11 +261,13 @@ translations = {
         'submit': 'Ուղարկել',
         'reset': 'Մաքրել',
         'result': 'Արդյունք',
-        'leaderboard': 'Ցուցակ',
         'no_scores': 'Դեռևս արդյունքներ չկան',
         'date': 'Ամսաթիվ',
         'score': 'Միավոր',
-        # Simulator
+        'question': 'Հարց',
+        'prev': '◀ Նախորդ',
+        'next': 'Հաջորդ ▶',
+        'finish': '✔ Ավարտել',
         'simulator_title': '🧬 Վիրուսային սիմուլյատոր',
         'simulator_desc': 'Դիտեք, թե ինչպես է վիրուսը տարածվում բջիջների միջև:',
         'infection_rate': '🦠 Վարակման արագություն',
@@ -259,7 +280,6 @@ translations = {
         'dead': '⚫ Մահացած',
         'start': '▶ Սկսել',
         'stop': '⏸️ Կանգնեցնել',
-        # Compare
         'compare_title': '🦠 Վիրուսների համեմատման գործիք',
         'compare_desc': 'Ընտրիր երկու վիրուս և տես դրանց տարբերությունները',
         'first_virus': '🔬 Առաջին վիրուս',
@@ -275,22 +295,11 @@ translations = {
         'vaccine': '💉 Պատվաստանյութ',
         'symptoms': '🤒 Ախտանիշներ',
         'same_error': '⚠️ Խնդրում ենք ընտրել տարբեր վիրուսներ',
-        # Chatbot
         'chatbot_title': '🦠 Վիրուսային օգնական',
         'chatbot_welcome': 'Բարև, ես վիրուսային օգնականն եմ:',
         'chatbot_placeholder': 'Գրիր հարցդ...',
         'chatbot_thinking': '⏳ Մտածում եմ...',
         'chatbot_error': '❌ Ցանցային սխալ',
-        # Leaderboard
-        'no_scores': 'Դեռևս արդյունքներ չկան',
-        'date': 'Ամսաթիվ',
-        'score': 'Միավոր',
-        'question': 'Հարց',
-        #quiz
-        'prev': '◀ Նախորդ',
-        'next': 'Հաջորդ ▶',
-        'finish': '✔ Ավարտել',
-        'result': 'Արդյունք',
         'quarantine': '🔒 Կարանտին (նվազեցնում է վարակումը 50%)',
         'share_title': '📢 Կիսվել',
         'share_text': 'Ստուգեք այս հիանալի կայքը՝ վիրուսների մասին'
@@ -303,7 +312,7 @@ translations = {
         'simulator': '🧬 Симулятор',
         'compare': '🔍 Сравнить',
         'footer': '© 2026 Платформа изучения вирусов | Все права защищены',
-        'footer_update': 'Данные обновлены: 4 апреля 2026',
+        'footer_update': 'Данные обновлены: 11 апреля 2026',
         'hero_title': '🦠 МИР ВИРУСОВ',
         'hero_subtitle': 'Открой невидимого врага. Самые свежие данные 2026 года',
         'hero_stat1': 'Вирусов человека',
@@ -337,7 +346,7 @@ translations = {
         'total_cases': 'Всего случаев',
         'total_deaths': 'Всего смертей',
         'armenia_map_title': '🇦🇲 Карта Армении и Армянского нагорья',
-        'armenia_map_desc': 'На карте представлены <strong>350+ населенных пунктов</strong> из Армении, Арцаха, Грузии, Азербайджана, Ирана и исторических армянских территорий Турции.',
+        'armenia_map_desc': 'На карте представлены <strong>350+ населенных пунктов</strong>',
         'regions': 'Регионы',
         'all': 'Все',
         'armenia': 'Армения',
@@ -363,6 +372,13 @@ translations = {
         'submit': 'Отправить',
         'reset': 'Сбросить',
         'result': 'Результат',
+        'no_scores': 'Пока нет результатов',
+        'date': 'Дата',
+        'score': 'Баллы',
+        'question': 'Вопрос',
+        'prev': '◀ Предыдущий',
+        'next': 'Следующий ▶',
+        'finish': '✔ Закончить',
         'simulator_title': '🧬 Вирусный симулятор',
         'simulator_desc': 'Наблюдайте, как вирус распространяется между клетками.',
         'infection_rate': '🦠 Скорость заражения',
@@ -395,14 +411,6 @@ translations = {
         'chatbot_placeholder': 'Напишите ваш вопрос...',
         'chatbot_thinking': '⏳ Думаю...',
         'chatbot_error': '❌ Ошибка сети',
-        'no_scores': 'Пока нет результатов',
-        'date': 'Дата',
-        'score': 'Баллы',
-        # quiz
-        'prev': '◀ Предыдущий',
-        'next': 'Следующий ▶',
-        'finish': '✔ Закончить',
-        'result': 'Результаты',
         'quarantine': '🔒 Карантин (снижает заражение на 50%)',
         'share_title': '📢 Поделиться',
         'share_text': 'Посмотрите этот отличный сайт о вирусах'
@@ -415,7 +423,7 @@ translations = {
         'simulator': '🧬 Simulator',
         'compare': '🔍 Compare',
         'footer': '© 2026 Virus Study Platform | All rights reserved',
-        'footer_update': 'Data updated: April 4, 2026',
+        'footer_update': 'Data updated: April 11, 2026',
         'hero_title': '🦠 WORLD OF VIRUSES',
         'hero_subtitle': 'Discover the invisible enemy. Latest data for 2026',
         'hero_stat1': 'Human viruses',
@@ -449,7 +457,7 @@ translations = {
         'total_cases': 'Total cases',
         'total_deaths': 'Total deaths',
         'armenia_map_title': '🇦🇲 Map of Armenia and Armenian Highlands',
-        'armenia_map_desc': 'The map shows <strong>350+ settlements</strong> from Armenia, Artsakh, Georgia, Azerbaijan, Iran, and historical Armenian territories of Turkey.',
+        'armenia_map_desc': 'The map shows <strong>350+ settlements</strong>',
         'regions': 'Regions',
         'all': 'All',
         'armenia': 'Armenia',
@@ -475,6 +483,13 @@ translations = {
         'submit': 'Submit',
         'reset': 'Reset',
         'result': 'Result',
+        'no_scores': 'No scores yet',
+        'date': 'Date',
+        'score': 'Score',
+        'question': 'Question',
+        'prev': '◀ Previous',
+        'next': 'Next ▶',
+        'finish': '✔ Finish',
         'simulator_title': '🧬 Virus Simulator',
         'simulator_desc': 'Watch how a virus spreads between cells.',
         'infection_rate': '🦠 Infection rate',
@@ -507,14 +522,6 @@ translations = {
         'chatbot_placeholder': 'Type your question...',
         'chatbot_thinking': '⏳ Thinking...',
         'chatbot_error': '❌ Network error',
-        'no_scores': 'No scores yet',
-        'date': 'Date',
-        'score': 'Score',
-         # quiz
-        'prev': '◀ Previous',
-        'next': 'Next ▶',
-        'finish': '✔ Finish',
-        'result': 'Result',
         'quarantine': '🔒 Quarantine (reduces infection by 50%)',
         'share_title': '📢 Share',
         'share_text': 'Check out this great website about viruses'
@@ -525,6 +532,7 @@ translations = {
 def inject_translations():
     lang = get_lang()
     return {'t': translations.get(lang, translations['hy'])}
+
 
 # ===== ROUTES =====
 @app.route("/")
@@ -544,7 +552,6 @@ def quiz(level):
     if level not in questions_db:
         return redirect("/quiz")
     
-    # questions_db[level]-ն արդեն dictionary է {'hy': [...], 'ru': [...], 'en': [...]}
     all_questions = questions_db[level]
     
     level_names = {
@@ -561,10 +568,10 @@ def quiz(level):
     
     return render_template("quiz.html",
         level=level,
-        level_name=level_names[level],      # dictionary 3 լեզվով
+        level_name=level_names[level],
         level_class=level_classes[level],
-        questions=all_questions,            # բոլոր լեզուների հարցերը
-        total=len(all_questions['hy'])      # total-ը կարող ենք վերցնել հայերենից
+        questions=all_questions,
+        total=len(all_questions['hy'])
     )
 
 @app.route("/leaderboard")
@@ -604,6 +611,8 @@ def save_score():
     db.session.commit()
     return jsonify({'success': True})
 
+
+# ===== AI CHAT WITH KNOWLEDGE BASE + MEMORY =====
 @app.route("/api/chat", methods=['POST'])
 def chat():
     try:
@@ -611,11 +620,80 @@ def chat():
         user_message = data.get('message', '')
         language = data.get('language', 'hy')
         
+        # Initialize chat history
+        if 'chat_history' not in session:
+            session['chat_history'] = []
+        
+        # Add user message
+        session['chat_history'].append({"role": "user", "content": user_message})
+        
+        # Keep only last 6 messages (3 user + 3 assistant)
+        if len(session['chat_history']) > 6:
+            session['chat_history'] = session['chat_history'][-6:]
+        
+        # Build history text
+        history_text = ""
+        for msg in session['chat_history'][:-1]:
+            role = "Օգտատեր" if msg['role'] == 'user' else "AI"
+            history_text += f"{role}: {msg['content']}\n"
+        
         prompts = {
-            'hy': "Դու վիրուսաբանության փորձագետ ես: Պատասխանիր հայերենով, հակիրճ և հստակ:",
-            'ru': "Ты эксперт по вирусологии: Отвечай на русском языке, кратко и четко:",
-            'en': "You are a virology expert: Answer in English, concisely and clearly:"
+            'hy': f"""Դու վիրուսաբանության համաշխարհային մակարդակի փորձագետ ես: Հաշվի առ նախորդ զրույցը:
+
+            ՆԱԽՈՐԴ ԶՐՈՒՅՑ.
+            {history_text}
+
+            ՎԻՐՈՒՍԱՅԻՆ ԳԻՏԵԼԻՔՆԵՐ.
+            {VIRUS_KNOWLEDGE}
+
+            ԿԱՐԵՎՈՐ ԿԱՆՈՆՆԵՐ.
+            - Պատասխանի՛ր ՄԻԱՅՆ հայերենով
+            - Եղիր հակիրճ, հստակ, ամենակարևոր փաստերով
+            - Եթե հարցը վիրուսների մասին ՉԷ, ասա, որ դու վիրուսաբանության մասնագետ ես
+            - Օգտագործիր բուլետներ (•) ցուցակների համար
+
+            ՀԱՐՑ. {user_message}
+
+            ՊԱՏԱՍԽԱՆ.
+            """,
+            'ru': f"""Ты эксперт мирового уровня по вирусологии: Учти предыдущий разговор:
+
+            ПРЕДЫДУЩИЙ РАЗГОВОР:
+            {history_text}
+
+            БАЗА ЗНАНИЙ О ВИРУСАХ:
+            {VIRUS_KNOWLEDGE}
+
+            ВАЖНЫЕ ПРАВИЛА:
+            - Отвечай ТОЛЬКО на русском языке
+            - Будь кратким, четким, с самыми важными фактами
+            - Если вопрос НЕ о вирусах, скажи, что ты специалист по вирусологии
+            - Используй маркированные списки (•)
+
+            ВОПРОС: {user_message}
+
+            ОТВЕТ:
+            """,
+            'en': f"""You are a world-class virology expert: Consider the previous conversation:
+
+            PREVIOUS CONVERSATION:
+            {history_text}
+
+            VIRUS KNOWLEDGE BASE:
+            {VIRUS_KNOWLEDGE}
+
+            IMPORTANT RULES:
+            - Answer ONLY in English
+            - Be concise, clear, with the most important facts
+            - If the question is NOT about viruses, say you are a virology specialist
+            - Use bullet points (•) for lists
+
+            QUESTION: {user_message}
+
+            ANSWER:
+            """
         }
+        
         system_prompt = prompts.get(language, prompts['hy'])
         
         response = groq_client.chat.completions.create(
@@ -624,17 +702,84 @@ def chat():
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.7,
-            max_tokens=500
+            temperature=0.5,
+            max_tokens=600
         )
         
-        return jsonify({'reply': response.choices[0].message.content})
+        reply = response.choices[0].message.content
+        
+        # Save assistant response to history
+        session['chat_history'].append({"role": "assistant", "content": reply})
+        
+        return jsonify({'reply': reply})
     except Exception as e:
         return jsonify({'reply': f'❌ Error: {str(e)}'}), 500
+
+
+# ===== STREAMING CHAT ENDPOINT =====
+@app.route("/api/chat/stream", methods=['POST'])
+def chat_stream():
+    data = request.json
+    user_message = data.get('message', '')
+    language = data.get('language', 'hy')
+    
+    prompts = {
+        'hy': f"""Դու վիրուսաբանության փորձագետ ես: 
+        ՎԻՐՈՒՍԱՅԻՆ ԳԻՏԵԼԻՔՆԵՐ.
+        {VIRUS_KNOWLEDGE}
+        
+        ԿԱՆՈՆՆԵՐ. Պատասխանի՛ր ՄԻԱՅՆ հայերենով, հակիրճ:
+        
+        ՀԱՐՑ. {user_message}
+        
+        ՊԱՏԱՍԽԱՆ.
+        """,
+        'ru': f"""Ты эксперт по вирусологии: 
+        БАЗА ЗНАНИЙ:
+        {VIRUS_KNOWLEDGE}
+        
+        ПРАВИЛА: Отвечай ТОЛЬКО на русском, кратко:
+        
+        ВОПРОС: {user_message}
+        
+        ОТВЕТ:
+        """,
+        'en': f"""You are a virology expert: 
+        KNOWLEDGE BASE:
+        {VIRUS_KNOWLEDGE}
+        
+        RULES: Answer ONLY in English, concisely:
+        
+        QUESTION: {user_message}
+        
+        ANSWER:
+        """
+    }
+    
+    def generate():
+        stream = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": prompts.get(language, prompts['hy'])},
+                {"role": "user", "content": user_message}
+            ],
+            temperature=0.5,
+            max_tokens=600,
+            stream=True
+        )
+        
+        for chunk in stream:
+            if chunk.choices[0].delta.content:
+                yield f"data: {chunk.choices[0].delta.content}\n\n"
+        yield "data: [DONE]\n\n"
+    
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
+
 
 with app.app_context():
     db.create_all()
