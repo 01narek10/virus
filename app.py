@@ -7,10 +7,9 @@ import os
 app = Flask(__name__)
 app.secret_key = "virus-secret-2026"
 
-# ===== DATABASE =====
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', 'sqlite:///scores.db').replace('postgres://', 'postgresql://')
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'scores.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
 
 # ===== GROQ =====
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
