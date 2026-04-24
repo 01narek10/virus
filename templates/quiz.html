@@ -248,6 +248,27 @@ function nextQuestion() {
     }
 }
 
+function saveScore(name, level, score, total, percent) {
+    fetch('/save_score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name: name,
+            level: level,
+            score: score,
+            total: total,
+            percent: percent
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Score saved successfully');
+        }
+    })
+    .catch(error => console.error('Error saving score:', error));
+}
+    
 // ===== PREVIOUS BUTTON =====
 function prevQuestion() {
     if (current > 0) {
