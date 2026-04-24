@@ -7,9 +7,13 @@ import os
 app = Flask(__name__)
 app.secret_key = "virus-secret-2026"
 
+# ===== SQLITE DATABASE (Չի expire-անում, աշխատում է Render-ում) =====
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'scores.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# ===== Սա է պակասում!!! =====
+db = SQLAlchemy(app)
 
 # ===== GROQ =====
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
