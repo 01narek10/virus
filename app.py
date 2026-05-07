@@ -103,7 +103,7 @@ virus_data = {
         'mortality': {'hy': '50-90%', 'ru': '50-90%', 'en': '50-90%'},
         'vaccine': {'hy': '✅ Կա', 'ru': '✅ Есть', 'en': '✅ Yes'},
         'symptoms': {'hy': 'Արյունահոսություն, ջերմություն', 'ru': 'Кровотечение, лихорадка', 'en': 'Bleeding, fever'},
-        'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Ebola_Virus_-_Electron_Micrograph.tiff/lossy-page1-1200px-Ebola_Virus_-_Electron_Micrograph.tiff.jpg'
+        'image': 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Ebola_virus_em.png'
     },
     'hiv': {
         'name': {'hy': 'ՄԻԱՎ', 'ru': 'ВИЧ', 'en': 'HIV'},
