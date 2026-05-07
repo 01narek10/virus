@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Ինչպես օգտվել մոդելներից{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📘 Օգտագործման ուղեցույց</h2>
+    <p>Այստեղ կարող ես գրել, թե ինչպես օգտվել մեր մոդելներից՝</p>
+    
+    <div class="guide-content" style="margin-top: 30px;">
+        <!-- ===== ԱՅՍՏԵՂ ԳՐԻՐ ՔՈ ԲՈՎԱՆԴԱԿՈՒԹՅՈՒՆԸ ===== -->
+        
+        <h3>🦠 Վիրուսների մոդել</h3>
+        <p>...</p>
+        
+        <h3>📊 Leaderboard մոդել</h3>
+        <p>...</p>
+        
+        <h3>🧪 Վիկտորինայի մոդել</h3>
+        <p>...</p>
+        
+        <h3>🧬 Սիմուլյատորի մոդել</h3>
+        <p>...</p>
+        
+        <h3>🤖 AI Chat մոդել</h3>
+        <p>...</p>
+        
+        <!-- ===== ՎԵՐՋ ===== -->
+    </div>
+</div>
+
+<style>
+    .guide-content h3 {
+        color: var(--border-color);
+        margin-top: 25px;
+        margin-bottom: 10px;
+    }
+    .guide-content p {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+    .guide-content code {
+        background: rgba(44, 195, 255, 0.2);
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+    .guide-content pre {
+        background: var(--bg-secondary);
+        padding: 15px;
+        border-radius: 10px;
+        overflow-x: auto;
+        border-left: 3px solid var(--border-color);
+    }
+</style>
+{% endblock %}
