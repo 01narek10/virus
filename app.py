@@ -587,6 +587,10 @@ def compare():
     lang = get_lang()
     return render_template("compare.html", viruses=virus_data, lang=lang)
 
+@app.route("/how-to-use")
+def how_to_use():
+    return render_template("how_to_use.html")
+
 @app.route("/simulator")
 def simulator():
     return render_template("simulator.html")
