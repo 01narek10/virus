@@ -1,55 +1,58 @@
 {% extends "base.html" %}
-{% block title %}Ինչպես օգտվել մոդելներից{% endblock %}
+{% block title %}{{ t.air_purifier_guide_title }}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>📘 Օգտագործման ուղեցույց</h2>
-    <p>Այստեղ կարող ես գրել, թե ինչպես օգտվել մեր մոդելներից՝</p>
-    
-    <div class="guide-content" style="margin-top: 30px;">
-        <!-- ===== ԱՅՍՏԵՂ ԳՐԻՐ ՔՈ ԲՈՎԱՆԴԱԿՈՒԹՅՈՒՆԸ ===== -->
-        
-        <h3>🦠 Վիրուսների մոդել</h3>
-        <p>...</p>
-        
-        <h3>📊 Leaderboard մոդել</h3>
-        <p>...</p>
-        
-        <h3>🧪 Վիկտորինայի մոդել</h3>
-        <p>...</p>
-        
-        <h3>🧬 Սիմուլյատորի մոդել</h3>
-        <p>...</p>
-        
-        <h3>🤖 AI Chat մոդել</h3>
-        <p>...</p>
-        
-        <!-- ===== ՎԵՐՋ ===== -->
+    <h2>🧼 {{ t.air_purifier_guide_title }}</h2>
+    <p>{{ t.air_purifier_subtitle }}</p>
+    <div style="height: 4px; width: 80px; background: var(--border-color); margin: 20px 0;"></div>
+
+    <!-- Ի՞նչ է սարքը -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.what_is }}</h3>
+    <p>{{ t.what_is_text }}</p>
+
+    <!-- Ինչպես օգտագործել -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.how_to_use_title }}</h3>
+    <ol style="line-height: 1.6; padding-left: 20px;">
+        <li><strong>{{ t.step1_place }}</strong> – {{ t.step1_place_text }}</li>
+        <li><strong>{{ t.step2_power }}</strong> – {{ t.step2_power_text }}</li>
+        <li><strong>{{ t.step3_speed }}</strong> – {{ t.step3_speed_text }}</li>
+        <li><strong>{{ t.step4_timer }}</strong> – {{ t.step4_timer_text }}</li>
+    </ol>
+
+    <!-- Անվտանգության կանոններ -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.safety_title }}</h3>
+    <ul style="line-height: 1.6; padding-left: 20px;">
+        <li>{{ t.safety1 }}</li>
+        <li>{{ t.safety2 }}</li>
+        <li>{{ t.safety3 }}</li>
+        <li>{{ t.safety4 }}</li>
+        <li>{{ t.safety5 }}</li>
+        <li>{{ t.safety6 }}</li>
+    </ul>
+
+    <!-- Սպասարկում -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.maintenance_title }}</h3>
+    <ul style="line-height: 1.6; padding-left: 20px;">
+        <li>🧹 {{ t.maintenance_prefilter }}</li>
+        <li>🔄 {{ t.maintenance_hepa }}</li>
+        <li>🔄 {{ t.maintenance_carbon }}</li>
+        <li>💡 {{ t.maintenance_uv }}</li>
+    </ul>
+
+    <!-- FAQ -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.faq_title }}</h3>
+    <div style="margin-top: 20px;">
+        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq1_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq1_a }}</p></details>
+        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq2_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq2_a }}</p></details>
+        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq3_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq3_a }}</p></details>
+        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq4_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq4_a }}</p></details>
+    </div>
+
+    <!-- Եզրակացություն -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.conclusion_title }}</h3>
+    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 15px;">
+        <p style="margin: 0;">{{ t.conclusion_text }}</p>
     </div>
 </div>
-
-<style>
-    .guide-content h3 {
-        color: var(--border-color);
-        margin-top: 25px;
-        margin-bottom: 10px;
-    }
-    .guide-content p {
-        margin-bottom: 15px;
-        line-height: 1.6;
-    }
-    .guide-content code {
-        background: rgba(44, 195, 255, 0.2);
-        padding: 2px 6px;
-        border-radius: 5px;
-        font-family: monospace;
-    }
-    .guide-content pre {
-        background: var(--bg-secondary);
-        padding: 15px;
-        border-radius: 10px;
-        overflow-x: auto;
-        border-left: 3px solid var(--border-color);
-    }
-</style>
 {% endblock %}
