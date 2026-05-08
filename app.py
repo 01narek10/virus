@@ -44,41 +44,121 @@ class Score(db.Model):
 
 # ===== QUESTIONS =====
 questions_db = {
-    'very_easy': [
-        {"question": "Վիրուսները տեսանելի են անզեն աչքով?", "options": ["Այո", "Ոչ"], "correct": 1, "explanation": "Վիրուսները շատ փոքր են (20-300 նանոմետր), տեսանելի են միայն էլեկտրոնային մանրադիտակով:"},
-        {"question": "Գրիպը վիրուսային հիվանդությո՞ւն է", "options": ["Այո", "Ոչ"], "correct": 0, "explanation": "Գրիպը առաջանում է ինֆլուենցա վիրուսից:"},
-        {"question": "Պատվաստումը պաշտպանում է վիրուսներից?", "options": ["Այո", "Ոչ"], "correct": 0, "explanation": "Պատվաստումը օգնում է իմունային համակարգին ճանաչել և պայքարել վիրուսների դեմ:"}
-    ],
-    'easy': [
-        {"question": "Ո՞րն է ամենատարածված վիրուսային հիվանդությունը", "options": ["Գրիպ", "Էբոլա", "COVID-19", "Կարմրուկ"], "correct": 0, "explanation": "Գրիպը ամենատարածված վիրուսային հիվանդությունն է, ամեն տարի վարակում է միլիոնավոր մարդկանց:"},
-        {"question": "Ինչպե՞ս են վիրուսները բազմանում", "options": ["Բաժանվելով", "Բջիջների ներսում պատճենվելով", "Սպորներով", "Պարզ բաժանմամբ"], "correct": 1, "explanation": "Վիրուսները կարող են բազմանալ միայն կենդանի բջիջների ներսում՝ օգտագործելով բջջի մեխանիզմները:"},
-        {"question": "Ո՞ր օրգանիզմներն են ավելի փոքր՝ վիրուսները, թե բակտերիաները", "options": ["Վիրուսները", "Բակտերիաները", "Նույն չափն են", "Կախված է տեսակից"], "correct": 0, "explanation": "Վիրուսները 10-100 անգամ փոքր են բակտերիաներից:"},
-        {"question": "Հակաբիոտիկները արդյունավետ են վիրուսների դեմ?", "options": ["Այո", "Ոչ", "Միայն որոշների", "Միայն գրիպի"], "correct": 1, "explanation": "Հակաբիոտիկները աշխատում են միայն բակտերիաների դեմ, ոչ թե վիրուսների:"}
-    ],
-    'medium': [
-        {"question": "Ո՞ր վիրուսն է առաջացնում COVID-19 հիվանդությունը:", "options": ["SARS-CoV-2", "MERS-CoV", "H1N1", "Էբոլա"], "correct": 0, "explanation": "COVID-19-ը առաջացնում է SARS-CoV-2 վիրուսը:"},
-        {"question": "Ո՞ր վիրուսն է առաջացնում ՁԻԱՀ", "options": ["HPV", "HIV", "HBV", "HSV"], "correct": 1, "explanation": "ՄԻԱՎ-ը (HIV) առաջացնում է ՁԻԱՀ:"},
-        {"question": "Ո՞ր թվականին հայտնաբերվեց COVID-19-ի առաջին դեպքը", "options": ["2018", "2019", "2020", "2021"], "correct": 1, "explanation": "COVID-19-ի առաջին դեպքը գրանցվել է 2019 թվականի դեկտեմբերին Ուհանում, Չինաստան:"},
-        {"question": "Ինչպե՞ս է փոխանցվում գրիպի վիրուսը", "options": ["Օդակաթիլային", "Արյան միջոցով", "Սեռական ճանապարհով", "Մոծակների միջոցով"], "correct": 0, "explanation": "Գրիպը փոխանցվում է օդակաթիլային ճանապարհով՝ հազալով, փռշտալով:"},
-        {"question": "Ո՞ր վիրուսն է փոխանցվում մոծակների միջոցով", "options": ["COVID-19", "ՄԻԱՎ", "Դենգե", "Գրիպ"], "correct": 2, "explanation": "Դենգե տենդը փոխանցվում է Aedes մոծակների միջոցով:"}
-    ],
-    'hard': [
-        {"question": "Ո՞ր վիրուսն ունի ամենաբարձր մահացությունը", "options": ["Էբոլա", "COVID-19", "ՄԻԱՎ", "Գրիպ"], "correct": 0, "explanation": "Էբոլա վիրուսի մահացությունը կազմում է 50-90%, ինչը ամենաբարձրն է ցանկում:"},
-        {"question": "Ո՞ր թվականին հայտնաբերվեց ՄԻԱՎ-ը", "options": ["1976", "1981", "1983", "1985"], "correct": 2, "explanation": "ՄԻԱՎ-ը հայտնաբերվել է 1983 թվականին Լյուկ Մոնտանյեի և Ռոբերտ Գալլոյի կողմից:"},
-        {"question": "Ո՞ր վիրուսն է առաջացնում ջրծաղիկ", "options": ["Varicella zoster", "Variola major", "Rhinovirus", "Adenovirus"], "correct": 1, "explanation": "Ջրծաղիկը առաջացնում է Variola major վիրուսը: Այն վերացվել է 1980 թվականին:"},
-        {"question": "Ինչպե՞ս է փոխանցվում մալարիան", "options": ["Օդակաթիլային", "Մոծակների միջոցով", "Արյան միջոցով", "Սեռական ճանապարհով"], "correct": 1, "explanation": "Մալարիան փոխանցվում է Anopheles մոծակների միջոցով, սակայն այն առաջանում է ոչ թե վիրուսից, այլ մակաբույծից (Plasmodium):"},
-        {"question": "Ո՞րն է ամենատարածված հեպատիտը աշխարհում", "options": ["Հեպատիտ A", "Հեպատիտ B", "Հեպատիտ C", "Հեպատիտ D"], "correct": 1, "explanation": "Հեպատիտ B-ն ամենատարածվածն է. աշխարհում մոտ 2 միլիարդ մարդ վարակված է եղել:"}
-    ],
-    'very_hard': [
-        {"question": "Ո՞ր թվականին ստեղծվեց առաջին պատվաստանյութը", "options": ["1796", "1885", "1901", "1950"], "correct": 0, "explanation": "1796 թվականին Էդվարդ Ջենները ստեղծեց ջրծաղիկի առաջին պատվաստանյութը:"},
-        {"question": "Ո՞ր վիրուսն ունի ԴՆԹ գենոմ", "options": ["COVID-19", "Էբոլա", "Ադենովիրուս", "ՄԻԱՎ"], "correct": 2, "explanation": "Ադենովիրուսը ԴՆԹ վիրուս է, մինչդեռ COVID-19-ը, Էբոլան և ՄԻԱՎ-ը ՌՆԹ վիրուսներ են:"},
-        {"question": "Ո՞րն է ամենամեծ վիրուսը", "options": ["Պիթովիրուս", "Էբոլա", "COVID-19", "ՄԻԱՎ"], "correct": 0, "explanation": "Պիթովիրուսը ամենամեծ հայտնի վիրուսն է (1.5 մկմ), տեսանելի է լուսային մանրադիտակով:"},
-        {"question": "Քանի՞ տեսակի հեպատիտ կա", "options": ["3", "4", "5", "6"], "correct": 2, "explanation": "Հիմնականում 5 տեսակ՝ A, B, C, D, E: Գոյություն ունեն նաև այլ տեսակներ (G, TTV):"},
-        {"question": "Ո՞ր վիրուսն է փոխանցվում կրծողների միջոցով", "options": ["Hantavirus", "Ebola", "Zika", "Dengue"], "correct": 0, "explanation": "Hantavirus-ը փոխանցվում է կրծողների (մկների) արտաթորանքի միջոցով:"},
-        {"question": "Ո՞ր թվականին հայտնաբերվեց Էբոլա վիրուսը", "options": ["1976", "1981", "1990", "2000"], "correct": 0, "explanation": "Էբոլա վիրուսը հայտնաբերվել է 1976 թվականին Կոնգոյի ԴՀ-ում և Սուդանում:"},
-        {"question": "Ո՞ր վիրուսն է առաջացնում կարմրուկ", "options": ["Morbillivirus", "Rubivirus", "Paramyxovirus", "Orthomyxovirus"], "correct": 0, "explanation": "Կարմրուկը առաջանում է Morbillivirus ցեղի վիրուսից (Paramyxoviridae ընտանիք):"},
-        {"question": "Ի՞նչ է նշանակում ՌՆԹ հապավումը", "options": ["Ռիբոնուկլեինաթթու", "Ռիբոնուկլեոպրոտեին", "Ռեգուլյար նուկլեինաթթու", "Ռեալ նուկլեինաթթու"], "correct": 0, "explanation": "ՌՆԹ-ն ռիբոնուկլեինաթթու է, որը վիրուսների գենետիկ նյութն է:"}
-    ]
+    'very_easy': {
+        'hy': [
+            {"question": "Վիրուսները տեսանելի են անզեն աչքով?", "options": ["Այո", "Ոչ"], "correct": 1, "explanation": "Վիրուսները շատ փոքր են (20-300 նանոմետր), տեսանելի են միայն էլեկտրոնային մանրադիտակով:"},
+            {"question": "Գրիպը վիրուսային հիվանդությո՞ւն է", "options": ["Այո", "Ոչ"], "correct": 0, "explanation": "Գրիպը առաջանում է ինֆլուենցա վիրուսից:"},
+            {"question": "Պատվաստումը պաշտպանում է վիրուսներից?", "options": ["Այո", "Ոչ"], "correct": 0, "explanation": "Պատվաստումը օգնում է իմունային համակարգին ճանաչել և պայքարել վիրուսների դեմ:"}
+        ],
+        'ru': [
+            {"question": "Вирусы видны невооруженным глазом?", "options": ["Да", "Нет"], "correct": 1, "explanation": "Вирусы очень маленькие (20-300 нанометров), видны только в электронный микроскоп."},
+            {"question": "Грипп — это вирусное заболевание?", "options": ["Да", "Нет"], "correct": 0, "explanation": "Грипп вызывается вирусом гриппа."},
+            {"question": "Вакцинация защищает от вирусов?", "options": ["Да", "Нет"], "correct": 0, "explanation": "Вакцинация помогает иммунной системе распознавать и бороться с вирусами."}
+        ],
+        'en': [
+            {"question": "Are viruses visible to the naked eye?", "options": ["Yes", "No"], "correct": 1, "explanation": "Viruses are very small (20-300 nanometers), visible only with an electron microscope."},
+            {"question": "Is flu a viral disease?", "options": ["Yes", "No"], "correct": 0, "explanation": "Flu is caused by the influenza virus."},
+            {"question": "Does vaccination protect against viruses?", "options": ["Yes", "No"], "correct": 0, "explanation": "Vaccination helps the immune system recognize and fight viruses."}
+        ]
+    },
+    'easy': {
+        'hy': [
+            {"question": "Ո՞րն է ամենատարածված վիրուսային հիվանդությունը", "options": ["Գրիպ", "Էբոլա", "COVID-19", "Կարմրուկ"], "correct": 0, "explanation": "Գրիպը ամենատարածված վիրուսային հիվանդությունն է, ամեն տարի վարակում է միլիոնավոր մարդկանց:"},
+            {"question": "Ինչպե՞ս են վիրուսները բազմանում", "options": ["Բաժանվելով", "Բջիջների ներսում պատճենվելով", "Սպորներով", "Պարզ բաժանմամբ"], "correct": 1, "explanation": "Վիրուսները կարող են բազմանալ միայն կենդանի բջիջների ներսում՝ օգտագործելով բջջի մեխանիզմները:"},
+            {"question": "Ո՞ր օրգանիզմներն են ավելի փոքր՝ վիրուսները, թե բակտերիաները", "options": ["Վիրուսները", "Բակտերիաները", "Նույն չափն են", "Կախված է տեսակից"], "correct": 0, "explanation": "Վիրուսները 10-100 անգամ փոքր են բակտերիաներից:"},
+            {"question": "Հակաբիոտիկները արդյունավետ են վիրուսների դեմ?", "options": ["Այո", "Ոչ", "Միայն որոշների", "Միայն գրիպի"], "correct": 1, "explanation": "Հակաբիոտիկները աշխատում են միայն բակտերիաների դեմ, ոչ թե վիրուսների:"}
+        ],
+        'ru': [
+            {"question": "Какое самое распространенное вирусное заболевание?", "options": ["Грипп", "Эбола", "COVID-19", "Корь"], "correct": 0, "explanation": "Грипп — самое распространенное вирусное заболевание, ежегодно поражающее миллионы людей."},
+            {"question": "Как размножаются вирусы?", "options": ["Деление", "Копирование внутри клеток", "Спорами", "Простым делением"], "correct": 1, "explanation": "Вирусы могут размножаться только внутри живых клеток, используя клеточные механизмы."},
+            {"question": "Какие организмы меньше: вирусы или бактерии?", "options": ["Вирусы", "Бактерии", "Одинаковы", "Зависит от вида"], "correct": 0, "explanation": "Вирусы в 10-100 раз меньше бактерий."},
+            {"question": "Эффективны ли антибиотики против вирусов?", "options": ["Да", "Нет", "Только некоторые", "Только для гриппа"], "correct": 1, "explanation": "Антибиотики работают только против бактерий, а не против вирусов."}
+        ],
+        'en': [
+            {"question": "What is the most common viral disease?", "options": ["Flu", "Ebola", "COVID-19", "Measles"], "correct": 0, "explanation": "Flu is the most common viral disease, infecting millions of people every year."},
+            {"question": "How do viruses reproduce?", "options": ["By dividing", "By copying inside cells", "By spores", "By simple division"], "correct": 1, "explanation": "Viruses can only reproduce inside living cells, using the cell's machinery."},
+            {"question": "Which organisms are smaller: viruses or bacteria?", "options": ["Viruses", "Bacteria", "Same size", "Depends on species"], "correct": 0, "explanation": "Viruses are 10-100 times smaller than bacteria."},
+            {"question": "Are antibiotics effective against viruses?", "options": ["Yes", "No", "Only some", "Only for flu"], "correct": 1, "explanation": "Antibiotics only work against bacteria, not viruses."}
+        ]
+    },
+    'medium': {
+        'hy': [
+            {"question": "Ո՞ր վիրուսն է առաջացնում COVID-19 հիվանդությունը:", "options": ["SARS-CoV-2", "MERS-CoV", "H1N1", "Էբոլա"], "correct": 0, "explanation": "COVID-19-ը առաջացնում է SARS-CoV-2 վիրուսը:"},
+            {"question": "Ո՞ր վիրուսն է առաջացնում ՁԻԱՀ", "options": ["HPV", "HIV", "HBV", "HSV"], "correct": 1, "explanation": "ՄԻԱՎ-ը (HIV) առաջացնում է ՁԻԱՀ:"},
+            {"question": "Ո՞ր թվականին հայտնաբերվեց COVID-19-ի առաջին դեպքը", "options": ["2018", "2019", "2020", "2021"], "correct": 1, "explanation": "COVID-19-ի առաջին դեպքը գրանցվել է 2019 թվականի դեկտեմբերին Ուհանում, Չինաստան:"},
+            {"question": "Ինչպե՞ս է փոխանցվում գրիպի վիրուսը", "options": ["Օդակաթիլային", "Արյան միջոցով", "Սեռական ճանապարհով", "Մոծակների միջոցով"], "correct": 0, "explanation": "Գրիպը փոխանցվում է օդակաթիլային ճանապարհով՝ հազալով, փռշտալով:"},
+            {"question": "Ո՞ր վիրուսն է փոխանցվում մոծակների միջոցով", "options": ["COVID-19", "ՄԻԱՎ", "Դենգե", "Գրիպ"], "correct": 2, "explanation": "Դենգե տենդը փոխանցվում է Aedes մոծակների միջոցով:"}
+        ],
+        'ru': [
+            {"question": "Какой вирус вызывает COVID-19?", "options": ["SARS-CoV-2", "MERS-CoV", "H1N1", "Эбола"], "correct": 0, "explanation": "COVID-19 вызывается вирусом SARS-CoV-2."},
+            {"question": "Какой вирус вызывает СПИД?", "options": ["HPV", "HIV", "HBV", "HSV"], "correct": 1, "explanation": "ВИЧ (HIV) вызывает СПИД."},
+            {"question": "В каком году был обнаружен первый случай COVID-19?", "options": ["2018", "2019", "2020", "2021"], "correct": 1, "explanation": "Первый случай COVID-19 был зарегистрирован в декабре 2019 года в Ухане, Китай."},
+            {"question": "Как передается вирус гриппа?", "options": ["Воздушно-капельным", "Через кровь", "Половым путем", "Через комаров"], "correct": 0, "explanation": "Грипп передается воздушно-капельным путем при кашле, чихании."},
+            {"question": "Какой вирус передается через комаров?", "options": ["COVID-19", "ВИЧ", "Денге", "Грипп"], "correct": 2, "explanation": "Лихорадка Денге передается через комаров Aedes."}
+        ],
+        'en': [
+            {"question": "Which virus causes COVID-19?", "options": ["SARS-CoV-2", "MERS-CoV", "H1N1", "Ebola"], "correct": 0, "explanation": "COVID-19 is caused by the SARS-CoV-2 virus."},
+            {"question": "Which virus causes AIDS?", "options": ["HPV", "HIV", "HBV", "HSV"], "correct": 1, "explanation": "HIV causes AIDS."},
+            {"question": "In which year was the first COVID-19 case detected?", "options": ["2018", "2019", "2020", "2021"], "correct": 1, "explanation": "The first COVID-19 case was recorded in December 2019 in Wuhan, China."},
+            {"question": "How is the flu virus transmitted?", "options": ["Airborne", "Through blood", "Sexually", "Through mosquitoes"], "correct": 0, "explanation": "Flu is transmitted through airborne droplets when coughing or sneezing."},
+            {"question": "Which virus is transmitted by mosquitoes?", "options": ["COVID-19", "HIV", "Dengue", "Flu"], "correct": 2, "explanation": "Dengue fever is transmitted by Aedes mosquitoes."}
+        ]
+    },
+    'hard': {
+        'hy': [
+            {"question": "Ո՞ր վիրուսն ունի ամենաբարձր մահացությունը", "options": ["Էբոլա", "COVID-19", "ՄԻԱՎ", "Գրիպ"], "correct": 0, "explanation": "Էբոլա վիրուսի մահացությունը կազմում է 50-90%, ինչը ամենաբարձրն է ցանկում:"},
+            {"question": "Ո՞ր թվականին հայտնաբերվեց ՄԻԱՎ-ը", "options": ["1976", "1981", "1983", "1985"], "correct": 2, "explanation": "ՄԻԱՎ-ը հայտնաբերվել է 1983 թվականին Լյուկ Մոնտանյեի և Ռոբերտ Գալլոյի կողմից:"},
+            {"question": "Ո՞ր վիրուսն է առաջացնում ջրծաղիկ", "options": ["Varicella zoster", "Variola major", "Rhinovirus", "Adenovirus"], "correct": 1, "explanation": "Ջրծաղիկը առաջացնում է Variola major վիրուսը: Այն վերացվել է 1980 թվականին:"},
+            {"question": "Ինչպե՞ս է փոխանցվում մալարիան", "options": ["Օդակաթիլային", "Մոծակների միջոցով", "Արյան միջոցով", "Սեռական ճանապարհով"], "correct": 1, "explanation": "Մալարիան փոխանցվում է Anopheles մոծակների միջոցով, սակայն այն առաջանում է ոչ թե վիրուսից, այլ մակաբույծից (Plasmodium):"},
+            {"question": "Ո՞րն է ամենատարածված հեպատիտը աշխարհում", "options": ["Հեպատիտ A", "Հեպատիտ B", "Հեպատիտ C", "Հեպատիտ D"], "correct": 1, "explanation": "Հեպատիտ B-ն ամենատարածվածն է. աշխարհում մոտ 2 միլիարդ մարդ վարակված է եղել:"}
+        ],
+        'ru': [
+            {"question": "Какой вирус имеет самую высокую смертность?", "options": ["Эбола", "COVID-19", "ВИЧ", "Грипп"], "correct": 0, "explanation": "Смертность от вируса Эбола составляет 50-90%, что является самым высоким показателем."},
+            {"question": "В каком году был обнаружен ВИЧ?", "options": ["1976", "1981", "1983", "1985"], "correct": 2, "explanation": "ВИЧ был обнаружен в 1983 году Люком Монтанье и Робертом Галло."},
+            {"question": "Какой вирус вызывает оспу?", "options": ["Varicella zoster", "Variola major", "Rhinovirus", "Adenovirus"], "correct": 1, "explanation": "Оспу вызывает вирус Variola major. Он был искоренен в 1980 году."},
+            {"question": "Как передается малярия?", "options": ["Воздушно-капельным", "Через комаров", "Через кровь", "Половым путем"], "correct": 1, "explanation": "Малярия передается через комаров Anopheles, но вызывается не вирусом, а паразитом (Plasmodium)."},
+            {"question": "Какой гепатит самый распространенный в мире?", "options": ["Гепатит A", "Гепатит B", "Гепатит C", "Гепатит D"], "correct": 1, "explanation": "Гепатит B — самый распространенный: около 2 миллиардов человек в мире были инфицированы."}
+        ],
+        'en': [
+            {"question": "Which virus has the highest mortality rate?", "options": ["Ebola", "COVID-19", "HIV", "Flu"], "correct": 0, "explanation": "Ebola virus has a mortality rate of 50-90%, the highest in the list."},
+            {"question": "In which year was HIV discovered?", "options": ["1976", "1981", "1983", "1985"], "correct": 2, "explanation": "HIV was discovered in 1983 by Luc Montagnier and Robert Gallo."},
+            {"question": "Which virus causes smallpox?", "options": ["Varicella zoster", "Variola major", "Rhinovirus", "Adenovirus"], "correct": 1, "explanation": "Smallpox is caused by the Variola major virus. It was eradicated in 1980."},
+            {"question": "How is malaria transmitted?", "options": ["Airborne", "Through mosquitoes", "Through blood", "Sexually"], "correct": 1, "explanation": "Malaria is transmitted by Anopheles mosquitoes, but it is caused by a parasite (Plasmodium), not a virus."},
+            {"question": "Which hepatitis is the most common in the world?", "options": ["Hepatitis A", "Hepatitis B", "Hepatitis C", "Hepatitis D"], "correct": 1, "explanation": "Hepatitis B is the most common: about 2 billion people worldwide have been infected."}
+        ]
+    },
+    'very_hard': {
+        'hy': [
+            {"question": "Ո՞ր թվականին ստեղծվեց առաջին պատվաստանյութը", "options": ["1796", "1885", "1901", "1950"], "correct": 0, "explanation": "1796 թվականին Էդվարդ Ջենները ստեղծեց ջրծաղիկի առաջին պատվաստանյութը:"},
+            {"question": "Ո՞ր վիրուսն ունի ԴՆԹ գենոմ", "options": ["COVID-19", "Էբոլա", "Ադենովիրուս", "ՄԻԱՎ"], "correct": 2, "explanation": "Ադենովիրուսը ԴՆԹ վիրուս է, մինչդեռ COVID-19-ը, Էբոլան և ՄԻԱՎ-ը ՌՆԹ վիրուսներ են:"},
+            {"question": "Ո՞րն է ամենամեծ վիրուսը", "options": ["Պիթովիրուս", "Էբոլա", "COVID-19", "ՄԻԱՎ"], "correct": 0, "explanation": "Պիթովիրուսը ամենամեծ հայտնի վիրուսն է (1.5 մկմ), տեսանելի է լուսային մանրադիտակով:"},
+            {"question": "Քանի՞ տեսակի հեպատիտ կա", "options": ["3", "4", "5", "6"], "correct": 2, "explanation": "Հիմնականում 5 տեսակ՝ A, B, C, D, E: Գոյություն ունեն նաև այլ տեսակներ (G, TTV):"},
+            {"question": "Ո՞ր վիրուսն է փոխանցվում կրծողների միջոցով", "options": ["Hantavirus", "Ebola", "Zika", "Dengue"], "correct": 0, "explanation": "Hantavirus-ը փոխանցվում է կրծողների (մկների) արտաթորանքի միջոցով:"},
+            {"question": "Ո՞ր թվականին հայտնաբերվեց Էբոլա վիրուսը", "options": ["1976", "1981", "1990", "2000"], "correct": 0, "explanation": "Էբոլա վիրուսը հայտնաբերվել է 1976 թվականին Կոնգոյի ԴՀ-ում և Սուդանում:"},
+            {"question": "Ո՞ր վիրուսն է առաջացնում կարմրուկ", "options": ["Morbillivirus", "Rubivirus", "Paramyxovirus", "Orthomyxovirus"], "correct": 0, "explanation": "Կարմրուկը առաջանում է Morbillivirus ցեղի վիրուսից (Paramyxoviridae ընտանիք):"},
+            {"question": "Ի՞նչ է նշանակում ՌՆԹ հապավումը", "options": ["Ռիբոնուկլեինաթթու", "Ռիբոնուկլեոպրոտեին", "Ռեգուլյար նուկլեինաթթու", "Ռեալ նուկլեինաթթու"], "correct": 0, "explanation": "ՌՆԹ-ն ռիբոնուկլեինաթթու է, որը վիրուսների գենետիկ նյութն է:"}
+        ],
+        'ru': [
+            {"question": "В каком году была создана первая вакцина?", "options": ["1796", "1885", "1901", "1950"], "correct": 0, "explanation": "В 1796 году Эдвард Дженнер создал первую вакцину против оспы."},
+            {"question": "Какой вирус имеет ДНК-геном?", "options": ["COVID-19", "Эбола", "Аденовирус", "ВИЧ"], "correct": 2, "explanation": "Аденовирус — это ДНК-вирус, тогда как COVID-19, Эбола и ВИЧ — РНК-вирусы."},
+            {"question": "Какой самый большой вирус?", "options": ["Питовирус", "Эбола", "COVID-19", "ВИЧ"], "correct": 0, "explanation": "Питовирус — самый крупный из известных вирусов (1,5 мкм), видимый в световой микроскоп."},
+            {"question": "Сколько типов гепатита существует?", "options": ["3", "4", "5", "6"], "correct": 2, "explanation": "Основных типов 5: A, B, C, D, E. Существуют и другие типы (G, TTV)."},
+            {"question": "Какой вирус передается через грызунов?", "options": ["Хантавирус", "Эбола", "Зика", "Денге"], "correct": 0, "explanation": "Хантавирус передается через выделения грызунов (мышей)."},
+            {"question": "В каком году был обнаружен вирус Эбола?", "options": ["1976", "1981", "1990", "2000"], "correct": 0, "explanation": "Вирус Эбола был обнаружен в 1976 году в ДР Конго и Судане."},
+            {"question": "Какой вирус вызывает корь?", "options": ["Morbillivirus", "Rubivirus", "Paramyxovirus", "Orthomyxovirus"], "correct": 0, "explanation": "Корь вызывает вирус рода Morbillivirus (семейство Paramyxoviridae)."},
+            {"question": "Что означает аббревиатура РНК?", "options": ["Рибонуклеиновая кислота", "Рибонуклеопротеин", "Регулярная нуклеиновая кислота", "Реальная нуклеиновая кислота"], "correct": 0, "explanation": "РНК — это рибонуклеиновая кислота, генетический материал вирусов."}
+        ],
+        'en': [
+            {"question": "In which year was the first vaccine created?", "options": ["1796", "1885", "1901", "1950"], "correct": 0, "explanation": "In 1796, Edward Jenner created the first smallpox vaccine."},
+            {"question": "Which virus has a DNA genome?", "options": ["COVID-19", "Ebola", "Adenovirus", "HIV"], "correct": 2, "explanation": "Adenovirus is a DNA virus, while COVID-19, Ebola, and HIV are RNA viruses."},
+            {"question": "What is the largest virus?", "options": ["Pithovirus", "Ebola", "COVID-19", "HIV"], "correct": 0, "explanation": "Pithovirus is the largest known virus (1.5 μm), visible under a light microscope."},
+            {"question": "How many types of hepatitis are there?", "options": ["3", "4", "5", "6"], "correct": 2, "explanation": "There are 5 main types: A, B, C, D, E. Other types exist (G, TTV)."},
+            {"question": "Which virus is transmitted by rodents?", "options": ["Hantavirus", "Ebola", "Zika", "Dengue"], "correct": 0, "explanation": "Hantavirus is transmitted through rodent (mouse) excreta."},
+            {"question": "In which year was the Ebola virus discovered?", "options": ["1976", "1981", "1990", "2000"], "correct": 0, "explanation": "Ebola virus was discovered in 1976 in the DRC and Sudan."},
+            {"question": "Which virus causes measles?", "options": ["Morbillivirus", "Rubivirus", "Paramyxovirus", "Orthomyxovirus"], "correct": 0, "explanation": "Measles is caused by the Morbillivirus genus (Paramyxoviridae family)."},
+            {"question": "What does RNA stand for?", "options": ["Ribonucleic acid", "Ribonucleoprotein", "Regular nucleic acid", "Real nucleic acid"], "correct": 0, "explanation": "RNA is ribonucleic acid, the genetic material of viruses."}
+        ]
+    }
 }
 
 # ===== VIRUS DATA FOR COMPARE =====
