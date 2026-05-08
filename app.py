@@ -662,6 +662,10 @@ def home():
 def map_page():
     return render_template("map.html")
 
+@app.route("/air-purifier")
+def air_purifier():
+    return render_template("air_purifier.html")
+    
 @app.route("/quiz")
 def quiz_choice():
     return render_template("quiz_choice.html")
@@ -702,10 +706,6 @@ def show_leaderboard():
 def compare():
     lang = get_lang()
     return render_template("compare.html", viruses=virus_data, lang=lang)
-
-@app.route("/how-to-use")
-def how_to_use():
-    return render_template("how_to_use.html")
 
 @app.route("/simulator")
 def simulator():
