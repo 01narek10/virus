@@ -1,58 +1,57 @@
 {% extends "base.html" %}
-{% block title %}{{ t.air_purifier_guide_title }}{% endblock %}
+{% block title %}{{ t.project_model_title }}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>🧼 {{ t.air_purifier_guide_title }}</h2>
-    <p>{{ t.air_purifier_subtitle }}</p>
+    <h2>{{ t.project_model_title }}</h2>
+    <p style="font-style: italic;">{{ t.project_subtitle }}</p>
     <div style="height: 4px; width: 80px; background: var(--border-color); margin: 20px 0;"></div>
 
-    <!-- Ի՞նչ է սարքը -->
-    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.what_is }}</h3>
-    <p>{{ t.what_is_text }}</p>
+    <!-- Գաղափար -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.idea_title }}</h3>
+    <p>{{ t.idea_text }}</p>
 
-    <!-- Ինչպես օգտագործել -->
-    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.how_to_use_title }}</h3>
-    <ol style="line-height: 1.6; padding-left: 20px;">
-        <li><strong>{{ t.step1_place }}</strong> – {{ t.step1_place_text }}</li>
-        <li><strong>{{ t.step2_power }}</strong> – {{ t.step2_power_text }}</li>
-        <li><strong>{{ t.step3_speed }}</strong> – {{ t.step3_speed_text }}</li>
-        <li><strong>{{ t.step4_timer }}</strong> – {{ t.step4_timer_text }}</li>
-    </ol>
+    <!-- Արտաքին տեսք -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.appearance_title }}</h3>
+    <p>{{ t.appearance_text }}</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <div style="width: 150px; height: 150px; background: radial-gradient(circle, #2cc3ff, #0a5e7e); border-radius: 50%; margin: 0 auto; position: relative; box-shadow: 0 0 30px rgba(44,195,255,0.5);">
+            <div style="position: absolute; width: 30px; height: 30px; background: #2cc3ff; border-radius: 50%; top: -15px; left: 20px;"></div>
+            <div style="position: absolute; width: 25px; height: 25px; background: #2cc3ff; border-radius: 50%; top: 10px; right: -10px;"></div>
+            <div style="position: absolute; width: 35px; height: 35px; background: #2cc3ff; border-radius: 50%; bottom: -10px; left: 40px;"></div>
+            <div style="position: absolute; width: 20px; height: 20px; background: #2cc3ff; border-radius: 50%; bottom: 30px; right: -5px;"></div>
+            <div style="position: absolute; width: 28px; height: 28px; background: #2cc3ff; border-radius: 50%; top: 50px; left: -15px;"></div>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.8;">{{ t.appearance_text }}</p>
+    </div>
+
+    <!-- Աշխատանքի սկզբունք -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.how_it_works_title }}</h3>
+    <p>{{ t.how_it_works_text }}</p>
+    <ul style="line-height: 1.6; padding-left: 20px;">
+        <li>{{ t.component_fan }}</li>
+        <li>{{ t.component_filter }}</li>
+        <li>{{ t.component_vibrator }}</li>
+        <li>{{ t.component_power }}</li>
+    </ul>
 
     <!-- Անվտանգության կանոններ -->
     <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.safety_title }}</h3>
     <ul style="line-height: 1.6; padding-left: 20px;">
-        <li>{{ t.safety1 }}</li>
-        <li>{{ t.safety2 }}</li>
-        <li>{{ t.safety3 }}</li>
-        <li>{{ t.safety4 }}</li>
-        <li>{{ t.safety5 }}</li>
-        <li>{{ t.safety6 }}</li>
+        <li>{{ t.safety_rule1 }}</li>
+        <li>{{ t.safety_rule2 }}</li>
+        <li>{{ t.safety_rule3 }}</li>
+        <li>{{ t.safety_rule4 }}</li>
     </ul>
 
-    <!-- Սպասարկում -->
-    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.maintenance_title }}</h3>
-    <ul style="line-height: 1.6; padding-left: 20px;">
-        <li>🧹 {{ t.maintenance_prefilter }}</li>
-        <li>🔄 {{ t.maintenance_hepa }}</li>
-        <li>🔄 {{ t.maintenance_carbon }}</li>
-        <li>💡 {{ t.maintenance_uv }}</li>
-    </ul>
-
-    <!-- FAQ -->
-    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.faq_title }}</h3>
-    <div style="margin-top: 20px;">
-        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq1_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq1_a }}</p></details>
-        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq2_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq2_a }}</p></details>
-        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq3_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq3_a }}</p></details>
-        <details style="margin-bottom: 15px;"><summary style="font-weight: bold; cursor: pointer;">{{ t.faq4_q }}</summary><p style="margin-top: 10px; padding-left: 20px;">{{ t.faq4_a }}</p></details>
+    <!-- Խորհուրդ -->
+    <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.recommendation_title }}</h3>
+    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 15px;">
+        <p style="margin: 0;">{{ t.recommendation_text }}</p>
     </div>
 
     <!-- Եզրակացություն -->
     <h3 style="color: var(--border-color); margin-top: 30px;">{{ t.conclusion_title }}</h3>
-    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 15px;">
-        <p style="margin: 0;">{{ t.conclusion_text }}</p>
-    </div>
+    <p>{{ t.conclusion_text }}</p>
 </div>
 {% endblock %}
