@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{{ t.quiz_title }} - {{ level_name }}{% endblock %}
+{% block title %}{{ t.quiz_title }} - {{ level_name[currentLang] }}{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2 style="text-align: center;">{{ t.quiz_title }} — {{ level_name }}</h2>
+    <h2 style="text-align: center;">{{ t.quiz_title }} — {{ level_name[currentLang] }}</h2>
     
     <div id="quiz-container" style="background: rgba(6,20,45,0.6); border-radius: 20px; padding: 30px; margin: 20px 0;">
         <div id="question-number" style="color: #2cc3ff; margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
@@ -33,7 +33,6 @@
 </div>
 
 <style>
-/* MODAL */
 .modal {
     display: none;
     position: fixed;
@@ -127,21 +126,7 @@ const currentLang = '{{ lang }}';
 const allQuestions = {{ questions | tojson }};
 const questions = allQuestions[currentLang] || allQuestions['hy'];
 const total = questions.length;
-// ===== QUIZ DATA =====
-const questions = [
-    {% for q in questions %}
-    {
-        text: "{{ q.question|safe }}",
-        options: [
-            {% for opt in q.options %}
-            "{{ opt|safe }}"{% if not loop.last %},{% endif %}
-            {% endfor %}
-        ],
-        correct: {{ q.correct }}
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-];
-const total = {{ total }};
+
 let current = 0;
 let answers = new Array(total).fill(null);
 let selectedOptionIndex = null;
@@ -195,13 +180,11 @@ function createOptionButtons() {
             }
         });
         btn.addEventListener('click', () => {
-            // Remove highlight from all buttons
             document.querySelectorAll('.option-btn').forEach(b => {
                 b.style.background = 'rgba(44,195,255,0.1)';
                 b.style.color = 'white';
                 b.style.boxShadow = 'none';
             });
-            // Highlight clicked button
             btn.style.background = 'linear-gradient(135deg, #2cc3ff, #1a9fd0)';
             btn.style.color = '#0a192f';
             btn.style.boxShadow = '0 0 15px rgba(44,195,255,0.5)';
@@ -219,12 +202,10 @@ function loadQuestion() {
     questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
     questionTextDiv.innerText = q.text;
     
-    // Clear and recreate buttons
     optionsContainer.innerHTML = '';
     const buttons = createOptionButtons();
     buttons.forEach(btn => optionsContainer.appendChild(btn));
     
-    // Update button states
     prevBtn.style.opacity = current === 0 ? '0.5' : '1';
     prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
     
@@ -234,7 +215,6 @@ function loadQuestion() {
         nextBtn.innerHTML = '{{ t.next|default("Հաջորդ") }} ▶';
     }
     
-    // Hide result if visible
     resultDiv.innerHTML = '';
 }
 
@@ -248,27 +228,6 @@ function nextQuestion() {
     }
 }
 
-function saveScore(name, level, score, total, percent) {
-    fetch('/save_score', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name: name,
-            level: level,
-            score: score,
-            total: total,
-            percent: percent
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Score saved successfully');
-        }
-    })
-    .catch(error => console.error('Error saving score:', error));
-}
-    
 // ===== PREVIOUS BUTTON =====
 function prevQuestion() {
     if (current > 0) {
@@ -287,7 +246,6 @@ function finishQuiz() {
     }
     const percent = Math.round((score / total) * 100);
     
-    // Show modal
     const modal = document.getElementById('nameModal');
     const nameInput = document.getElementById('playerName');
     const okBtn = document.getElementById('modalOk');
@@ -333,22 +291,18 @@ function finishQuiz() {
         }
     };
     
-    // Remove previous listeners to avoid duplicates
     okBtn.removeEventListener('click', okHandler);
     cancelBtn.removeEventListener('click', cancelHandler);
     nameInput.removeEventListener('keypress', enterHandler);
     
-    // Add fresh listeners
     okBtn.addEventListener('click', okHandler);
     cancelBtn.addEventListener('click', cancelHandler);
     nameInput.addEventListener('keypress', enterHandler);
 }
 
-// ===== EVENT LISTENERS =====
 prevBtn.addEventListener('click', prevQuestion);
 nextBtn.addEventListener('click', nextQuestion);
 
-// ===== INIT =====
 loadQuestion();
 </script>
 {% endblock %}
