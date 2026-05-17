@@ -90,12 +90,12 @@
 </style>
 
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // 1. Ստանալ տվյալները Flask-ից
     const currentLang = '{{ lang }}';
     const allQuestions = {{ questions | tojson }};
     
-    // 2. Ստուգել, որ allQuestions-ը գոյություն ունի և ունի ընթացիկ լեզուն
+    // 2. Ստուգել, որ allQuestions-ը գոյություն ունի
     if (!allQuestions || typeof allQuestions !== 'object') {
         const errorDiv = document.getElementById('question-text');
         if (errorDiv) errorDiv.innerText = '⚠️ Տվյալների բազայի սխալ: allQuestions is missing.';
@@ -250,6 +250,6 @@
     
     // Start the quiz
     loadQuestion();
-})();
+});
 </script>
 {% endblock %}
