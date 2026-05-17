@@ -73,10 +73,6 @@
     font-size: 1rem;
     outline: none;
 }
-.modal-content input:focus {
-    border-color: #fff;
-    box-shadow: 0 0 10px rgba(44,195,255,0.5);
-}
 .modal-buttons {
     display: flex;
     gap: 15px;
@@ -87,52 +83,33 @@
     border-radius: 40px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s;
 }
 .modal-buttons .btn-ok {
     background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
     border: none;
     color: #0a192f;
 }
-.modal-buttons .btn-ok:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(44,195,255,0.4);
-}
 .modal-buttons .btn-cancel {
     background: transparent;
     border: 1px solid #2cc3ff;
     color: white;
 }
-.modal-buttons .btn-cancel:hover {
-    background: rgba(44,195,255,0.2);
-}
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ===== GET CURRENT LANGUAGE =====
     const currentLang = '{{ lang }}';
     const allQuestions = {{ questions | tojson }};
     const questions = allQuestions[currentLang] || allQuestions['hy'];
     const total = questions.length;
     
-    console.log('Loaded questions:', questions);  // debug
-    
     let current = 0;
     let answers = new Array(total).fill(null);
-    let selectedOptionIndex = null;
     
-    // ===== DOM ELEMENTS =====
     const questionNumberDiv = document.getElementById('question-number');
     const questionTextDiv = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
@@ -140,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextBtn = document.getElementById('next-btn');
     const resultDiv = document.getElementById('quiz-result');
     
-    // ===== CREATE BUTTONS FOR OPTIONS =====
     function createOptionButtons() {
         const q = questions[current];
         const buttons = [];
@@ -148,47 +124,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = document.createElement('button');
             btn.textContent = opt;
             btn.className = 'option-btn';
-            btn.setAttribute('data-value', idx);
-            btn.style.background = 'rgba(44,195,255,0.1)';
+            btn.style.background = answers[current] === idx ? 'linear-gradient(135deg, #2cc3ff, #1a9fd0)' : 'rgba(44,195,255,0.1)';
             btn.style.border = '2px solid #2cc3ff';
             btn.style.borderRadius = '50px';
             btn.style.padding = '14px 20px';
             btn.style.fontSize = '1rem';
             btn.style.fontWeight = 'bold';
-            btn.style.color = 'white';
+            btn.style.color = answers[current] === idx ? '#0a192f' : 'white';
             btn.style.cursor = 'pointer';
             btn.style.transition = 'all 0.2s';
-            btn.style.textAlign = 'center';
-            
-            if (answers[current] === idx) {
-                btn.style.background = 'linear-gradient(135deg, #2cc3ff, #1a9fd0)';
-                btn.style.color = '#0a192f';
-                btn.style.boxShadow = '0 0 15px rgba(44,195,255,0.5)';
-                selectedOptionIndex = idx;
-            }
-            
-            btn.addEventListener('mouseenter', () => {
-                if (answers[current] !== idx) {
-                    btn.style.background = 'rgba(44,195,255,0.3)';
-                    btn.style.transform = 'translateY(-2px)';
-                }
-            });
-            btn.addEventListener('mouseleave', () => {
-                if (answers[current] !== idx) {
-                    btn.style.background = 'rgba(44,195,255,0.1)';
-                    btn.style.transform = 'translateY(0)';
-                }
-            });
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.option-btn').forEach(b => {
                     b.style.background = 'rgba(44,195,255,0.1)';
                     b.style.color = 'white';
-                    b.style.boxShadow = 'none';
                 });
                 btn.style.background = 'linear-gradient(135deg, #2cc3ff, #1a9fd0)';
                 btn.style.color = '#0a192f';
-                btn.style.boxShadow = '0 0 15px rgba(44,195,255,0.5)';
-                selectedOptionIndex = idx;
                 answers[current] = idx;
             });
             buttons.push(btn);
@@ -196,57 +147,32 @@ document.addEventListener('DOMContentLoaded', function() {
         return buttons;
     }
     
-    // ===== LOAD CURRENT QUESTION =====
     function loadQuestion() {
         const q = questions[current];
         if (!q) return;
         questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
         questionTextDiv.innerText = q.text;
-        
         optionsContainer.innerHTML = '';
-        const buttons = createOptionButtons();
-        buttons.forEach(btn => optionsContainer.appendChild(btn));
-        
+        createOptionButtons().forEach(btn => optionsContainer.appendChild(btn));
         prevBtn.style.opacity = current === 0 ? '0.5' : '1';
         prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
-        
-        if (current === total - 1) {
-            nextBtn.innerHTML = '✔ {{ t.finish|default("Ավարտել") }}';
-        } else {
-            nextBtn.innerHTML = '{{ t.next|default("Հաջորդ") }} ▶';
-        }
-        
+        nextBtn.innerHTML = (current === total - 1) ? '✔ {{ t.finish|default("Ավարտել") }}' : '{{ t.next|default("Հաջորդ") }} ▶';
         resultDiv.innerHTML = '';
     }
     
-    // ===== NEXT BUTTON =====
     function nextQuestion() {
-        if (current === total - 1) {
-            finishQuiz();
-        } else {
-            current++;
-            loadQuestion();
-        }
+        if (current === total - 1) finishQuiz();
+        else { current++; loadQuestion(); }
     }
     
-    // ===== PREVIOUS BUTTON =====
-    function prevQuestion() {
-        if (current > 0) {
-            current--;
-            loadQuestion();
-        }
-    }
+    function prevQuestion() { if (current > 0) { current--; loadQuestion(); } }
     
-    // ===== FINISH QUIZ (WITH MODAL) =====
     function finishQuiz() {
         let score = 0;
         for (let i = 0; i < total; i++) {
-            if (answers[i] !== null && answers[i] === questions[i].correct) {
-                score++;
-            }
+            if (answers[i] !== null && answers[i] === questions[i].correct) score++;
         }
         const percent = Math.round((score / total) * 100);
-        
         const modal = document.getElementById('nameModal');
         const nameInput = document.getElementById('playerName');
         const okBtn = document.getElementById('modalOk');
@@ -261,51 +187,29 @@ document.addEventListener('DOMContentLoaded', function() {
             if (name && name.trim()) {
                 fetch('/save_score', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        name: name.trim(),
-                        level: '{{ level }}',
-                        score: score,
-                        total: total,
-                        percent: percent
-                    })
-                }).then(() => {
-                    window.location.href = '/leaderboard';
-                }).catch(() => {
-                    resultDiv.innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
-                    nextBtn.disabled = true;
-                    prevBtn.disabled = true;
-                });
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name.trim(), level: '{{ level }}', score: score, total: total, percent: percent })
+                }).then(() => { window.location.href = '/leaderboard'; })
+                  .catch(() => { resultDiv.innerHTML = `<div style="padding:15px;background:rgba(44,195,255,0.2);border-radius:20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`; });
             } else {
-                resultDiv.innerHTML = `<div style="padding: 15px; background: rgba(44,195,255,0.2); border-radius: 20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
-                nextBtn.disabled = true;
-                prevBtn.disabled = true;
+                resultDiv.innerHTML = `<div style="padding:15px;background:rgba(44,195,255,0.2);border-radius:20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
             }
         };
         
         const okHandler = () => submitScore(nameInput.value);
         const cancelHandler = () => submitScore('');
-        const enterHandler = (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                okHandler();
-            }
-        };
+        const enterHandler = (e) => { if (e.key === 'Enter') { e.preventDefault(); okHandler(); } };
         
         okBtn.removeEventListener('click', okHandler);
         cancelBtn.removeEventListener('click', cancelHandler);
         nameInput.removeEventListener('keypress', enterHandler);
-        
         okBtn.addEventListener('click', okHandler);
         cancelBtn.addEventListener('click', cancelHandler);
         nameInput.addEventListener('keypress', enterHandler);
     }
     
-    // ===== EVENT LISTENERS =====
     prevBtn.addEventListener('click', prevQuestion);
     nextBtn.addEventListener('click', nextQuestion);
-    
-    // ===== INIT =====
     loadQuestion();
 });
 </script>
