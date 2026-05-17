@@ -90,20 +90,22 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
     // 1. Ստանալ տվյալները Flask-ից
     const currentLang = '{{ lang }}';
     const allQuestions = {{ questions | tojson }};
     
     // 2. Ստուգել, որ allQuestions-ը գոյություն ունի և ունի ընթացիկ լեզուն
     if (!allQuestions || typeof allQuestions !== 'object') {
-        document.getElementById('question-text').innerText = '⚠️ Տվյալների բազայի սխալ: allQuestions is missing.';
+        const errorDiv = document.getElementById('question-text');
+        if (errorDiv) errorDiv.innerText = '⚠️ Տվյալների բազայի սխալ: allQuestions is missing.';
         return;
     }
     
     const questions = allQuestions[currentLang];
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
-        document.getElementById('question-text').innerText = '⚠️ Տվյալների բազայի սխալ: questions not found for language ' + currentLang;
+        const errorDiv = document.getElementById('question-text');
+        if (errorDiv) errorDiv.innerText = '⚠️ Տվյալների բազայի սխալ: questions not found for language ' + currentLang;
         return;
     }
     
@@ -113,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let current = 0;
     let answers = new Array(total).fill(null);
     
+    // DOM elements
     const questionNumberDiv = document.getElementById('question-number');
     const questionTextDiv = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
@@ -120,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextBtn = document.getElementById('next-btn');
     const resultDiv = document.getElementById('quiz-result');
     
+    // Helper to create option buttons
     function createOptionButtons() {
         const q = questions[current];
         if (!q) return [];
@@ -137,40 +141,56 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.style.color = answers[current] === idx ? '#0a192f' : 'white';
             btn.style.cursor = 'pointer';
             btn.style.transition = 'all 0.2s';
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.option-btn').forEach(b => {
-                    b.style.background = 'rgba(44,195,255,0.1)';
-                    b.style.color = 'white';
-                });
-                btn.style.background = 'linear-gradient(135deg, #2cc3ff, #1a9fd0)';
-                btn.style.color = '#0a192f';
-                answers[current] = idx;
-            });
+            btn.addEventListener('click', (function(index) {
+                return function() {
+                    document.querySelectorAll('.option-btn').forEach(b => {
+                        b.style.background = 'rgba(44,195,255,0.1)';
+                        b.style.color = 'white';
+                    });
+                    btn.style.background = 'linear-gradient(135deg, #2cc3ff, #1a9fd0)';
+                    btn.style.color = '#0a192f';
+                    answers[current] = index;
+                };
+            })(idx));
             buttons.push(btn);
         });
         return buttons;
     }
     
+    // Load current question
     function loadQuestion() {
         const q = questions[current];
         if (!q) return;
-        questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
-        questionTextDiv.innerText = q.text;
-        optionsContainer.innerHTML = '';
-        createOptionButtons().forEach(btn => optionsContainer.appendChild(btn));
-        prevBtn.style.opacity = current === 0 ? '0.5' : '1';
-        prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
-        nextBtn.innerHTML = (current === total - 1) ? '✔ {{ t.finish|default("Ավարտել") }}' : '{{ t.next|default("Հաջորդ") }} ▶';
-        resultDiv.innerHTML = '';
+        if (questionNumberDiv) questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
+        if (questionTextDiv) questionTextDiv.innerText = q.text;
+        if (optionsContainer) {
+            optionsContainer.innerHTML = '';
+            createOptionButtons().forEach(btn => optionsContainer.appendChild(btn));
+        }
+        if (prevBtn) {
+            prevBtn.style.opacity = current === 0 ? '0.5' : '1';
+            prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
+        }
+        if (nextBtn) {
+            nextBtn.innerHTML = (current === total - 1) ? '✔ {{ t.finish|default("Ավարտել") }}' : '{{ t.next|default("Հաջորդ") }} ▶';
+        }
+        if (resultDiv) resultDiv.innerHTML = '';
     }
     
     function nextQuestion() {
-        if (current === total - 1) finishQuiz();
-        else { current++; loadQuestion(); }
+        if (current === total - 1) {
+            finishQuiz();
+        } else {
+            current++;
+            loadQuestion();
+        }
     }
     
     function prevQuestion() {
-        if (current > 0) { current--; loadQuestion(); }
+        if (current > 0) {
+            current--;
+            loadQuestion();
+        }
     }
     
     function finishQuiz() {
@@ -184,12 +204,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const okBtn = document.getElementById('modalOk');
         const cancelBtn = document.getElementById('modalCancel');
         
-        modal.style.display = 'flex';
-        nameInput.value = '';
-        nameInput.focus();
+        if (modal) modal.style.display = 'flex';
+        if (nameInput) {
+            nameInput.value = '';
+            nameInput.focus();
+        }
         
         const submitScore = (name) => {
-            modal.style.display = 'none';
+            if (modal) modal.style.display = 'none';
             if (name && name.trim()) {
                 fetch('/save_score', {
                     method: 'POST',
@@ -197,28 +219,37 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ name: name.trim(), level: '{{ level }}', score: score, total: total, percent: percent })
                 }).then(() => { window.location.href = '/leaderboard'; })
                   .catch(() => {
-                      resultDiv.innerHTML = `<div style="padding:15px;background:rgba(44,195,255,0.2);border-radius:20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+                      if (resultDiv) resultDiv.innerHTML = `<div style="padding:15px;background:rgba(44,195,255,0.2);border-radius:20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
                   });
             } else {
-                resultDiv.innerHTML = `<div style="padding:15px;background:rgba(44,195,255,0.2);border-radius:20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
+                if (resultDiv) resultDiv.innerHTML = `<div style="padding:15px;background:rgba(44,195,255,0.2);border-radius:20px;">{{ t.result }}: ${score}/${total} (${percent}%)</div>`;
             }
         };
         
-        const okHandler = () => submitScore(nameInput.value);
+        const okHandler = () => submitScore(nameInput ? nameInput.value : '');
         const cancelHandler = () => submitScore('');
         const enterHandler = (e) => { if (e.key === 'Enter') { e.preventDefault(); okHandler(); } };
         
-        okBtn.removeEventListener('click', okHandler);
-        cancelBtn.removeEventListener('click', cancelHandler);
-        nameInput.removeEventListener('keypress', enterHandler);
-        okBtn.addEventListener('click', okHandler);
-        cancelBtn.addEventListener('click', cancelHandler);
-        nameInput.addEventListener('keypress', enterHandler);
+        if (okBtn) {
+            okBtn.removeEventListener('click', okHandler);
+            okBtn.addEventListener('click', okHandler);
+        }
+        if (cancelBtn) {
+            cancelBtn.removeEventListener('click', cancelHandler);
+            cancelBtn.addEventListener('click', cancelHandler);
+        }
+        if (nameInput) {
+            nameInput.removeEventListener('keypress', enterHandler);
+            nameInput.addEventListener('keypress', enterHandler);
+        }
     }
     
-    prevBtn.addEventListener('click', prevQuestion);
-    nextBtn.addEventListener('click', nextQuestion);
+    // Event listeners
+    if (prevBtn) prevBtn.addEventListener('click', prevQuestion);
+    if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
+    
+    // Start the quiz
     loadQuestion();
-});
+})();
 </script>
 {% endblock %}
