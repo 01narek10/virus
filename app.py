@@ -702,7 +702,7 @@ def quiz(level):
     if level not in questions_db:
         return redirect("/quiz")
     
-    all_questions = questions_db[level]
+    all_questions = questions_db[level]   # <--- Սա {'hy': [...], 'ru': [...], 'en': [...]}
     
     level_names = {
         'very_easy': {'hy': 'Շատ հեշտ', 'ru': 'Очень легкий', 'en': 'Very Easy'},
@@ -718,10 +718,10 @@ def quiz(level):
     
     return render_template("quiz.html",
         level=level,
-        level_name=level_names[level],
+        level_name=level_names[level],   # <--- dictionary
         level_class=level_classes[level],
-        questions=all_questions,
-        total=len(all_questions['hy'])
+        questions=all_questions,         # <--- ամբողջ dict-ը
+        total=len(all_questions['hy'])   # <--- total-ը վերցնում ենք հայերենից
     )
 
 @app.route("/leaderboard")
