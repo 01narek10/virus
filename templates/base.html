@@ -52,48 +52,76 @@
     <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}">🇷🇺 Рус</a>
     <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
-
-
 <!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <!-- Համբուրգերի կոճակ (մոբայլ տեսքի համար) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Կրճատվող բաժին -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/">
-                    {% if lang == 'hy' %}🏠 Գլխավոր
-                    {% elif lang == 'ru' %}🏠 Главная
-                    {% else %}🏠 Home{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/map">
-                    {% if lang == 'hy' %}🗺️ Քարտեզ
-                    {% elif lang == 'ru' %}🗺️ Карта
-                    {% else %}🗺️ Map{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/quiz">
-                    {% if lang == 'hy' %}🧪 Վիկտորինա
-                    {% elif lang == 'ru' %}🧪 Викторина
-                    {% else %}🧪 Quiz{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/leaderboard">
-                    {% if lang == 'hy' %}🏆 Ցուցակ
-                    {% elif lang == 'ru' %}🏆 Таблица
-                    {% else %}🏆 Leaderboard{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/simulator">
-                    {% if lang == 'hy' %}🧬 Սիմուլյատոր
-                    {% elif lang == 'ru' %}🧬 Симулятор
-                    {% else %}🧬 Simulator{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/compare">
-                    {% if lang == 'hy' %}🔍 Համեմատել
-                    {% elif lang == 'ru' %}🔍 Сравнить
-                    {% else %}🔍 Compare{% endif %}
-                </a></li>
-                <li class="nav-item"><a class="nav-link" href="/air-purifier">
-                    {% if lang == 'hy' %}🧪 Մեր մոդելը
-                    {% elif lang == 'ru' %}🧪 Наша модель
-                    {% else %}🧪 Our model{% endif %}
-                </a></li>
+            <!-- navbar-nav me-auto - կոճակները ձախից -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        {% if lang == 'hy' %}🏠 Գլխավոր
+                        {% elif lang == 'ru' %}🏠 Главная
+                        {% else %}🏠 Home{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/map">
+                        {% if lang == 'hy' %}🗺️ Քարտեզ
+                        {% elif lang == 'ru' %}🗺️ Карта
+                        {% else %}🗺️ Map{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/quiz">
+                        {% if lang == 'hy' %}🧪 Վիկտորինա
+                        {% elif lang == 'ru' %}🧪 Викторина
+                        {% else %}🧪 Quiz{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/leaderboard">
+                        {% if lang == 'hy' %}🏆 Ցուցակ
+                        {% elif lang == 'ru' %}🏆 Таблица
+                        {% else %}🏆 Leaderboard{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/simulator">
+                        {% if lang == 'hy' %}🧬 Սիմուլյատոր
+                        {% elif lang == 'ru' %}🧬 Симулятор
+                        {% else %}🧬 Simulator{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/compare">
+                        {% if lang == 'hy' %}🔍 Համեմատել
+                        {% elif lang == 'ru' %}🔍 Сравнить
+                        {% else %}🔍 Compare{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/air-purifier">
+                        {% if lang == 'hy' %}🧼 Մեր մոդելը
+                        {% elif lang == 'ru' %}🧼 Наша модель
+                        {% else %}🧼 Our model{% endif %}
+                    </a>
+                </li>
             </ul>
+            <!-- navbar-nav me-auto-ն ավարտվեց -->
         </div>
+        <!-- collapse-ը ավարտվեց -->
+
+        <!-- Լեզվի և թեմայի ընտրիչները (աջ կողմում) – արդեն պետք է լինեն, բայց համոզվեք, որ դրանք դուրս են navbar-collapse-ից -->
+        <!-- (ձեր language-selector-ը և themeToggle-ը արդեն կան առանձին) -->
+    </div>
+</nav>
 
 
 <main class="container">
