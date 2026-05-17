@@ -91,11 +91,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Ստանալ տվյալները Flask-ից
     const currentLang = '{{ lang }}';
     const allQuestions = {{ questions | tojson }};
     
-    // 2. Ստուգել, որ allQuestions-ը գոյություն ունի
     if (!allQuestions || typeof allQuestions !== 'object') {
         const errorDiv = document.getElementById('question-text');
         if (errorDiv) errorDiv.innerText = '⚠️ Տվյալների բազայի սխալ: allQuestions is missing.';
@@ -115,7 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let current = 0;
     let answers = new Array(total).fill(null);
     
-    // DOM elements
     const questionNumberDiv = document.getElementById('question-number');
     const questionTextDiv = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
@@ -123,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextBtn = document.getElementById('next-btn');
     const resultDiv = document.getElementById('quiz-result');
     
-    // Helper to create option buttons
     function createOptionButtons() {
         const q = questions[current];
         if (!q) return [];
@@ -157,12 +153,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return buttons;
     }
     
-    // Load current question
     function loadQuestion() {
         const q = questions[current];
         if (!q) return;
         if (questionNumberDiv) questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
-        if (questionTextDiv) questionTextDiv.innerText = q.text;
+        // ՈՒՂՂՈՒՄ․ q.text → q.question
+        if (questionTextDiv) questionTextDiv.innerText = q.question;
         if (optionsContainer) {
             optionsContainer.innerHTML = '';
             createOptionButtons().forEach(btn => optionsContainer.appendChild(btn));
@@ -244,11 +240,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Event listeners
     if (prevBtn) prevBtn.addEventListener('click', prevQuestion);
     if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
     
-    // Start the quiz
     loadQuestion();
 });
 </script>
