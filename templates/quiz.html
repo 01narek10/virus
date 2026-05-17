@@ -8,11 +8,7 @@
     <div id="quiz-container" style="background: rgba(6,20,45,0.6); border-radius: 20px; padding: 30px; margin: 20px 0;">
         <div id="question-number" style="color: #2cc3ff; margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
         <div id="question-text" style="font-size: 1.4rem; margin-bottom: 35px; text-align: center; line-height: 1.4; color: white;"></div>
-        <div id="options-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 35px;"></div>
-        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
-            <button id="prev-btn" class="quiz-nav-btn" style="background: rgba(44,195,255,0.2); color: white; padding: 12px 30px; border: 1px solid #2cc3ff; border-radius: 50px; font-size: 1rem; cursor: pointer;">◀ {{ t.prev|default('Նախորդ') }}</button>
-            <button id="next-btn" class="quiz-nav-btn" style="background: linear-gradient(135deg, #2cc3ff, #1a9fd0); color: #0a192f; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer;">{{ t.next|default('Հաջորդ') }} ▶</button>
-        </div>
+        <div id="options-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 35px;"></div>
         <div id="quiz-result" style="margin-top: 25px; text-align: center; font-size: 1.1rem; color: white;"></div>
     </div>
 </div>
@@ -108,17 +104,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const total = questions.length;
-    console.log('✅ Quiz initialized:', { currentLang, total, firstQuestion: questions[0] });
-    
     let current = 0;
     let answers = new Array(total).fill(null);
+    let waitingForNext = false;
     
     const questionNumberDiv = document.getElementById('question-number');
     const questionTextDiv = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
     const resultDiv = document.getElementById('quiz-result');
+    
+    function disableButtons(disabled) {
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.disabled = disabled;
+        });
+    }
+    
+    function showAnswerFeedback(selectedIdx) {
+        const q = questions[current];
+        const allButtons = document.querySelectorAll('.option-btn');
+        // Reset all buttons to default style
+        allButtons.forEach((btn, idx) => {
+            btn.style.background = 'rgba(44,195,255,0.1)';
+            btn.style.color = 'white';
+            btn.style.border = '2px solid #2cc3ff';
+            // Highlight correct answer in green
+            if (idx === q.correct) {
+                btn.style.background = '#28a745';
+                btn.style.border = '2px solid #28a745';
+                btn.style.color = 'white';
+            }
+            // Highlight selected wrong answer in red
+            if (idx === selectedIdx && idx !== q.correct) {
+                btn.style.background = '#dc3545';
+                btn.style.border = '2px solid #dc3545';
+                btn.style.color = 'white';
+            }
+        });
+    }
     
     function createOptionButtons() {
         const q = questions[current];
@@ -128,26 +150,40 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = document.createElement('button');
             btn.textContent = opt;
             btn.className = 'option-btn';
-            btn.style.background = answers[current] === idx ? 'linear-gradient(135deg, #2cc3ff, #1a9fd0)' : 'rgba(44,195,255,0.1)';
+            btn.style.background = 'rgba(44,195,255,0.1)';
             btn.style.border = '2px solid #2cc3ff';
             btn.style.borderRadius = '50px';
-            btn.style.padding = '14px 20px';
-            btn.style.fontSize = '1rem';
+            btn.style.padding = '8px 12px';  // փոքրացրած
+            btn.style.fontSize = '0.9rem';    // փոքրացրած
             btn.style.fontWeight = 'bold';
-            btn.style.color = answers[current] === idx ? '#0a192f' : 'white';
+            btn.style.color = 'white';
             btn.style.cursor = 'pointer';
             btn.style.transition = 'all 0.2s';
-            btn.addEventListener('click', (function(index) {
-                return function() {
-                    document.querySelectorAll('.option-btn').forEach(b => {
-                        b.style.background = 'rgba(44,195,255,0.1)';
-                        b.style.color = 'white';
-                    });
-                    btn.style.background = 'linear-gradient(135deg, #2cc3ff, #1a9fd0)';
-                    btn.style.color = '#0a192f';
-                    answers[current] = index;
-                };
-            })(idx));
+            btn.style.width = '100%';
+            
+            btn.addEventListener('click', () => {
+                if (waitingForNext) return;
+                if (answers[current] !== null) return;
+                
+                answers[current] = idx;
+                waitingForNext = true;
+                
+                showAnswerFeedback(idx);
+                disableButtons(true);
+                
+                // Auto move to next question after 1 second
+                setTimeout(() => {
+                    if (current + 1 < total) {
+                        current++;
+                        loadQuestion();
+                        waitingForNext = false;
+                        disableButtons(false);
+                    } else {
+                        // Quiz finished
+                        finishQuiz();
+                    }
+                }, 1000);
+            });
             buttons.push(btn);
         });
         return buttons;
@@ -157,36 +193,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const q = questions[current];
         if (!q) return;
         if (questionNumberDiv) questionNumberDiv.innerText = `{{ t.question }} ${current+1} / ${total}`;
-        // ՈՒՂՂՈՒՄ․ q.text → q.question
         if (questionTextDiv) questionTextDiv.innerText = q.question;
         if (optionsContainer) {
             optionsContainer.innerHTML = '';
             createOptionButtons().forEach(btn => optionsContainer.appendChild(btn));
         }
-        if (prevBtn) {
-            prevBtn.style.opacity = current === 0 ? '0.5' : '1';
-            prevBtn.style.pointerEvents = current === 0 ? 'none' : 'auto';
-        }
-        if (nextBtn) {
-            nextBtn.innerHTML = (current === total - 1) ? '✔ {{ t.finish|default("Ավարտել") }}' : '{{ t.next|default("Հաջորդ") }} ▶';
-        }
         if (resultDiv) resultDiv.innerHTML = '';
-    }
-    
-    function nextQuestion() {
-        if (current === total - 1) {
-            finishQuiz();
-        } else {
-            current++;
-            loadQuestion();
-        }
-    }
-    
-    function prevQuestion() {
-        if (current > 0) {
-            current--;
-            loadQuestion();
-        }
+        waitingForNext = false;
     }
     
     function finishQuiz() {
@@ -239,9 +252,6 @@ document.addEventListener('DOMContentLoaded', function() {
             nameInput.addEventListener('keypress', enterHandler);
         }
     }
-    
-    if (prevBtn) prevBtn.addEventListener('click', prevQuestion);
-    if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
     
     loadQuestion();
 });
