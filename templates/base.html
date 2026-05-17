@@ -52,17 +52,17 @@
     <a href="/set_language/ru" class="lang-btn {% if lang == 'ru' %}active{% endif %}">🇷🇺 Рус</a>
     <a href="/set_language/en" class="lang-btn {% if lang == 'en' %}active{% endif %}">🇬🇧 En</a>
 </div>
+
+<!-- THEME TOGGLE -->
+<button id="themeToggle" class="theme-toggle">🌙</button>
+
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <!-- Համբուրգերի կոճակ (մոբայլ տեսքի համար) -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-        <!-- Կրճատվող բաժին -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- navbar-nav me-auto - կոճակները ձախից -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" href="/">
@@ -114,15 +114,9 @@
                     </a>
                 </li>
             </ul>
-            <!-- navbar-nav me-auto-ն ավարտվեց -->
         </div>
-        <!-- collapse-ը ավարտվեց -->
-
-        <!-- Լեզվի և թեմայի ընտրիչները (աջ կողմում) – արդեն պետք է լինեն, բայց համոզվեք, որ դրանք դուրս են navbar-collapse-ից -->
-        <!-- (ձեր language-selector-ը և themeToggle-ը արդեն կան առանձին) -->
     </div>
 </nav>
-
 
 <main class="container">
     {% block content %}{% endblock %}
@@ -252,7 +246,7 @@ function removeThinking(id) {
     if (el) el.remove();
 }
 
-// ===== STREAMING CHAT (LETTER BY LETTER) =====
+// ===== STREAMING CHAT =====
 async function sendMessageStream() {
     var input = document.getElementById('userInput');
     var message = input.value.trim();
