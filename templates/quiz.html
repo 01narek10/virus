@@ -119,13 +119,15 @@
 </style>
 
 <script>
-// ===== GET CURRENT LANGUAGE =====
-const currentLang = '{{ lang }}';
 
-// ===== LOAD QUESTIONS FOR CURRENT LANGUAGE =====
-const allQuestions = {{ questions | tojson }};
-const questions = allQuestions[currentLang] || allQuestions['hy'];
-const total = questions.length;
+    const currentLang = '{{ lang }}';
+    const allQuestions = {{ questions | tojson }};
+    const questions = allQuestions[currentLang] || allQuestions['hy'];
+    const total = questions.length;
+    
+    console.log('Loaded questions:', questions);  // <--- debug: ստուգիր console-ում
+    // ... մնացած կոդը
+
 
 let current = 0;
 let answers = new Array(total).fill(null);
