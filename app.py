@@ -399,14 +399,15 @@ translations = {
         'component_vibrator': '⚡ Արագ տատանվող սարք (պզզիկ) – ալկոհոլի գոլորշի է արտադրում, որը ոչնչացնում է վիրուսներն ու բակտերիաները',
         'component_power': '🔌 Սնուցում՝ 220V → 12V (քուլերի համար) և 220V → 5V (պզզիկի համար)',
         'safety_title': '⚠️ Անվտանգության կանոններ',
-        'safety_rule1': '• Զգույշ եղեք էլեկտրական հոսանքի հետ. սարքն աշխատում է 220V ցանցից:',
-        'safety_rule2': '• ՀԱՆԿԱՐԾ մի թեքեք սարքը, որպեսզի ալկոհոլի հեղուկը չթափվի:',
-        'safety_rule3': '• Սարքը տեղադրեք կայուն, հարթ մակերևույթի վրա:',
-        'safety_rule4': '• Մի ծածկեք օդի մուտքի/ելքի անցքերը:',
+        'safety_rule1': ' Զգույշ եղեք էլեկտրական հոսանքի հետ. սարքն աշխատում է 220V ցանցից:',
+        'safety_rule2': ' ՀԱՆԿԱՐԾ մի թեքեք սարքը, որպեսզի ալկոհոլի հեղուկը չթափվի:',
+        'safety_rule3': ' Սարքը տեղադրեք կայուն, հարթ մակերևույթի վրա:',
+        'safety_rule4': ' Մի ծածկեք օդի մուտքի/ելքի անցքերը:',
         'recommendation_title': '✅ Խորհուրդ',
         'recommendation_text': 'Սարքը միացնել օրվա ընթացքում 20-30 րոպե մեկ սենյակի համար: Բավարար է օդը մաքուր և ախտահանված պահելու համար:',
         'conclusion_title': '📌 Եզրակացություն',
-        'conclusion_text': 'Այս մոդելը ցույց է տալիս, թե ինչպես ինժեներական մոտեցմամբ կարելի է ստեղծել արդյունավետ, ցածր գնով և տեսողական ուժեղ ազդեցությամբ ախտահանիչ սարք:'
+        'conclusion_text': 'Այս մոդելը ցույց է տալիս, թե ինչպես ինժեներական մոտեցմամբ կարելի է ստեղծել արդյունավետ, ցածր գնով և տեսողական ուժեղ ազդեցությամբ ախտահանիչ սարք:',
+        'safety_rule5': ' Մոդելը չմիացնել պատուհանի մոտ, քանի որ քամին խառնում և անհավասարաչափ բրդում է հեղուկը:'
     },
     'ru': {
         'home': '🏠 Главная',
@@ -531,13 +532,14 @@ translations = {
         'component_vibrator': '⚡ Быстровибрирующее устройство (пищалка) – производит пары спирта, которые уничтожают вирусы и бактерии',
         'component_power': '🔌 Питание: 220V → 12V (для кулера) и 220V → 5V (для пищалки)',
         'safety_title': '⚠️ Правила безопасности',
-        'safety_rule1': '• Будьте осторожны с электрическим током — устройство работает от сети 220V.',
-        'safety_rule2': '• НИ В КОЕМ СЛУЧАЕ не наклоняйте устройство, чтобы спиртовая жидкость не вылилась.',
-        'safety_rule3': '• Устанавливайте устройство на устойчивую ровную поверхность.',
-        'safety_rule4': '• Не закрывайте входные/выходные отверстия для воздуха.',
+        'safety_rule1': ' Будьте осторожны с электрическим током — устройство работает от сети 220V.',
+        'safety_rule2': ' НИ В КОЕМ СЛУЧАЕ не наклоняйте устройство, чтобы спиртовая жидкость не вылилась.',
+        'safety_rule3': ' Устанавливайте устройство на устойчивую ровную поверхность.',
+        'safety_rule4': ' Не закрывайте входные/выходные отверстия для воздуха.',
         'recommendation_title': '✅ Рекомендация',
         'recommendation_text': 'Включайте устройство на 20–30 минут в день на одно помещение. Этого достаточно для поддержания чистого и обеззараженного воздуха.',
         'conclusion_title': '📌 Заключение',
+        'safety_rule5': ' Не включайте устройство рядом с окном, так как ветер перемешивает и неравномерно взбалтывает жидкость.',
         'conclusion_text': 'Эта модель показывает, как с помощью инженерного подхода можно создать эффективное, недорогое и визуально эффектное дезинфицирующее устройство.'
     },
     'en': {
@@ -663,13 +665,14 @@ translations = {
         'component_vibrator': '⚡ Fast‑vibrating buzzer – produces alcohol vapour that kills viruses and bacteria',
         'component_power': '🔌 Power supply: 220V → 12V (for fan) and 220V → 5V (for buzzer)',
         'safety_title': '⚠️ Safety rules',
-        'safety_rule1': '• Be careful with mains electricity – the device runs on 220V.',
-        'safety_rule2': '• NEVER tilt the device, otherwise the alcohol liquid may spill.',
-        'safety_rule3': '• Place the device on a stable, flat surface.',
-        'safety_rule4': '• Do not cover the air intake/exhaust vents.',
+        'safety_rule1': ' Be careful with mains electricity – the device runs on 220V.',
+        'safety_rule2': ' NEVER tilt the device, otherwise the alcohol liquid may spill.',
+        'safety_rule3': ' Place the device on a stable, flat surface.',
+        'safety_rule4': ' Do not cover the air intake/exhaust vents.',
         'recommendation_title': '✅ Recommendation',
         'recommendation_text': 'Run the device for 20–30 minutes per day per room. This is enough to keep the air clean and disinfected.',
         'conclusion_title': '📌 Conclusion',
+        'safety_rule5': ' Do not turn on the device near a window, as the wind stirs and unevenly shakes the liquid.',
         'conclusion_text': 'This model shows how an engineering approach can create an effective, low‑cost, visually impactful sterilizer.'
     }
 }
