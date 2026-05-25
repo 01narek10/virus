@@ -765,7 +765,6 @@ def save_score():
     return jsonify({'success': True})
 
 
-# ===== AI CHAT WITH KNOWLEDGE BASE + MEMORY =====
 @app.route("/api/chat", methods=['POST'])
 def chat():
     try:
@@ -773,101 +772,93 @@ def chat():
         user_message = data.get('message', '')
         language = data.get('language', 'hy')
         
-        # Initialize chat history
         if 'chat_history' not in session:
             session['chat_history'] = []
         
-        # Add user message
+        # Ավելացնել նոր հաղորդագրություն
         session['chat_history'].append({"role": "user", "content": user_message})
         
-        # Keep only last 6 messages (3 user + 3 assistant)
-        if len(session['chat_history']) > 6:
-            session['chat_history'] = session['chat_history'][-6:]
+        # Պահել միայն վերջին 4 հաղորդագրությունը (2 հարց + 2 պատասխան)
+        if len(session['chat_history']) > 4:
+            session['chat_history'] = session['chat_history'][-4:]
         
-        # Build history text
+        # Կառուցել կարճ պատմություն (առանց ավելորդ տեքստի)
         history_text = ""
         for msg in session['chat_history'][:-1]:
-            role = "Օգտատեր" if msg['role'] == 'user' else "AI"
+            role = "User" if msg['role'] == 'user' else "Assistant"
             history_text += f"{role}: {msg['content']}\n"
         
-        prompts = {
-            'hy': f"""Դու վիրուսաբանության համաշխարհային մակարդակի փորձագետ ես: Հաշվի առ նախորդ զրույցը:
-
-            ՆԱԽՈՐԴ ԶՐՈՒՅՑ.
-            {history_text}
-
-            ՎԻՐՈՒՍԱՅԻՆ ԳԻՏԵԼԻՔՆԵՐ.
-            {VIRUS_KNOWLEDGE}
-
-            ԿԱՐԵՎՈՐ ԿԱՆՈՆՆԵՐ.
-            - Պատասխանի՛ր ՄԻԱՅՆ հայերենով
-            - Եղիր հակիրճ, հստակ, ամենակարևոր փաստերով
-            - Եթե հարցը վիրուսների մասին ՉԷ, ասա, որ դու վիրուսաբանության մասնագետ ես
-            - Օգտագործիր բուլետներ (•) ցուցակների համար
-
-            ՀԱՐՑ. {user_message}
-
-            ՊԱՏԱՍԽԱՆ.
-            """,
-            'ru': f"""Ты эксперт мирового уровня по вирусологии: Учти предыдущий разговор:
-
-            ПРЕДЫДУЩИЙ РАЗГОВОР:
-            {history_text}
-
-            БАЗА ЗНАНИЙ О ВИРУСАХ:
-            {VIRUS_KNOWLEDGE}
-
-            ВАЖНЫЕ ПРАВИЛА:
-            - Отвечай ТОЛЬКО на русском языке
-            - Будь кратким, четким, с самыми важными фактами
-            - Если вопрос НЕ о вирусах, скажи, что ты специалист по вирусологии
-            - Используй маркированные списки (•)
-
-            ВОПРОС: {user_message}
-
-            ОТВЕТ:
-            """,
-            'en': f"""You are a world-class virology expert: Consider the previous conversation:
-
-            PREVIOUS CONVERSATION:
-            {history_text}
-
-            VIRUS KNOWLEDGE BASE:
-            {VIRUS_KNOWLEDGE}
-
-            IMPORTANT RULES:
-            - Answer ONLY in English
-            - Be concise, clear, with the most important facts
-            - If the question is NOT about viruses, say you are a virology specialist
-            - Use bullet points (•) for lists
-
-            QUESTION: {user_message}
-
-            ANSWER:
-            """
-        }
+        # Կարճ, հստակ knowledge base (միայն ամենակարևոր վիրուսները)
+        KNOWLEDGE_SHORT = """
+COVID-19: 2019, airborne, fever/cough, vaccine available
+Ebola: 1976, body fluids, bleeding/fever, mortality 50-90%
+HIV: 1983, blood/sexual, weakens immune system, no vaccine
+Flu: airborne, fever/cough, annual vaccine
+Rotavirus: 1973, diarrhea/vomiting, vaccine
+Adenovirus: 1953, cold/sore throat, vaccine
+Dengue: mosquito, fever/rash/joint pain
+Hantavirus: rodents, breathing problems
+Nipah: bats, brain swelling
+Zika: mosquito, birth defects
+MERS: camels, mortality 35%
+Polio: paralysis, vaccine
+Measles: rash/fever/cough, vaccine
+Smallpox: eradicated 1980
+HPV: cervical cancer, vaccine
+"""
         
-        system_prompt = prompts.get(language, prompts['hy'])
+        # Պարզ, կարճ prompts (առանց ավելորդ հրահանգների)
+        if language == 'hy':
+            system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով: 
+
+{history_text}
+
+Տվյալներ:
+{KNOWLEDGE_SHORT}
+
+Հարց: {user_message}
+
+Պատասխան:"""
+        elif language == 'ru':
+            system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком.
+
+{history_text}
+
+Данные:
+{KNOWLEDGE_SHORT}
+
+Вопрос: {user_message}
+
+Ответ:"""
+        else:
+            system_prompt = f"""You are a virus expert. Answer briefly, with correct English.
+
+{history_text}
+
+Data:
+{KNOWLEDGE_SHORT}
+
+Question: {user_message}
+
+Answer:"""
         
+        # Groq API call
         response = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama3-8b-8192",  # Ավելի կարճ մոդել (8B) 8192 context
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.5,
-            max_tokens=8192
+            temperature=0.3,
+            max_tokens=1024  # 8192-ը չափազանց մեծ է, 1024-ը բավարար է կարճ պատասխանների համար
         )
         
         reply = response.choices[0].message.content
-        
-        # Save assistant response to history
         session['chat_history'].append({"role": "assistant", "content": reply})
         
         return jsonify({'reply': reply})
     except Exception as e:
         return jsonify({'reply': f'❌ Error: {str(e)}'}), 500
-
 
 # ===== STREAMING CHAT ENDPOINT =====
 @app.route("/api/chat/stream", methods=['POST'])
