@@ -4516,3 +4516,72 @@ footer::before {
             margin-top: 40px;
             color: #aaa;
         }
+
+
+/* TIMELINE STYLES */
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background: rgba(6, 20, 45, 0.5);
+    border-radius: 16px;
+    padding: 15px;
+    transition: transform 0.2s;
+}
+
+.timeline-item:hover {
+    transform: translateX(5px);
+    background: rgba(44, 195, 255, 0.1);
+}
+
+.timeline-year {
+    min-width: 120px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--border-color);
+    text-align: left;
+    padding-top: 4px;
+}
+
+.timeline-content {
+    flex: 1;
+}
+
+.timeline-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.timeline-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .timeline-item {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+    }
+    .timeline-year {
+        min-width: auto;
+        font-size: 1rem;
+    }
+    .timeline-content h3 {
+        font-size: 1rem;
+    }
+    .timeline-content p {
+        font-size: 0.85rem;
+    }
+}
