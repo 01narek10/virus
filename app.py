@@ -7,12 +7,10 @@ import os
 app = Flask(__name__)
 app.secret_key = "virus-secret-2026"
 
-# ===== SQLITE DATABASE (Չի expire-անում, աշխատում է Render-ում) =====
+# ===== SQLITE DATABASE =====
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'scores.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# ===== Սա է պակասում!!! =====
 db = SQLAlchemy(app)
 
 # ===== GROQ =====
@@ -42,7 +40,7 @@ class Score(db.Model):
             'date': self.date
         }
 
-# ===== QUESTIONS =====
+# ===== QUESTIONS (3 languages) =====
 questions_db = {
     'very_easy': {
         'hy': [
@@ -249,31 +247,6 @@ def set_language(lang):
         session['lang'] = lang
     return redirect(request.referrer or '/')
 
-
-# ===== KNOWLEDGE BASE FOR AI =====
-VIRUS_KNOWLEDGE = """
-🦠 COVID-19 (SARS-CoV-2): հայտնաբերվել է 2019թ., օդակաթիլային փոխանցում, մահացությունը ~2%, ախտանիշներ՝ ջերմություն, հազ, շնչահեղձություն: Պատվաստանյութը mRNA (Pfizer, Moderna):
-🦠 Էբոլա (Ebola): հայտնաբերվել է 1976թ., փոխանցվում է մարմնի հեղուկներով, մահացությունը 50-90%, ախտանիշներ՝ արյունահոսություն, ջերմություն: Պատվաստանյութը Ervebo (2019):
-🦠 ՄԻԱՎ (HIV): հայտնաբերվել է 1983թ., արյան և սեռական ճանապարհով, մահացությունը բուժման դեպքում <0.1%, ախտանիշներ՝ իմունային անբավարարություն: Պատվաստանյութ չկա:
-🦠 Գրիպ (Influenza): ամենատարածված վիրուսային հիվանդությունը, օդակաթիլային, մահացությունը ~0.1%, ամենամյա պատվաստանյութ:
-🦠 Ռոտավիրուս (Rotavirus): հայտնաբերվել է 1973թ., ֆեկալ-օրալ, մահացությունը 0.1%, կա պատվաստանյութ (Rotarix, RotaTeq):
-🦠 Ադենովիրուս (Adenovirus): հայտնաբերվել է 1953թ., օդակաթիլային, մահացությունը <1%, կա պատվաստանյութ (Ad4, Ad7):
-🦠 Դենգե (Dengue): մոծակների միջոցով, ախտանիշներ՝ բարձր ջերմություն, ցան, հոդացավ, մահացությունը <1%:
-🦠 Hantavirus: կրծողների միջոցով, ախտանիշներ՝ շնչառական սինդրոմ, մահացությունը 38%:
-🦠 Nipah: չղջիկների միջոցով, ախտանիշներ՝ էնցեֆալիտ, մահացությունը 70%:
-🦠 Zika: մոծակների միջոցով, ախտանիշներ՝ միկրոցեֆալիա նորածինների մոտ:
-🦠 MERS-CoV: ուղտերի միջոցով, մահացությունը 35%:
-🦠 Պոլիո (Poliovirus): ֆեկալ-օրալ, կաթվածահարում, պատվաստանյութը վերացրել է հիվանդությունը:
-🦠 Կարմրուկ (Measles): օդակաթիլային, մահացությունը 0.2%, ախտանիշներ՝ ցան, ջերմություն, հազ:
-🦠 Ջրծաղիկ (Smallpox): Variola major, վերացվել է 1980թ., 30% մահացություն:
-🦠 HPV (Papillomavirus): սեռական ճանապարհով, առաջացնում է արգանդի վզիկի քաղցկեղ, կա պատվաստանյութ:
-🦠 RSV (Respiratory Syncytial Virus): մանկական շնչառական վարակ, մահացությունը 0.1%:
-🦠 H1N1 (Swine flu): 2009 թ. համաճարակ, 18% մահացություն:
-🦠 Lassa: կրծողների միջոցով, մահացությունը 1%:
-🦠 Marburg: Էբոլայի նման, 90% մահացություն:
-🦠 Norovirus: ստամոքս-աղիքային, փսխում, լուծ, 0.01% մահացություն:
-"""
-
 # ===== TRANSLATIONS =====
 translations = {
     'hy': {
@@ -403,11 +376,11 @@ translations = {
         'safety_rule2': ' ՀԱՆԿԱՐԾ մի թեքեք սարքը, որպեսզի ալկոհոլի հեղուկը չթափվի:',
         'safety_rule3': ' Սարքը տեղադրեք կայուն, հարթ մակերևույթի վրա:',
         'safety_rule4': ' Մի ծածկեք օդի մուտքի/ելքի անցքերը:',
+        'safety_rule5': ' Մոդելը չմիացնել պատուհանի մոտ, քանի որ քամին խառնում և անհավասարաչափ բրդում է հեղուկը:',
         'recommendation_title': '✅ Խորհուրդ',
         'recommendation_text': 'Սարքը միացնել օրվա ընթացքում 20-30 րոպե մեկ սենյակի համար: Բավարար է օդը մաքուր և ախտահանված պահելու համար:',
         'conclusion_title': '📌 Եզրակացություն',
-        'conclusion_text': 'Այս մոդելը ցույց է տալիս, թե ինչպես ինժեներական մոտեցմամբ կարելի է ստեղծել արդյունավետ, ցածր գնով և տեսողական ուժեղ ազդեցությամբ ախտահանիչ սարք:',
-        'safety_rule5': ' Մոդելը չմիացնել պատուհանի մոտ, քանի որ քամին խառնում և անհավասարաչափ բրդում է հեղուկը:'
+        'conclusion_text': 'Այս մոդելը ցույց է տալիս, թե ինչպես ինժեներական մոտեցմամբ կարելի է ստեղծել արդյունավետ, ցածր գնով և տեսողական ուժեղ ազդեցությամբ ախտահանիչ սարք:'
     },
     'ru': {
         'home': '🏠 Главная',
@@ -536,10 +509,10 @@ translations = {
         'safety_rule2': ' НИ В КОЕМ СЛУЧАЕ не наклоняйте устройство, чтобы спиртовая жидкость не вылилась.',
         'safety_rule3': ' Устанавливайте устройство на устойчивую ровную поверхность.',
         'safety_rule4': ' Не закрывайте входные/выходные отверстия для воздуха.',
+        'safety_rule5': ' Не включайте устройство рядом с окном, так как ветер перемешивает и неравномерно взбалтывает жидкость.',
         'recommendation_title': '✅ Рекомендация',
         'recommendation_text': 'Включайте устройство на 20–30 минут в день на одно помещение. Этого достаточно для поддержания чистого и обеззараженного воздуха.',
         'conclusion_title': '📌 Заключение',
-        'safety_rule5': ' Не включайте устройство рядом с окном, так как ветер перемешивает и неравномерно взбалтывает жидкость.',
         'conclusion_text': 'Эта модель показывает, как с помощью инженерного подхода можно создать эффективное, недорогое и визуально эффектное дезинфицирующее устройство.'
     },
     'en': {
@@ -669,10 +642,10 @@ translations = {
         'safety_rule2': ' NEVER tilt the device, otherwise the alcohol liquid may spill.',
         'safety_rule3': ' Place the device on a stable, flat surface.',
         'safety_rule4': ' Do not cover the air intake/exhaust vents.',
+        'safety_rule5': ' Do not turn on the device near a window, as the wind stirs and unevenly shakes the liquid.',
         'recommendation_title': '✅ Recommendation',
         'recommendation_text': 'Run the device for 20–30 minutes per day per room. This is enough to keep the air clean and disinfected.',
         'conclusion_title': '📌 Conclusion',
-        'safety_rule5': ' Do not turn on the device near a window, as the wind stirs and unevenly shakes the liquid.',
         'conclusion_text': 'This model shows how an engineering approach can create an effective, low‑cost, visually impactful sterilizer.'
     }
 }
@@ -681,7 +654,6 @@ translations = {
 def inject_translations():
     lang = get_lang()
     return {'t': translations.get(lang, translations['hy'])}
-
 
 # ===== ROUTES =====
 @app.route("/")
@@ -695,7 +667,7 @@ def map_page():
 @app.route("/air-purifier")
 def air_purifier():
     return render_template("air_purifier.html")
-    
+
 @app.route("/quiz")
 def quiz_choice():
     return render_template("quiz_choice.html")
@@ -705,7 +677,7 @@ def quiz(level):
     if level not in questions_db:
         return redirect("/quiz")
     
-    all_questions = questions_db[level]   # <--- Սա {'hy': [...], 'ru': [...], 'en': [...]}
+    all_questions = questions_db[level]
     
     level_names = {
         'very_easy': {'hy': 'Շատ հեշտ', 'ru': 'Очень легкий', 'en': 'Very Easy'},
@@ -721,10 +693,10 @@ def quiz(level):
     
     return render_template("quiz.html",
         level=level,
-        level_name=level_names[level],   # <--- dictionary
+        level_name=level_names[level],
         level_class=level_classes[level],
-        questions=all_questions,         # <--- ամբողջ dict-ը
-        total=len(all_questions['hy'])   # <--- total-ը վերցնում ենք հայերենից
+        questions=all_questions,
+        total=len(all_questions['hy'])
     )
 
 @app.route("/leaderboard")
@@ -764,32 +736,8 @@ def save_score():
     db.session.commit()
     return jsonify({'success': True})
 
-
-@app.route("/api/chat", methods=['POST'])
-def chat():
-    try:
-        data = request.json
-        user_message = data.get('message', '')
-        language = data.get('language', 'hy')
-        
-        if 'chat_history' not in session:
-            session['chat_history'] = []
-        
-        # Ավելացնել նոր հաղորդագրություն
-        session['chat_history'].append({"role": "user", "content": user_message})
-        
-        # Պահել միայն վերջին 4 հաղորդագրությունը (2 հարց + 2 պատասխան)
-        if len(session['chat_history']) > 4:
-            session['chat_history'] = session['chat_history'][-4:]
-        
-        # Կառուցել կարճ պատմություն (առանց ավելորդ տեքստի)
-        history_text = ""
-        for msg in session['chat_history'][:-1]:
-            role = "User" if msg['role'] == 'user' else "Assistant"
-            history_text += f"{role}: {msg['content']}\n"
-        
-        # Կարճ, հստակ knowledge base (միայն ամենակարևոր վիրուսները)
-        KNOWLEDGE_SHORT = """
+# ===== AI KNOWLEDGE BASE (SHORT) =====
+KNOWLEDGE_SHORT = """
 COVID-19: 2019, airborne, fever/cough, vaccine available
 Ebola: 1976, body fluids, bleeding/fever, mortality 50-90%
 HIV: 1983, blood/sexual, weakens immune system, no vaccine
@@ -805,11 +753,32 @@ Polio: paralysis, vaccine
 Measles: rash/fever/cough, vaccine
 Smallpox: eradicated 1980
 HPV: cervical cancer, vaccine
+Norovirus: gastroenteritis
 """
+
+# ===== CHAT ENDPOINT (NON-STREAMING) =====
+@app.route("/api/chat", methods=['POST'])
+def chat():
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        language = data.get('language', 'hy')
         
-        # Պարզ, կարճ prompts (առանց ավելորդ հրահանգների)
+        if 'chat_history' not in session:
+            session['chat_history'] = []
+        
+        session['chat_history'].append({"role": "user", "content": user_message})
+        
+        if len(session['chat_history']) > 4:
+            session['chat_history'] = session['chat_history'][-4:]
+        
+        history_text = ""
+        for msg in session['chat_history'][:-1]:
+            role = "User" if msg['role'] == 'user' else "Assistant"
+            history_text += f"{role}: {msg['content']}\n"
+        
         if language == 'hy':
-            system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով: 
+            system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով (1-2 նախադասություն):
 
 {history_text}
 
@@ -820,7 +789,7 @@ HPV: cervical cancer, vaccine
 
 Պատասխան:"""
         elif language == 'ru':
-            system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком.
+            system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком (1-2 предложения):
 
 {history_text}
 
@@ -831,7 +800,7 @@ HPV: cervical cancer, vaccine
 
 Ответ:"""
         else:
-            system_prompt = f"""You are a virus expert. Answer briefly, with correct English.
+            system_prompt = f"""You are a virus expert. Answer briefly, with correct English (1-2 sentences):
 
 {history_text}
 
@@ -842,15 +811,14 @@ Question: {user_message}
 
 Answer:"""
         
-        # Groq API call
         response = groq_client.chat.completions.create(
-            model="llama3-8b-8192",  # Ավելի կարճ մոդել (8B) 8192 context
+            model="llama3-8b-8192",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.3,
-            max_tokens=1024  # 8192-ը չափազանց մեծ է, 1024-ը բավարար է կարճ պատասխանների համար
+            temperature=0.2,
+            max_tokens=500
         )
         
         reply = response.choices[0].message.content
@@ -867,48 +835,43 @@ def chat_stream():
     user_message = data.get('message', '')
     language = data.get('language', 'hy')
     
-    prompts = {
-        'hy': f"""Դու վիրուսաբանության փորձագետ ես: 
-        ՎԻՐՈՒՍԱՅԻՆ ԳԻՏԵԼԻՔՆԵՐ.
-        {VIRUS_KNOWLEDGE}
-        
-        ԿԱՆՈՆՆԵՐ. Պատասխանի՛ր ՄԻԱՅՆ հայերենով, հակիրճ:
-        
-        ՀԱՐՑ. {user_message}
-        
-        ՊԱՏԱՍԽԱՆ.
-        """,
-        'ru': f"""Ты эксперт по вирусологии: 
-        БАЗА ЗНАНИЙ:
-        {VIRUS_KNOWLEDGE}
-        
-        ПРАВИЛА: Отвечай ТОЛЬКО на русском, кратко:
-        
-        ВОПРОС: {user_message}
-        
-        ОТВЕТ:
-        """,
-        'en': f"""You are a virology expert: 
-        KNOWLEDGE BASE:
-        {VIRUS_KNOWLEDGE}
-        
-        RULES: Answer ONLY in English, concisely:
-        
-        QUESTION: {user_message}
-        
-        ANSWER:
-        """
-    }
+    if language == 'hy':
+        system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով (1-2 նախադասություն):
+
+Տվյալներ:
+{KNOWLEDGE_SHORT}
+
+Հարց: {user_message}
+
+Պատասխան:"""
+    elif language == 'ru':
+        system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком (1-2 предложения):
+
+Данные:
+{KNOWLEDGE_SHORT}
+
+Вопрос: {user_message}
+
+Ответ:"""
+    else:
+        system_prompt = f"""You are a virus expert. Answer briefly, with correct English (1-2 sentences):
+
+Data:
+{KNOWLEDGE_SHORT}
+
+Question: {user_message}
+
+Answer:"""
     
     def generate():
         stream = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama3-8b-8192",
             messages=[
-                {"role": "system", "content": prompts.get(language, prompts['hy'])},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.5,
-            max_tokens=600,
+            temperature=0.2,
+            max_tokens=500,
             stream=True
         )
         
@@ -919,11 +882,9 @@ def chat_stream():
     
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
-
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
-
 
 with app.app_context():
     db.create_all()
