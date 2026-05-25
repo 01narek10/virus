@@ -856,7 +856,7 @@ def chat():
                 {"role": "user", "content": user_message}
             ],
             temperature=0.5,
-            max_tokens=600
+            max_tokens=8192
         )
         
         reply = response.choices[0].message.content
