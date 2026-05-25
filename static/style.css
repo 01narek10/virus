@@ -1760,3 +1760,53 @@ footer p { color: var(--text-secondary); }
     color: #2cc3ff;
 }
 .leaderboard-table tr:hover { background: rgba(44,195,255,0.1); }
+
+
+
+<style>
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(6, 20, 45, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+.leaderboard-table th {
+    background: linear-gradient(135deg, #2cc3ff, #1a9fd0);
+    color: white !important;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+.leaderboard-table td {
+    padding: 12px 15px;
+    color: white !important;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.leaderboard-table tr:hover td {
+    background: rgba(44, 195, 255, 0.2);
+}
+.leaderboard-table td:first-child {
+    color: #ffd700 !important;
+    font-weight: bold;
+}
+.leaderboard-table td:nth-child(4),
+.leaderboard-table td:nth-child(5) {
+    color: #6fcf97 !important;
+    font-weight: bold;
+}
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+.very-easy { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; }
+.easy { background: linear-gradient(135deg, #5cb85c, #3d8b3d); color: white; }
+.medium { background: linear-gradient(135deg, #ffc107, #b27a00); color: #0a192f; }
+.hard { background: linear-gradient(135deg, #fd7e14, #c25e00); color: white; }
+.very-hard { background: linear-gradient(135deg, #dc3545, #a71d2a); color: white; }
+</style>
