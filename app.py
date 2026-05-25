@@ -737,10 +737,11 @@ def save_score():
     return jsonify({'success': True})
 
 # ===== AI KNOWLEDGE BASE (SHORT) =====
+# ===== AI KNOWLEDGE BASE (SHORT) =====
 KNOWLEDGE_SHORT = """
-COVID-19: 2019, airborne, fever/cough, vaccine available
+COVID-19: 2019, airborne, fever/cough, vaccine
 Ebola: 1976, body fluids, bleeding/fever, mortality 50-90%
-HIV: 1983, blood/sexual, weakens immune system, no vaccine
+HIV: 1983, blood/sexual, weakens immunity, no vaccine
 Flu: airborne, fever/cough, annual vaccine
 Rotavirus: 1973, diarrhea/vomiting, vaccine
 Adenovirus: 1953, cold/sore throat, vaccine
@@ -753,10 +754,9 @@ Polio: paralysis, vaccine
 Measles: rash/fever/cough, vaccine
 Smallpox: eradicated 1980
 HPV: cervical cancer, vaccine
-Norovirus: gastroenteritis
 """
 
-# ===== CHAT ENDPOINT (NON-STREAMING) =====
+# ===== CHAT ENDPOINT =====
 @app.route("/api/chat", methods=['POST'])
 def chat():
     try:
@@ -769,8 +769,8 @@ def chat():
         
         session['chat_history'].append({"role": "user", "content": user_message})
         
-        if len(session['chat_history']) > 4:
-            session['chat_history'] = session['chat_history'][-4:]
+        if len(session['chat_history']) > 6:
+            session['chat_history'] = session['chat_history'][-6:]
         
         history_text = ""
         for msg in session['chat_history'][:-1]:
@@ -778,7 +778,7 @@ def chat():
             history_text += f"{role}: {msg['content']}\n"
         
         if language == 'hy':
-            system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով (1-2 նախադասություն):
+            system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով:
 
 {history_text}
 
@@ -789,7 +789,7 @@ def chat():
 
 Պատասխան:"""
         elif language == 'ru':
-            system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком (1-2 предложения):
+            system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком.
 
 {history_text}
 
@@ -800,7 +800,7 @@ def chat():
 
 Ответ:"""
         else:
-            system_prompt = f"""You are a virus expert. Answer briefly, with correct English (1-2 sentences):
+            system_prompt = f"""You are a virus expert. Answer briefly, with correct English.
 
 {history_text}
 
@@ -812,13 +812,13 @@ Question: {user_message}
 Answer:"""
         
         response = groq_client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.2,
-            max_tokens=500
+            temperature=0.3,
+            max_tokens=1024
         )
         
         reply = response.choices[0].message.content
@@ -835,8 +835,24 @@ def chat_stream():
     user_message = data.get('message', '')
     language = data.get('language', 'hy')
     
+    if 'chat_history' not in session:
+        session['chat_history'] = []
+    
+    # Add user message to history
+    session['chat_history'].append({"role": "user", "content": user_message})
+    
+    if len(session['chat_history']) > 6:
+        session['chat_history'] = session['chat_history'][-6:]
+    
+    history_text = ""
+    for msg in session['chat_history'][:-1]:
+        role = "User" if msg['role'] == 'user' else "Assistant"
+        history_text += f"{role}: {msg['content']}\n"
+    
     if language == 'hy':
-        system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով (1-2 նախադասություն):
+        system_prompt = f"""Դու վիրուսների մասնագետ: Պատասխանիր հակիրճ, ճիշտ հայերենով:
+
+{history_text}
 
 Տվյալներ:
 {KNOWLEDGE_SHORT}
@@ -845,7 +861,9 @@ def chat_stream():
 
 Պատասխան:"""
     elif language == 'ru':
-        system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком (1-2 предложения):
+        system_prompt = f"""Ты специалист по вирусам. Отвечай кратко, правильным русским языком.
+
+{history_text}
 
 Данные:
 {KNOWLEDGE_SHORT}
@@ -854,7 +872,9 @@ def chat_stream():
 
 Ответ:"""
     else:
-        system_prompt = f"""You are a virus expert. Answer briefly, with correct English (1-2 sentences):
+        system_prompt = f"""You are a virus expert. Answer briefly, with correct English.
+
+{history_text}
 
 Data:
 {KNOWLEDGE_SHORT}
@@ -865,19 +885,25 @@ Answer:"""
     
     def generate():
         stream = groq_client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
             ],
-            temperature=0.2,
-            max_tokens=500,
+            temperature=0.3,
+            max_tokens=1024,
             stream=True
         )
         
+        full_reply = ""
         for chunk in stream:
             if chunk.choices[0].delta.content:
-                yield f"data: {chunk.choices[0].delta.content}\n\n"
+                content = chunk.choices[0].delta.content
+                full_reply += content
+                yield f"data: {content}\n\n"
+        
+        # Save assistant response to history
+        session['chat_history'].append({"role": "assistant", "content": full_reply})
         yield "data: [DONE]\n\n"
     
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
